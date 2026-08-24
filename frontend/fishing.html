@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fishing Intelligence - ORCA Marine Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@500&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ee0000",
+                      "secondary": "#0057c0",
+                      "on-primary": "#ffffff",
+                      "body": "#4d4d4d",
+                      "on-tertiary": "#ffffff",
+                      "inverse-surface": "#2f3131",
+                      "surface-dim": "#dadada",
+                      "on-surface-variant": "#444748",
+                      "surface-bright": "#f9f9f9",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed-variant": "#004397",
+                      "on-background": "#1a1c1c",
+                      "outline-variant": "#c4c7c7",
+                      "surface-container": "#eeeeee",
+                      "on-tertiary-fixed-variant": "#484645",
+                      "surface": "#f9f9f9",
+                      "outline": "#747878",
+                      "mute": "#8f8f8f",
+                      "primary-fixed": "#e5e2e1",
+                      "tertiary-fixed-dim": "#cac6c4",
+                      "background": "#f9f9f9",
+                      "tertiary": "#000000",
+                      "primary-container": "#1c1b1b",
+                      "surface-container-highest": "#e2e2e2",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#006ff0",
+                      "on-tertiary-container": "#868382",
+                      "inverse-primary": "#c8c6c5",
+                      "tertiary-container": "#1c1b1a",
+                      "on-primary-container": "#858383",
+                      "ink": "#171717",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "hairline": "#ebebeb",
+                      "surface-container-low": "#f3f3f3",
+                      "surface-tint": "#5f5e5e",
+                      "on-tertiary-fixed": "#1c1b1a",
+                      "on-primary-fixed": "#1c1b1b",
+                      "primary": "#000000",
+                      "gradient-cyan": "#00dfd8",
+                      "on-secondary-fixed": "#001a43",
+                      "secondary-fixed": "#d8e2ff",
+                      "tertiary-fixed": "#e6e2df",
+                      "gradient-blue": "#007cf0",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "on-surface": "#1a1c1c",
+                      "canvas": "#fafafa",
+                      "warning": "#f5a623",
+                      "surface-variant": "#e2e2e2",
+                      "secondary-fixed-dim": "#aec6ff",
+                      "on-primary-fixed-variant": "#474746",
+                      "surface-container-high": "#e8e8e8",
+                      "canvas-elevated": "#ffffff",
+                      "gradient-violet": "#7928ca",
+                      "inverse-on-surface": "#f0f1f1",
+                      "on-secondary-container": "#fefcff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "2xl": "40px",
+                      "xs": "8px",
+                      "sm": "12px",
+                      "section": "128px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "4xl": "96px",
+                      "xxs": "4px",
+                      "xl": "32px",
+                      "3xl": "64px"
+              },
+              "fontFamily": {
+                      "label-mono": [
+                              "Geist Mono", "monospace"
+                      ],
+                      "display-xl": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "button-app": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "body-md": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "button-marketing": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "headline-md": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "headline-lg": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "body-lg": [
+                              "Geist Sans", "sans-serif"
+                      ]
+              },
+              "fontSize": {
+                      "label-mono": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-2.4px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "button-app": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "button-marketing": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "letterSpacing": "-0.4px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-1.28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        body {
+            background-color: #FAFAFA; /* canvas */
+        }
+    </style>
+</head>
+<body class="flex bg-canvas h-screen overflow-hidden text-body font-body-md">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen flex flex-col pt-20 pb-lg px-md w-64 z-40 bg-surface border-r border-hairline hidden md:flex">
+  <div class="mb-xl px-sm cursor-pointer" onclick="window.location.href='index.html'">
+    <h1 class="font-headline-md text-headline-md font-bold text-ink">ORCA Marine</h1>
+    <p class="font-label-mono text-label-mono text-mute mt-1">Intelligence Platform</p>
+  </div>
+  <ul class="flex flex-col gap-xs flex-1">
+        <li onclick="window.location.href='index.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">info</span>
+          <span class="font-button-app text-button-app">About ORCA</span>
+        </li>
+        <li onclick="window.location.href='dashboard.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="font-button-app text-button-app">Dashboard</span>
+        </li>
+        <li onclick="window.location.href='assistant.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">smart_toy</span>
+          <span class="font-button-app text-button-app">Marine Assistant</span>
+        </li>
+        <li onclick="window.location.href='map.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">map</span>
+          <span class="font-button-app text-button-app">Intelligence Map</span>
+        </li>
+        <li onclick="window.location.href='safety.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">warning</span>
+          <span class="font-button-app text-button-app">Safety & Alerts</span>
+        </li>
+        <li onclick="window.location.href='fishing.html'" class="group flex items-center gap-sm p-sm cursor-pointer bg-surface-container-low text-ink font-medium rounded-lg">
+          <span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">sailing</span>
+          <span class="font-button-app text-button-app">Fishing Intelligence</span>
+        </li>
+        <li onclick="window.location.href='route.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">route</span>
+          <span class="font-button-app text-button-app">Route Planning</span>
+        </li>
+        <li onclick="window.location.href='reports.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">analytics</span>
+          <span class="font-button-app text-button-app">Reports & Insights</span>
+        </li>
+  </ul>
+  <div class="mt-auto">
+    <div onclick="window.location.href='settings.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-button-app text-button-app">Settings</span>
+    </div>
+  </div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 h-screen overflow-y-auto relative">
+<!-- TopNavBar (Mobile Only Fallback Header for this specific layout to allow full map, but keeping standard structure) -->
+<header class="md:hidden sticky top-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface/70 backdrop-blur-md border-b border-hairline">
+<span class="font-headline-md text-headline-md font-bold text-ink">ORCA</span>
+<div class="flex gap-md text-primary">
+<span class="material-symbols-outlined cursor-pointer" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer" data-icon="help_outline">help_outline</span>
+</div>
+</header>
+<div class="p-md md:p-xl lg:p-3xl max-w-7xl mx-auto space-y-xl">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-ink">Fishing Intelligence</h2>
+<p class="font-body-lg text-body-lg text-body mt-xs">Real-time marine conditions and predictive catch zones.</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-sm rounded-lg border border-hairline bg-surface-container-lowest text-ink font-button-app text-button-app hover:bg-surface-container-low transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">filter_list</span> Filter Data
+                    </button>
+<button class="px-md py-sm rounded-lg bg-ink text-on-primary font-button-app text-button-app hover:bg-primary-container transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">refresh</span> Update Scan
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Main Map Area (Spans 8 cols) -->
+<div class="lg:col-span-8 bg-surface-container-lowest border border-hairline rounded-[12px] p-sm flex flex-col h-[600px] relative overflow-hidden">
+<div class="flex justify-between items-center px-md py-xs mb-sm border-b border-hairline pb-sm">
+<div class="flex gap-md">
+<span class="font-label-mono text-label-mono bg-surface-container-low px-xs py-xxs rounded text-body flex items-center gap-xxs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Live SST
+                            </span>
+<span class="font-label-mono text-label-mono bg-surface-container-low px-xs py-xxs rounded text-body flex items-center gap-xxs">
+<span class="w-2 h-2 rounded-full bg-warning"></span> Chlorophyll-a
+                            </span>
+</div>
+<div class="font-label-mono text-label-mono text-mute">
+                            Data Updated: Just Now
+                        </div>
+</div>
+<!-- Map Placeholder -->
+<div class="flex-1 bg-surface-variant rounded-lg relative overflow-hidden" data-location="North Sea Fishing Grounds" style="">
+<img class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="A highly detailed, top-down satellite style interface map of a deep ocean region in high-contrast light mode. The map shows thermal gradients in cool blues and stark white contour lines. Several technical hexagonal overlays indicate potential zones. The aesthetic is clean, precise, and resembles a high-end military or commercial marine dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4bZCxxNZAK-IuKyO10a7jSgzLNRq_nKDfkVnDaAIgLA-gbxHZjrzFvFwbkK3aV0LI-MsMOpqjU4jnYav5p9SpCeybYgYvbXavXXl2ZkQFflT2BbqOwnBtOYIRo7fVYUUXREvGsylS5hQevzMSn0O6mbv2c7man2jp6XqPtqNxd_keJiNHSoWEZafOgO1Fm-MC_1mNi2Srp4PqbRds6jIb403WD8UsF6cF-4sjXC2GUwe_HDUpQRHtTQ"/>
+<!-- Map Overlays -->
+<div class="absolute inset-0 p-lg">
+<!-- Target Indicator -->
+<div class="absolute top-1/3 left-1/2 w-16 h-16 rounded-full border border-secondary flex items-center justify-center bg-secondary/10 backdrop-blur-sm cursor-pointer animate-pulse">
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+<span class="absolute -top-6 bg-surface-container-lowest text-ink font-label-mono text-label-mono px-xs py-xxs border border-hairline rounded whitespace-nowrap shadow-sm">Sector Bravo-3</span>
+</div>
+<!-- Secondary Indicator -->
+<div class="absolute bottom-1/3 right-1/4 w-12 h-12 rounded-full border border-warning flex items-center justify-center bg-warning/10 backdrop-blur-sm cursor-pointer opacity-70">
+<div class="w-1.5 h-1.5 bg-warning rounded-full"></div>
+<span class="absolute -top-6 bg-surface-container-lowest text-ink font-label-mono text-label-mono px-xs py-xxs border border-hairline rounded whitespace-nowrap shadow-sm">Sector Alpha-9</span>
+</div>
+</div>
+<!-- Map Controls -->
+<div class="absolute right-md bottom-md flex flex-col gap-xs">
+<button class="w-8 h-8 bg-surface-container-lowest border border-hairline rounded-lg flex items-center justify-center text-ink hover:bg-surface-container-low shadow-sm">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="w-8 h-8 bg-surface-container-lowest border border-hairline rounded-lg flex items-center justify-center text-ink hover:bg-surface-container-low shadow-sm">
+<span class="material-symbols-outlined text-sm">remove</span>
+</button>
+<button class="w-8 h-8 bg-surface-container-lowest border border-hairline rounded-lg flex items-center justify-center text-ink hover:bg-surface-container-low shadow-sm mt-xs">
+<span class="material-symbols-outlined text-sm">my_location</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Side Panel (Spans 4 cols) -->
+<div class="lg:col-span-4 space-y-lg flex flex-col h-[600px]">
+<!-- Top Recommendation Card -->
+<div class="bg-surface-container-lowest border border-hairline rounded-[16px] p-lg flex-shrink-0 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary to-gradient-cyan"></div>
+<div class="flex justify-between items-start mb-md">
+<div>
+<span class="font-label-mono text-label-mono text-secondary mb-xxs block uppercase tracking-wider">Top Recommendation</span>
+<h3 class="font-headline-md text-headline-md text-ink">Sector Bravo-3</h3>
+</div>
+<div class="bg-surface-container-low px-sm py-xs rounded-lg flex flex-col items-end border border-hairline">
+<span class="font-headline-md text-headline-md text-ink leading-none">94<span class="text-sm text-mute">%</span></span>
+<span class="font-label-mono text-label-mono text-mute">Suitability</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm mb-lg">
+<div class="bg-surface p-sm rounded-lg border border-hairline">
+<div class="flex items-center gap-xs text-mute mb-xs">
+<span class="material-symbols-outlined text-sm">navigation</span>
+<span class="font-label-mono text-label-mono">Distance</span>
+</div>
+<div class="font-body-md text-body-md text-ink font-medium">12.4 NM</div>
+</div>
+<div class="bg-surface p-sm rounded-lg border border-hairline">
+<div class="flex items-center gap-xs text-mute mb-xs">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="font-label-mono text-label-mono">Est. ETA</span>
+</div>
+<div class="font-body-md text-body-md text-ink font-medium">1h 15m</div>
+</div>
+</div>
+<div class="space-y-sm">
+<h4 class="font-label-mono text-label-mono text-ink">Why This Area Is Recommended:</h4>
+<ul class="space-y-xs">
+<li class="flex items-start gap-xs">
+<span class="material-symbols-outlined text-secondary text-sm mt-0.5">check_circle</span>
+<span class="font-body-md text-body-md text-body">Optimal thermal front detected (14.2°C).</span>
+</li>
+<li class="flex items-start gap-xs">
+<span class="material-symbols-outlined text-secondary text-sm mt-0.5">check_circle</span>
+<span class="font-body-md text-body-md text-body">High chlorophyll concentration indicating baitfish.</span>
+</li>
+</ul>
+</div>
+<button class="mt-md w-full bg-surface-container-lowest border border-outline-variant text-ink font-button-app text-button-app py-sm rounded-[6px] hover:bg-surface-container-low transition-colors">
+                            Set as Waypoint
+                        </button>
+</div>
+<!-- Marine Indicators Brief -->
+<div class="bg-surface-container-lowest border border-hairline rounded-[12px] p-lg flex-1 overflow-y-auto">
+<h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md">Marine Indicators</h3>
+<div class="space-y-md">
+<!-- Indicator 1 -->
+<div>
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-mono text-label-mono text-mute">Sea Surface Temp (SST)</span>
+<span class="font-label-mono text-label-mono text-ink">14.2°C</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden flex">
+<div class="h-full bg-gradient-blue w-1/3"></div>
+<div class="h-full bg-secondary w-1/3"></div>
+<div class="h-full bg-error w-1/3 opacity-20"></div>
+</div>
+</div>
+<!-- Indicator 2 -->
+<div>
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-mono text-label-mono text-mute">Chlorophyll-a</span>
+<span class="font-label-mono text-label-mono text-ink">2.4 mg/m³</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden flex">
+<div class="h-full bg-gradient-cyan w-[70%]"></div>
+</div>
+</div>
+<!-- Indicator 3 -->
+<div>
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-mono text-label-mono text-mute">Current Velocity</span>
+<span class="font-label-mono text-label-mono text-ink">1.2 kts</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden flex">
+<div class="h-full bg-ink w-[40%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Zone Comparison Table -->
+<div class="bg-surface-container-lowest border border-hairline rounded-[12px] overflow-hidden">
+<div class="p-lg border-b border-hairline flex justify-between items-center bg-surface/50">
+<h3 class="font-body-lg text-body-lg text-ink font-semibold">Zone Comparison</h3>
+<button class="font-label-mono text-label-mono text-secondary hover:underline">View Full Analysis</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest border-b border-hairline font-label-mono text-label-mono text-mute uppercase">
+<th class="p-md font-medium">Sector</th>
+<th class="p-md font-medium">Score</th>
+<th class="p-md font-medium">Distance</th>
+<th class="p-md font-medium">SST</th>
+<th class="p-md font-medium">Activity Level</th>
+<th class="p-md font-medium">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-ink">
+<tr class="border-b border-hairline hover:bg-surface-container-lowest/50 transition-colors bg-surface/30">
+<td class="p-md flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="font-medium">Bravo-3</span>
+</td>
+<td class="p-md"><span class="bg-surface-container-high px-xs py-xxs rounded text-ink font-label-mono text-label-mono">94%</span></td>
+<td class="p-md text-body">12.4 NM</td>
+<td class="p-md text-body">14.2°C</td>
+<td class="p-md">
+<span class="text-secondary flex items-center gap-xs text-sm"><span class="material-symbols-outlined text-[16px]">trending_up</span> High</span>
+</td>
+<td class="p-md">
+<button class="text-secondary font-medium hover:underline text-sm">Select</button>
+</td>
+</tr>
+<tr class="border-b border-hairline hover:bg-surface-container-lowest/50 transition-colors">
+<td class="p-md flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-warning"></div>
+                                    Alpha-9
+                                </td>
+<td class="p-md"><span class="bg-surface-container-high px-xs py-xxs rounded text-ink font-label-mono text-label-mono">78%</span></td>
+<td class="p-md text-body">24.1 NM</td>
+<td class="p-md text-body">15.1°C</td>
+<td class="p-md">
+<span class="text-warning flex items-center gap-xs text-sm"><span class="material-symbols-outlined text-[16px]">trending_flat</span> Medium</span>
+</td>
+<td class="p-md">
+<button class="text-body font-medium hover:text-ink text-sm transition-colors">Select</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest/50 transition-colors">
+<td class="p-md flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-mute"></div>
+                                    Delta-1
+                                </td>
+<td class="p-md"><span class="bg-surface-container-high px-xs py-xxs rounded text-ink font-label-mono text-label-mono">62%</span></td>
+<td class="p-md text-body">8.5 NM</td>
+<td class="p-md text-body">13.8°C</td>
+<td class="p-md">
+<span class="text-mute flex items-center gap-xs text-sm"><span class="material-symbols-outlined text-[16px]">trending_down</span> Low</span>
+</td>
+<td class="p-md">
+<button class="text-body font-medium hover:text-ink text-sm transition-colors">Select</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</body></html>

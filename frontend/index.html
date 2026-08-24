@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORCA Marine Intelligence - Landing Page</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ee0000",
+                      "secondary": "#0057c0",
+                      "on-primary": "#ffffff",
+                      "body": "#4d4d4d",
+                      "on-tertiary": "#ffffff",
+                      "inverse-surface": "#2f3131",
+                      "surface-dim": "#dadada",
+                      "on-surface-variant": "#444748",
+                      "surface-bright": "#f9f9f9",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed-variant": "#004397",
+                      "on-background": "#1a1c1c",
+                      "outline-variant": "#c4c7c7",
+                      "surface-container": "#eeeeee",
+                      "on-tertiary-fixed-variant": "#484645",
+                      "surface": "#f9f9f9",
+                      "outline": "#747878",
+                      "mute": "#8f8f8f",
+                      "primary-fixed": "#e5e2e1",
+                      "tertiary-fixed-dim": "#cac6c4",
+                      "background": "#f9f9f9",
+                      "tertiary": "#000000",
+                      "primary-container": "#1c1b1b",
+                      "surface-container-highest": "#e2e2e2",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#006ff0",
+                      "on-tertiary-container": "#868382",
+                      "inverse-primary": "#c8c6c5",
+                      "tertiary-container": "#1c1b1a",
+                      "on-primary-container": "#858383",
+                      "ink": "#171717",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "hairline": "#ebebeb",
+                      "surface-container-low": "#f3f3f3",
+                      "surface-tint": "#5f5e5e",
+                      "on-tertiary-fixed": "#1c1b1a",
+                      "on-primary-fixed": "#1c1b1b",
+                      "primary": "#000000",
+                      "gradient-cyan": "#00dfd8",
+                      "on-secondary-fixed": "#001a43",
+                      "secondary-fixed": "#d8e2ff",
+                      "tertiary-fixed": "#e6e2df",
+                      "gradient-blue": "#007cf0",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "on-surface": "#1a1c1c",
+                      "canvas": "#fafafa",
+                      "warning": "#f5a623",
+                      "surface-variant": "#e2e2e2",
+                      "secondary-fixed-dim": "#aec6ff",
+                      "on-primary-fixed-variant": "#474746",
+                      "surface-container-high": "#e8e8e8",
+                      "canvas-elevated": "#ffffff",
+                      "gradient-violet": "#7928ca",
+                      "inverse-on-surface": "#f0f1f1",
+                      "on-secondary-container": "#fefcff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "2xl": "40px",
+                      "xs": "8px",
+                      "sm": "12px",
+                      "section": "128px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "4xl": "96px",
+                      "xxs": "4px",
+                      "xl": "32px",
+                      "3xl": "64px"
+              },
+              "fontFamily": {
+                      "label-mono": [
+                              "Geist Mono", "monospace"
+                      ],
+                      "display-xl": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "button-app": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "body-md": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "button-marketing": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "headline-md": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "headline-lg": [
+                              "Geist Sans", "sans-serif"
+                      ],
+                      "body-lg": [
+                              "Geist Sans", "sans-serif"
+                      ]
+              },
+              "fontSize": {
+                      "label-mono": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-2.4px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "button-app": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "button-marketing": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "letterSpacing": "-0.4px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-1.28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .mesh-gradient {
+            background-color: #fafafa;
+            background-image: 
+                radial-gradient(at 10% 20%, hsla(178,100%,44%,0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(209,100%,47%,0.15) 0px, transparent 50%),
+                radial-gradient(at 40% 80%, hsla(270,66%,63%,0.15) 0px, transparent 50%);
+        }
+      </style>
+</head>
+<body class="bg-canvas text-body font-body-md antialiased min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="fixed left-0 top-0 h-screen flex flex-col pt-20 pb-lg px-md w-64 z-40 bg-surface border-r border-hairline hidden md:flex">
+  <div class="mb-xl px-sm cursor-pointer" onclick="window.location.href='index.html'">
+    <h1 class="font-headline-md text-headline-md font-bold text-ink">ORCA Marine</h1>
+    <p class="font-label-mono text-label-mono text-mute mt-1">Intelligence Platform</p>
+  </div>
+  <ul class="flex flex-col gap-xs flex-1">
+        <li onclick="window.location.href='index.html'" class="group flex items-center gap-sm p-sm cursor-pointer bg-surface-container-low text-ink font-medium rounded-lg">
+          <span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">info</span>
+          <span class="font-button-app text-button-app">About ORCA</span>
+        </li>
+        <li onclick="window.location.href='dashboard.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="font-button-app text-button-app">Dashboard</span>
+        </li>
+        <li onclick="window.location.href='assistant.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">smart_toy</span>
+          <span class="font-button-app text-button-app">Marine Assistant</span>
+        </li>
+        <li onclick="window.location.href='map.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">map</span>
+          <span class="font-button-app text-button-app">Intelligence Map</span>
+        </li>
+        <li onclick="window.location.href='safety.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">warning</span>
+          <span class="font-button-app text-button-app">Safety & Alerts</span>
+        </li>
+        <li onclick="window.location.href='fishing.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">sailing</span>
+          <span class="font-button-app text-button-app">Fishing Intelligence</span>
+        </li>
+        <li onclick="window.location.href='route.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">route</span>
+          <span class="font-button-app text-button-app">Route Planning</span>
+        </li>
+        <li onclick="window.location.href='reports.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">analytics</span>
+          <span class="font-button-app text-button-app">Reports & Insights</span>
+        </li>
+  </ul>
+  <div class="mt-auto">
+    <div onclick="window.location.href='settings.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-button-app text-button-app">Settings</span>
+    </div>
+  </div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 w-full">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex flex-col items-center justify-center text-center px-4 md:px-3xl py-section mesh-gradient overflow-hidden border-b border-hairline">
+<div class="z-10 max-w-4xl mx-auto flex flex-col items-center gap-lg">
+<div class="font-label-mono text-label-mono bg-surface-container-highest px-sm py-xxs rounded-DEFAULT text-body border border-hairline mb-4">
+                    INTRODUCING ORCA v1.0
+                </div>
+<h1 class="font-display-xl text-display-xl text-ink">Marine Intelligence,<br/>Made Actionable</h1>
+<p class="font-body-lg text-body-lg text-body max-w-2xl mt-4">
+                    ORCA leverages advanced agentic AI reasoning to synthesize complex meteorological, navigational, and operational marine data into clear, actionable intelligence for professionals at sea.
+                </p>
+<div class="mt-xl flex flex-wrap gap-md justify-center">
+<button class="bg-ink text-on-primary font-button-marketing text-button-marketing px-xl py-sm rounded-full hover:opacity-90 transition-opacity">
+                        Explore Platform
+                    </button>
+<button class="bg-surface border border-hairline text-ink font-button-app text-button-app px-xl py-sm rounded-lg hover:bg-surface-container-lowest transition-colors">
+                        Read Documentation
+                    </button>
+</div>
+</div>
+<!-- Decorative technical elements -->
+<div class="absolute bottom-10 left-10 font-label-mono text-label-mono text-mute hidden md:block">
+                SYS_STATUS: OPTIMAL<br/>LAT: 45.1234 N | LON: 12.5678 E
+            </div>
+</section>
+<!-- Features Section (Bento Grid) -->
+<section class="py-section px-4 md:px-3xl bg-canvas">
+<div class="max-w-7xl mx-auto">
+<div class="mb-2xl text-center md:text-left">
+<h2 class="font-headline-lg text-headline-lg text-ink">Core Capabilities</h2>
+<p class="font-body-md text-body-md text-body mt-2">Precision tools built for high-stakes maritime operations.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Feature Card 1 -->
+<div class="bg-canvas-elevated border border-hairline rounded-[12px] p-lg md:col-span-2 flex flex-col h-full hover:shadow-sm transition-shadow duration-300">
+<div class="bg-surface-container rounded-lg w-12 h-12 flex items-center justify-center mb-xl">
+<span class="material-symbols-outlined text-ink">forum</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-ink mb-sm">Conversational AI</h3>
+<p class="font-body-md text-body-md text-body flex-1">
+                            Interact with your vessel's data through natural language. Ask complex questions about fuel efficiency, weather routing, and system diagnostics, and receive intelligent, context-aware responses instantly.
+                        </p>
+<div class="mt-lg pt-lg border-t border-hairline flex gap-sm font-label-mono text-label-mono text-mute">
+<span class="bg-surface-container px-2 py-1 rounded-DEFAULT">NLP</span>
+<span class="bg-surface-container px-2 py-1 rounded-DEFAULT">Contextual Memory</span>
+</div>
+</div>
+<!-- Feature Card 2 -->
+<div class="bg-canvas-elevated border border-hairline rounded-[12px] p-lg flex flex-col h-full hover:shadow-sm transition-shadow duration-300">
+<div class="bg-surface-container rounded-lg w-12 h-12 flex items-center justify-center mb-xl">
+<span class="material-symbols-outlined text-ink">verified_user</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-ink mb-sm">Safety Assessment</h3>
+<p class="font-body-md text-body-md text-body flex-1">
+                            Real-time risk evaluation combining weather forecasting, vessel telemetry, and historical incident data to ensure proactive safety management.
+                        </p>
+</div>
+<!-- Feature Card 3 -->
+<div class="bg-canvas-elevated border border-hairline rounded-[12px] p-lg flex flex-col h-full md:col-span-3 lg:col-span-1 hover:shadow-sm transition-shadow duration-300">
+<div class="bg-surface-container rounded-lg w-12 h-12 flex items-center justify-center mb-xl">
+<span class="material-symbols-outlined text-ink">phishing</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-ink mb-sm">Fishing Intelligence</h3>
+<p class="font-body-md text-body-md text-body flex-1">
+                            Predictive modeling for optimal fishing grounds utilizing sea surface temperature, chlorophyll concentration, and historical yield data.
+                        </p>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

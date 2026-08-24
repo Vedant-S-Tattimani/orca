@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORCA - Safety &amp; Alerts</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ee0000",
+                        "secondary": "#0057c0",
+                        "on-primary": "#ffffff",
+                        "body": "#4d4d4d",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#2f3131",
+                        "surface-dim": "#dadada",
+                        "on-surface-variant": "#444748",
+                        "surface-bright": "#f9f9f9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#004397",
+                        "on-background": "#1a1c1c",
+                        "outline-variant": "#c4c7c7",
+                        "surface-container": "#eeeeee",
+                        "on-tertiary-fixed-variant": "#484645",
+                        "surface": "#f9f9f9",
+                        "outline": "#747878",
+                        "mute": "#8f8f8f",
+                        "primary-fixed": "#e5e2e1",
+                        "tertiary-fixed-dim": "#cac6c4",
+                        "background": "#f9f9f9",
+                        "tertiary": "#000000",
+                        "primary-container": "#1c1b1b",
+                        "surface-container-highest": "#e2e2e2",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#006ff0",
+                        "on-tertiary-container": "#868382",
+                        "inverse-primary": "#c8c6c5",
+                        "tertiary-container": "#1c1b1a",
+                        "on-primary-container": "#858383",
+                        "ink": "#171717",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "hairline": "#ebebeb",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-tint": "#5f5e5e",
+                        "on-tertiary-fixed": "#1c1b1a",
+                        "on-primary-fixed": "#1c1b1b",
+                        "primary": "#000000",
+                        "gradient-cyan": "#00dfd8",
+                        "on-secondary-fixed": "#001a43",
+                        "secondary-fixed": "#d8e2ff",
+                        "tertiary-fixed": "#e6e2df",
+                        "gradient-blue": "#007cf0",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "canvas": "#fafafa",
+                        "warning": "#f5a623",
+                        "surface-variant": "#e2e2e2",
+                        "secondary-fixed-dim": "#aec6ff",
+                        "on-primary-fixed-variant": "#474746",
+                        "surface-container-high": "#e8e8e8",
+                        "canvas-elevated": "#ffffff",
+                        "gradient-violet": "#7928ca",
+                        "inverse-on-surface": "#f0f1f1",
+                        "on-secondary-container": "#fefcff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "2xl": "40px",
+                        "xs": "8px",
+                        "sm": "12px",
+                        "section": "128px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "4xl": "96px",
+                        "xxs": "4px",
+                        "xl": "32px",
+                        "3xl": "64px"
+                    },
+                    "fontFamily": {
+                        "label-mono": ["Geist Mono"],
+                        "display-xl": ["Geist"],
+                        "button-app": ["Geist"],
+                        "body-md": ["Geist"],
+                        "button-marketing": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "body-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "label-mono": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "display-xl": ["48px", { "lineHeight": "48px", "letterSpacing": "-2.4px", "fontWeight": "600" }],
+                        "button-app": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "button-marketing": ["16px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.4px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-1.28px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                @apply bg-surface/70 backdrop-blur-md;
+            }
+        }
+    </style>
+</head>
+<body class="bg-canvas text-on-surface font-body-md min-h-screen flex">
+<!-- Side Nav -->
+<aside class="fixed left-0 top-0 h-screen flex flex-col pt-20 pb-lg px-md w-64 z-40 bg-surface dark:bg-surface-container-lowest text-primary dark:text-on-surface border-r border-hairline dark:border-outline-variant font-body-md text-body-md hidden md:flex">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-ink dark:text-on-surface">ORCA Marine</h1>
+<p class="text-body text-xs mt-1">Intelligence Platform</p>
+</div>
+<nav class="fixed left-0 top-0 h-screen flex flex-col pt-20 pb-lg px-md w-64 z-40 bg-surface border-r border-hairline hidden md:flex">
+  <div class="mb-xl px-sm cursor-pointer" onclick="window.location.href='index.html'">
+    <h1 class="font-headline-md text-headline-md font-bold text-ink">ORCA Marine</h1>
+    <p class="font-label-mono text-label-mono text-mute mt-1">Intelligence Platform</p>
+  </div>
+  <ul class="flex flex-col gap-xs flex-1">
+        <li onclick="window.location.href='index.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">info</span>
+          <span class="font-button-app text-button-app">About ORCA</span>
+        </li>
+        <li onclick="window.location.href='dashboard.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="font-button-app text-button-app">Dashboard</span>
+        </li>
+        <li onclick="window.location.href='assistant.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">smart_toy</span>
+          <span class="font-button-app text-button-app">Marine Assistant</span>
+        </li>
+        <li onclick="window.location.href='map.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">map</span>
+          <span class="font-button-app text-button-app">Intelligence Map</span>
+        </li>
+        <li onclick="window.location.href='safety.html'" class="group flex items-center gap-sm p-sm cursor-pointer bg-surface-container-low text-ink font-medium rounded-lg">
+          <span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+          <span class="font-button-app text-button-app">Safety & Alerts</span>
+        </li>
+        <li onclick="window.location.href='fishing.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">sailing</span>
+          <span class="font-button-app text-button-app">Fishing Intelligence</span>
+        </li>
+        <li onclick="window.location.href='route.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">route</span>
+          <span class="font-button-app text-button-app">Route Planning</span>
+        </li>
+        <li onclick="window.location.href='reports.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">analytics</span>
+          <span class="font-button-app text-button-app">Reports & Insights</span>
+        </li>
+  </ul>
+  <div class="mt-auto">
+    <div onclick="window.location.href='settings.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-button-app text-button-app">Settings</span>
+    </div>
+  </div>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-0 md:ml-64 flex flex-col min-h-screen">
+<!-- Top Nav (Mobile & Desktop) -->
+<header class="sticky top-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface/70 dark:bg-surface-container-lowest/70 backdrop-blur-md text-primary dark:text-on-surface font-body-md text-body-md border-b border-hairline dark:border-outline-variant md:hidden">
+<div class="font-headline-md text-headline-md font-bold text-ink dark:text-on-surface">ORCA</div>
+<div class="flex gap-md">
+<span class="material-symbols-outlined cursor-pointer hover:text-ink transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-ink transition-colors md:hidden" data-icon="menu">menu</span>
+</div>
+</header>
+<div class="p-lg md:p-xl flex-1 flex flex-col gap-xl max-w-7xl mx-auto w-full">
+<!-- Header -->
+<div>
+<h2 class="font-headline-lg text-headline-lg text-ink mb-xs">Safety &amp; Alerts</h2>
+<p class="text-body font-body-lg text-body-lg">Real-time environmental risk assessment and active advisories for your operating area.</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Active Advisories (Col Span 8) -->
+<section class="lg:col-span-8 flex flex-col gap-md">
+<h3 class="font-headline-md text-headline-md text-ink">Active Advisories</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Critical Alert Card -->
+<div class="bg-canvas-elevated border border-error rounded-xl p-md flex flex-col gap-md relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-error"></div>
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-xs text-error font-label-mono text-label-mono bg-error-container px-2 py-1 rounded-sm">
+<span class="material-symbols-outlined text-sm" data-icon="warning" data-weight="fill">warning</span>
+                                    CRITICAL
+                                </div>
+<span class="text-mute text-xs">Updated 10m ago</span>
+</div>
+<div>
+<h4 class="font-button-app text-button-app text-ink">Gale Warning</h4>
+<p class="text-body text-sm mt-1">Sustained winds 34-47 knots expected in sectors alpha and bravo. Immediate action required for vessels under 40ft.</p>
+</div>
+<div class="mt-auto pt-md border-t border-hairline flex gap-sm">
+<button class="bg-primary text-on-primary font-button-app text-button-app px-md py-xs rounded flex-1">View Details</button>
+<button class="border border-hairline text-ink font-button-app text-button-app px-md py-xs rounded">Acknowledge</button>
+</div>
+</div>
+<!-- Warning Alert Card -->
+<div class="bg-canvas-elevated border border-warning rounded-xl p-md flex flex-col gap-md relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-warning"></div>
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-xs text-warning font-label-mono text-label-mono bg-warning/10 px-2 py-1 rounded-sm">
+<span class="material-symbols-outlined text-sm" data-icon="visibility">visibility</span>
+                                    WARNING
+                                </div>
+<span class="text-mute text-xs">Updated 1h ago</span>
+</div>
+<div>
+<h4 class="font-button-app text-button-app text-ink">Reduced Visibility</h4>
+<p class="text-body text-sm mt-1">Dense fog advisory. Visibility below 1 NM in coastal areas. Use radar and maintain strict radio watch.</p>
+</div>
+<div class="mt-auto pt-md border-t border-hairline flex gap-sm">
+<button class="border border-hairline text-ink font-button-app text-button-app px-md py-xs rounded flex-1">View Details</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Environmental Matrix (Col Span 4) -->
+<section class="lg:col-span-4 flex flex-col gap-md">
+<h3 class="font-headline-md text-headline-md text-ink">Environmental Matrix</h3>
+<div class="bg-canvas-elevated border border-hairline rounded-xl p-md flex flex-col gap-md">
+<div class="flex justify-between items-center border-b border-hairline pb-sm">
+<span class="text-body font-button-app text-button-app">Wind Speed (Kts)</span>
+<span class="font-label-mono text-label-mono text-error">38 MAX</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-error w-[80%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-center border-b border-hairline pb-sm pt-sm">
+<span class="text-body font-button-app text-button-app">Wave Height (m)</span>
+<span class="font-label-mono text-label-mono text-warning">4.2 SWELL</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-warning w-[60%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-center pt-sm">
+<span class="text-body font-button-app text-button-app">Lightning Risk</span>
+<span class="font-label-mono text-label-mono text-secondary">MODERATE</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[40%] rounded-full"></div>
+</div>
+</div>
+</section>
+<!-- Alert Chronology (Col Span 6) -->
+<section class="lg:col-span-6 flex flex-col gap-md">
+<h3 class="font-headline-md text-headline-md text-ink">Alert Chronology</h3>
+<div class="bg-canvas-elevated border border-hairline rounded-xl p-md">
+<div class="relative pl-6 border-l-2 border-surface-variant space-y-md">
+<!-- Timeline Item -->
+<div class="relative">
+<div class="absolute -left-[31px] top-1 h-3 w-3 rounded-full bg-error ring-4 ring-canvas-elevated"></div>
+<div class="font-label-mono text-label-mono text-mute mb-1">14:30 ZULU</div>
+<div class="font-button-app text-button-app text-ink">Gale Warning Upgraded</div>
+<p class="text-body text-sm mt-1">NOAA issued urgent upgrade based on localized pressure drop.</p>
+</div>
+<!-- Timeline Item -->
+<div class="relative">
+<div class="absolute -left-[31px] top-1 h-3 w-3 rounded-full bg-warning ring-4 ring-canvas-elevated"></div>
+<div class="font-label-mono text-label-mono text-mute mb-1">12:15 ZULU</div>
+<div class="font-button-app text-button-app text-ink">Visibility Advisory</div>
+<p class="text-body text-sm mt-1">Coastal stations reporting declining visibility.</p>
+</div>
+<!-- Timeline Item -->
+<div class="relative">
+<div class="absolute -left-[31px] top-1 h-3 w-3 rounded-full bg-surface-tint ring-4 ring-canvas-elevated"></div>
+<div class="font-label-mono text-label-mono text-mute mb-1">08:00 ZULU</div>
+<div class="font-button-app text-button-app text-ink">Routine Forecast Issued</div>
+<p class="text-body text-sm mt-1">Standard morning brief loaded.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Required Actions (Col Span 6) -->
+<section class="lg:col-span-6 flex flex-col gap-md">
+<h3 class="font-headline-md text-headline-md text-ink">Required Actions Checklist</h3>
+<div class="bg-canvas-elevated border border-hairline rounded-xl p-md flex flex-col gap-sm">
+<label class="flex items-start gap-md p-sm hover:bg-surface-bright rounded transition-colors cursor-pointer border border-transparent hover:border-hairline">
+<input class="mt-1 rounded text-primary focus:ring-primary border-outline-variant" type="checkbox"/>
+<div>
+<span class="font-button-app text-button-app text-ink block">Secure all loose deck gear</span>
+<span class="text-body text-sm">Gale Warning protocol</span>
+</div>
+</label>
+<label class="flex items-start gap-md p-sm hover:bg-surface-bright rounded transition-colors cursor-pointer border border-transparent hover:border-hairline">
+<input class="mt-1 rounded text-primary focus:ring-primary border-outline-variant" type="checkbox"/>
+<div>
+<span class="font-button-app text-button-app text-ink block">Verify secondary comms channel</span>
+<span class="text-body text-sm">Standard protocol during heavy weather</span>
+</div>
+</label>
+<label class="flex items-start gap-md p-sm hover:bg-surface-bright rounded transition-colors cursor-pointer border border-transparent hover:border-hairline">
+<input class="mt-1 rounded text-primary focus:ring-primary border-outline-variant" type="checkbox"/>
+<div>
+<span class="font-button-app text-button-app text-ink block">Update route plan for avoidance</span>
+<span class="text-body text-sm">System recommendation</span>
+</div>
+</label>
+</div>
+</section>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Route Planning - ORCA Marine Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ee0000",
+                      "secondary": "#0057c0",
+                      "on-primary": "#ffffff",
+                      "body": "#4d4d4d",
+                      "on-tertiary": "#ffffff",
+                      "inverse-surface": "#2f3131",
+                      "surface-dim": "#dadada",
+                      "on-surface-variant": "#444748",
+                      "surface-bright": "#f9f9f9",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed-variant": "#004397",
+                      "on-background": "#1a1c1c",
+                      "outline-variant": "#c4c7c7",
+                      "surface-container": "#eeeeee",
+                      "on-tertiary-fixed-variant": "#484645",
+                      "surface": "#f9f9f9",
+                      "outline": "#747878",
+                      "mute": "#8f8f8f",
+                      "primary-fixed": "#e5e2e1",
+                      "tertiary-fixed-dim": "#cac6c4",
+                      "background": "#f9f9f9",
+                      "tertiary": "#000000",
+                      "primary-container": "#1c1b1b",
+                      "surface-container-highest": "#e2e2e2",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#006ff0",
+                      "on-tertiary-container": "#868382",
+                      "inverse-primary": "#c8c6c5",
+                      "tertiary-container": "#1c1b1a",
+                      "on-primary-container": "#858383",
+                      "ink": "#171717",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "hairline": "#ebebeb",
+                      "surface-container-low": "#f3f3f3",
+                      "surface-tint": "#5f5e5e",
+                      "on-tertiary-fixed": "#1c1b1a",
+                      "on-primary-fixed": "#1c1b1b",
+                      "primary": "#000000",
+                      "gradient-cyan": "#00dfd8",
+                      "on-secondary-fixed": "#001a43",
+                      "secondary-fixed": "#d8e2ff",
+                      "tertiary-fixed": "#e6e2df",
+                      "gradient-blue": "#007cf0",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "on-surface": "#1a1c1c",
+                      "canvas": "#fafafa",
+                      "warning": "#f5a623",
+                      "surface-variant": "#e2e2e2",
+                      "secondary-fixed-dim": "#aec6ff",
+                      "on-primary-fixed-variant": "#474746",
+                      "surface-container-high": "#e8e8e8",
+                      "canvas-elevated": "#ffffff",
+                      "gradient-violet": "#7928ca",
+                      "inverse-on-surface": "#f0f1f1",
+                      "on-secondary-container": "#fefcff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "2xl": "40px",
+                      "xs": "8px",
+                      "sm": "12px",
+                      "section": "128px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "4xl": "96px",
+                      "xxs": "4px",
+                      "xl": "32px",
+                      "3xl": "64px"
+              },
+              "fontFamily": {
+                      "label-mono": [
+                              "Geist Mono"
+                      ],
+                      "display-xl": [
+                              "Geist Sans"
+                      ],
+                      "button-app": [
+                              "Geist Sans"
+                      ],
+                      "body-md": [
+                              "Geist Sans"
+                      ],
+                      "button-marketing": [
+                              "Geist Sans"
+                      ],
+                      "headline-md": [
+                              "Geist Sans"
+                      ],
+                      "headline-lg": [
+                              "Geist Sans"
+                      ],
+                      "body-lg": [
+                              "Geist Sans"
+                      ]
+              },
+              "fontSize": {
+                      "label-mono": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-xl": [
+                              "48px",
+                              {
+                                      "lineHeight": "48px",
+                                      "letterSpacing": "-2.4px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "button-app": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "button-marketing": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "letterSpacing": "-0.4px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-1.28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-canvas text-body font-body-md h-full flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen flex flex-col pt-20 pb-lg px-md w-64 z-40 bg-surface border-r border-hairline hidden md:flex">
+  <div class="mb-xl px-sm cursor-pointer" onclick="window.location.href='index.html'">
+    <h1 class="font-headline-md text-headline-md font-bold text-ink">ORCA Marine</h1>
+    <p class="font-label-mono text-label-mono text-mute mt-1">Intelligence Platform</p>
+  </div>
+  <ul class="flex flex-col gap-xs flex-1">
+        <li onclick="window.location.href='index.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">info</span>
+          <span class="font-button-app text-button-app">About ORCA</span>
+        </li>
+        <li onclick="window.location.href='dashboard.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="font-button-app text-button-app">Dashboard</span>
+        </li>
+        <li onclick="window.location.href='assistant.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">smart_toy</span>
+          <span class="font-button-app text-button-app">Marine Assistant</span>
+        </li>
+        <li onclick="window.location.href='map.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">map</span>
+          <span class="font-button-app text-button-app">Intelligence Map</span>
+        </li>
+        <li onclick="window.location.href='safety.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">warning</span>
+          <span class="font-button-app text-button-app">Safety & Alerts</span>
+        </li>
+        <li onclick="window.location.href='fishing.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">sailing</span>
+          <span class="font-button-app text-button-app">Fishing Intelligence</span>
+        </li>
+        <li onclick="window.location.href='route.html'" class="group flex items-center gap-sm p-sm cursor-pointer bg-surface-container-low text-ink font-medium rounded-lg">
+          <span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">route</span>
+          <span class="font-button-app text-button-app">Route Planning</span>
+        </li>
+        <li onclick="window.location.href='reports.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">analytics</span>
+          <span class="font-button-app text-button-app">Reports & Insights</span>
+        </li>
+  </ul>
+  <div class="mt-auto">
+    <div onclick="window.location.href='settings.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-button-app text-button-app">Settings</span>
+    </div>
+  </div>
+</nav>
+<!-- TopNavBar (Mobile) -->
+<header class="bg-surface/70 dark:bg-surface-container-lowest/70 backdrop-blur-md text-primary dark:text-on-surface font-body-md text-body-md docked full-width top-0 border-b border-hairline dark:border-outline-variant flat no shadows sticky top-0 w-full z-50 flex justify-between items-center px-lg h-16 md:hidden">
+<div class="font-headline-md text-headline-md font-bold text-ink dark:text-on-surface">ORCA</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined cursor-pointer hover:text-ink transition-colors" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-ink transition-colors" data-icon="help_outline">help_outline</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high ml-xs"></div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col md:ml-64 h-full relative">
+<!-- Top App Bar for Desktop -->
+<header class="hidden md:flex bg-surface/70 dark:bg-surface-container-lowest/70 backdrop-blur-md text-primary dark:text-on-surface font-body-md text-body-md top-0 w-full z-10 justify-between items-center px-lg h-16 border-b border-hairline absolute">
+<div class="font-headline-md text-headline-md font-bold text-ink dark:text-on-surface invisible">ORCA</div> <!-- Spacer to keep layout balanced if needed -->
+<div class="flex-1 max-w-md ml-xl mr-auto">
+<!-- Search placeholder -->
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined cursor-pointer hover:text-ink dark:hover:text-on-surface transition-colors text-mute" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-ink dark:hover:text-on-surface transition-colors text-mute" data-icon="help_outline">help_outline</span>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-hairline ml-xs object-cover" data-alt="A minimalist, monochromatic user avatar profile picture showing a technical silhouette against a bright white background. High contrast, professional marine intelligence user profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_fVYVJNMO1xjTLYSyJVnREHd2xLjp5adsEqmX1o32RfQMjBl-109pppO01QyHFOJYXc5Wps5ZBVdl8_AY7JxRHWBott5zex9wnk-z2F9PdIYRDUaQvW1Eaj2CqsXgMPRzT4Kz_NjviF23-qqa5zpwihFoHcKfCgnKtznPaDIm-kpdNqdQ8J8dXw9buUHDBsjmTbc4JQ2o1RbrIZ7LiGWTZu58wHXhiSLgxlo5J-oLazfyahx3YgNBsQ"/>
+</div>
+</header>
+<!-- Planning Interface -->
+<div class="flex-1 flex flex-col lg:flex-row w-full h-full pt-16 md:pt-16">
+<!-- Left Panel: Inputs & Summary -->
+<aside class="w-full lg:w-96 bg-canvas-elevated border-r border-hairline flex flex-col h-full z-20 overflow-y-auto">
+<div class="p-lg border-b border-hairline bg-surface">
+<h2 class="font-headline-md text-headline-md text-ink mb-md">Voyage Plan</h2>
+<div class="flex flex-col gap-sm relative">
+<div class="absolute left-[11px] top-8 bottom-8 w-[2px] bg-hairline z-0"></div>
+<div class="relative z-10 flex items-start gap-sm">
+<div class="w-6 h-6 rounded-full border-2 border-gradient-cyan bg-white flex items-center justify-center flex-shrink-0 mt-1">
+<div class="w-2 h-2 rounded-full bg-gradient-cyan"></div>
+</div>
+<div class="flex-1">
+<label class="block text-label-mono font-label-mono text-mute mb-xxs">ORIGIN</label>
+<input class="w-full bg-white border border-hairline rounded-lg px-sm py-2 text-ink font-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors" type="text" value="Port of Seattle"/>
+</div>
+</div>
+<div class="relative z-10 flex items-start gap-sm">
+<div class="w-6 h-6 rounded-full border-2 border-outline bg-white flex items-center justify-center flex-shrink-0 mt-1"></div>
+<div class="flex-1">
+<label class="block text-label-mono font-label-mono text-mute mb-xxs">DESTINATION</label>
+<input class="w-full bg-white border border-hairline rounded-lg px-sm py-2 text-ink font-body-md focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors" type="text" value="Juneau Harbor"/>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg bg-ink text-white font-button-app text-button-app py-2 px-4 rounded-lg hover:bg-primary transition-colors flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">route</span>
+                        Calculate Optimal Route
+                    </button>
+</div>
+<!-- Route Summary Cards -->
+<div class="p-lg flex-1">
+<h3 class="text-label-mono font-label-mono text-mute mb-sm">RECOMMENDED ROUTE</h3>
+<div class="bg-white border border-hairline rounded-[12px] p-md mb-md cursor-pointer hover:border-gradient-cyan transition-colors shadow-[0px_1px_1px_rgba(0,0,0,0.04)] ring-1 ring-gradient-cyan">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-body-md text-ink font-medium">Inside Passage Alpha</span>
+<span class="bg-surface-container px-2 py-1 rounded-[4px] text-label-mono font-label-mono text-ink">OPTIMAL</span>
+</div>
+<div class="grid grid-cols-2 gap-sm mb-sm">
+<div>
+<div class="text-label-mono font-label-mono text-mute">DISTANCE</div>
+<div class="font-label-mono font-label-mono text-ink text-lg">912 NM</div>
+</div>
+<div>
+<div class="text-label-mono font-label-mono text-mute">EST. TIME</div>
+<div class="font-label-mono font-label-mono text-ink text-lg">4d 12h</div>
+</div>
+</div>
+<div class="flex items-center gap-xs text-label-mono font-label-mono text-mute bg-surface-bright p-sm rounded-lg border border-hairline">
+<span class="material-symbols-outlined text-[16px] text-gradient-cyan">waves</span>
+<span>Favorable currents through Hecate Strait.</span>
+</div>
+</div>
+<div class="bg-white border border-hairline rounded-[12px] p-md cursor-pointer hover:border-outline-variant transition-colors shadow-[0px_1px_1px_rgba(0,0,0,0.04)] opacity-70">
+<div class="flex justify-between items-start mb-sm">
+<span class="font-body-md text-ink font-medium">Offshore Bravo</span>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div>
+<div class="text-label-mono font-label-mono text-mute">DISTANCE</div>
+<div class="font-label-mono font-label-mono text-ink text-lg">840 NM</div>
+</div>
+<div>
+<div class="text-label-mono font-label-mono text-mute">EST. TIME</div>
+<div class="font-label-mono font-label-mono text-ink text-lg">4d 02h</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Map Canvas -->
+<div class="flex-1 relative bg-surface-dim overflow-hidden">
+<!-- Map Background Placeholder -->
+<div class="absolute inset-0 bg-cover bg-center w-full h-full opacity-50 mix-blend-multiply" data-alt="A highly detailed nautical chart map interface focusing on the Pacific Northwest coast from Seattle to Alaska. The map features a minimalist, high-contrast light mode aesthetic with crisp topography lines, deep blue ocean depths, and stark white landmasses. The style is technical, precise, and devoid of clutter, resembling a professional marine navigation system." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_HcbuOuQmewz74Xv2hmwmEUpRQgKiygiO9fDsa0dhJEqSEqyKz0JvqI3KfRR32P_0autuwuuEOCVB5MukIO9mW0HBpaNnkVc10HZuLTm9vJOT2m6e-QVRH6zp9ESt0nyW_UfNQMDCbLlAz4SBjMQOd6h-iqBJULfHe-numaeiPDQpWDZSfdp9zVq5blfR05f-C-UgIsgCNQz9DeseV9_Du-ehrdc8Hhy3Di4gyNDqks7Qh7VvcPaV2w')"></div>
+<!-- Map Overlay UI (Controls) -->
+<div class="absolute top-md right-md flex flex-col gap-xs z-10">
+<button class="w-10 h-10 bg-white border border-hairline rounded-full flex items-center justify-center text-ink shadow-[0px_1px_1px_rgba(0,0,0,0.04)] hover:bg-surface transition-colors">
+<span class="material-symbols-outlined">layers</span>
+</button>
+<button class="w-10 h-10 bg-white border border-hairline rounded-full flex items-center justify-center text-ink shadow-[0px_1px_1px_rgba(0,0,0,0.04)] hover:bg-surface transition-colors">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+<div class="flex flex-col bg-white border border-hairline rounded-lg shadow-[0px_1px_1px_rgba(0,0,0,0.04)] overflow-hidden mt-sm">
+<button class="w-10 h-10 flex items-center justify-center text-ink hover:bg-surface border-b border-hairline transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-ink hover:bg-surface transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+</div>
+</div>
+<!-- Risk Analysis Timeline (Floating Bottom) -->
+<div class="absolute bottom-lg left-lg right-lg bg-white/90 backdrop-blur-md border border-hairline rounded-[12px] p-md shadow-[0px_8px_16px_-4px_rgba(0,0,0,0.1)] z-10 max-w-4xl mx-auto">
+<div class="flex justify-between items-center mb-md">
+<h4 class="font-body-md text-ink font-medium">Risk Analysis Timeline</h4>
+<span class="text-label-mono font-label-mono text-mute">DEPARTURE: 04 OCT 08:00Z</span>
+</div>
+<div class="flex justify-between items-end relative pt-lg pb-sm">
+<!-- Connecting Line -->
+<div class="absolute left-[10%] right-[10%] top-[32px] h-[2px] bg-hairline -z-10"></div>
+<!-- Waypoint 1 -->
+<div class="flex flex-col items-center flex-1">
+<div class="w-3 h-3 rounded-full bg-gradient-cyan mb-xs ring-4 ring-white"></div>
+<span class="text-label-mono font-label-mono text-ink">DEPARTURE</span>
+<div class="mt-xs bg-surface p-xs rounded-[4px] border border-hairline flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px] text-body">air</span>
+<span class="font-label-mono font-label-mono text-[10px] text-body">12kt NW</span>
+</div>
+</div>
+<!-- Waypoint 2 -->
+<div class="flex flex-col items-center flex-1">
+<div class="w-3 h-3 rounded-full bg-warning mb-xs ring-4 ring-white"></div>
+<span class="text-label-mono font-label-mono text-ink">MID-ROUTE</span>
+<div class="mt-xs bg-surface p-xs rounded-[4px] border border-hairline flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px] text-warning">tsunami</span>
+<span class="font-label-mono font-label-mono text-[10px] text-body">Swell 3m</span>
+</div>
+</div>
+<!-- Waypoint 3 -->
+<div class="flex flex-col items-center flex-1">
+<div class="w-3 h-3 rounded-full bg-outline-variant mb-xs ring-4 ring-white"></div>
+<span class="text-label-mono font-label-mono text-ink">ARRIVAL</span>
+<div class="mt-xs bg-surface p-xs rounded-[4px] border border-hairline flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px] text-body">cloud</span>
+<span class="font-label-mono font-label-mono text-[10px] text-body">Overcast</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

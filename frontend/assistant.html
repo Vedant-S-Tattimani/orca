@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORCA Marine Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "error": "#ee0000",
+                        "secondary": "#0057c0",
+                        "on-primary": "#ffffff",
+                        "body": "#4d4d4d",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#2f3131",
+                        "surface-dim": "#dadada",
+                        "on-surface-variant": "#444748",
+                        "surface-bright": "#f9f9f9",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#004397",
+                        "on-background": "#1a1c1c",
+                        "outline-variant": "#c4c7c7",
+                        "surface-container": "#eeeeee",
+                        "on-tertiary-fixed-variant": "#484645",
+                        "surface": "#f9f9f9",
+                        "outline": "#747878",
+                        "mute": "#8f8f8f",
+                        "primary-fixed": "#e5e2e1",
+                        "tertiary-fixed-dim": "#cac6c4",
+                        "background": "#f9f9f9",
+                        "tertiary": "#000000",
+                        "primary-container": "#1c1b1b",
+                        "surface-container-highest": "#e2e2e2",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#006ff0",
+                        "on-tertiary-container": "#868382",
+                        "inverse-primary": "#c8c6c5",
+                        "tertiary-container": "#1c1b1a",
+                        "on-primary-container": "#858383",
+                        "ink": "#171717",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "hairline": "#ebebeb",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-tint": "#5f5e5e",
+                        "on-tertiary-fixed": "#1c1b1a",
+                        "on-primary-fixed": "#1c1b1b",
+                        "primary": "#000000",
+                        "gradient-cyan": "#00dfd8",
+                        "on-secondary-fixed": "#001a43",
+                        "secondary-fixed": "#d8e2ff",
+                        "tertiary-fixed": "#e6e2df",
+                        "gradient-blue": "#007cf0",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "canvas": "#fafafa",
+                        "warning": "#f5a623",
+                        "surface-variant": "#e2e2e2",
+                        "secondary-fixed-dim": "#aec6ff",
+                        "on-primary-fixed-variant": "#474746",
+                        "surface-container-high": "#e8e8e8",
+                        "canvas-elevated": "#ffffff",
+                        "gradient-violet": "#7928ca",
+                        "inverse-on-surface": "#f0f1f1",
+                        "on-secondary-container": "#fefcff"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "2xl": "40px",
+                        "xs": "8px",
+                        "sm": "12px",
+                        "section": "128px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "4xl": "96px",
+                        "xxs": "4px",
+                        "xl": "32px",
+                        "3xl": "64px"
+                    },
+                    fontFamily: {
+                        "label-mono": ["Geist Mono"],
+                        "display-xl": ["Geist Sans"],
+                        "button-app": ["Geist Sans"],
+                        "body-md": ["Geist Sans"],
+                        "button-marketing": ["Geist Sans"],
+                        "headline-md": ["Geist Sans"],
+                        "headline-lg": ["Geist Sans"],
+                        "body-lg": ["Geist Sans"]
+                    },
+                    fontSize: {
+                        "label-mono": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "display-xl": ["48px", { "lineHeight": "48px", "letterSpacing": "-2.4px", "fontWeight": "600" }],
+                        "button-app": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "button-marketing": ["16px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.4px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-1.28px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Geist Sans', sans-serif; background-color: theme('colors.canvas'); }
+        .geist-mono { font-family: 'Geist Mono', monospace; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+        
+        /* Scrollbar styles for modern look */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: theme('colors.surface-dim'); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: theme('colors.outline-variant'); }
+    </style>
+</head>
+<body class="text-on-surface flex h-screen overflow-hidden">
+<!-- TopNavBar (Mobile only) -->
+<nav class="fixed left-0 top-0 h-screen flex flex-col pt-20 pb-lg px-md w-64 z-40 bg-surface border-r border-hairline hidden md:flex">
+  <div class="mb-xl px-sm cursor-pointer" onclick="window.location.href='index.html'">
+    <h1 class="font-headline-md text-headline-md font-bold text-ink">ORCA Marine</h1>
+    <p class="font-label-mono text-label-mono text-mute mt-1">Intelligence Platform</p>
+  </div>
+  <ul class="flex flex-col gap-xs flex-1">
+        <li onclick="window.location.href='index.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">info</span>
+          <span class="font-button-app text-button-app">About ORCA</span>
+        </li>
+        <li onclick="window.location.href='dashboard.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="font-button-app text-button-app">Dashboard</span>
+        </li>
+        <li onclick="window.location.href='assistant.html'" class="group flex items-center gap-sm p-sm cursor-pointer bg-surface-container-low text-ink font-medium rounded-lg">
+          <span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+          <span class="font-button-app text-button-app">Marine Assistant</span>
+        </li>
+        <li onclick="window.location.href='map.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">map</span>
+          <span class="font-button-app text-button-app">Intelligence Map</span>
+        </li>
+        <li onclick="window.location.href='safety.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">warning</span>
+          <span class="font-button-app text-button-app">Safety & Alerts</span>
+        </li>
+        <li onclick="window.location.href='fishing.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">sailing</span>
+          <span class="font-button-app text-button-app">Fishing Intelligence</span>
+        </li>
+        <li onclick="window.location.href='route.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">route</span>
+          <span class="font-button-app text-button-app">Route Planning</span>
+        </li>
+        <li onclick="window.location.href='reports.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">analytics</span>
+          <span class="font-button-app text-button-app">Reports & Insights</span>
+        </li>
+  </ul>
+  <div class="mt-auto">
+    <div onclick="window.location.href='settings.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-button-app text-button-app">Settings</span>
+    </div>
+  </div>
+</nav>
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex fixed left-0 top-0 h-screen flex-col pt-20 pb-lg px-md w-64 z-40 bg-surface border-r border-hairline">
+<div class="mb-xl px-sm">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 bg-ink rounded flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[20px]" data-icon="sailing">sailing</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md font-bold text-ink leading-tight">ORCA Marine</div>
+<div class="font-label-mono text-label-mono text-mute">Intelligence Platform</div>
+</div>
+</div>
+</div>
+<nav class="fixed left-0 top-0 h-screen flex flex-col pt-20 pb-lg px-md w-64 z-40 bg-surface border-r border-hairline hidden md:flex">
+  <div class="mb-xl px-sm cursor-pointer" onclick="window.location.href='index.html'">
+    <h1 class="font-headline-md text-headline-md font-bold text-ink">ORCA Marine</h1>
+    <p class="font-label-mono text-label-mono text-mute mt-1">Intelligence Platform</p>
+  </div>
+  <ul class="flex flex-col gap-xs flex-1">
+        <li onclick="window.location.href='index.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">info</span>
+          <span class="font-button-app text-button-app">About ORCA</span>
+        </li>
+        <li onclick="window.location.href='dashboard.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span class="font-button-app text-button-app">Dashboard</span>
+        </li>
+        <li onclick="window.location.href='assistant.html'" class="group flex items-center gap-sm p-sm cursor-pointer bg-surface-container-low text-ink font-medium rounded-lg">
+          <span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+          <span class="font-button-app text-button-app">Marine Assistant</span>
+        </li>
+        <li onclick="window.location.href='map.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">map</span>
+          <span class="font-button-app text-button-app">Intelligence Map</span>
+        </li>
+        <li onclick="window.location.href='safety.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">warning</span>
+          <span class="font-button-app text-button-app">Safety & Alerts</span>
+        </li>
+        <li onclick="window.location.href='fishing.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">sailing</span>
+          <span class="font-button-app text-button-app">Fishing Intelligence</span>
+        </li>
+        <li onclick="window.location.href='route.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">route</span>
+          <span class="font-button-app text-button-app">Route Planning</span>
+        </li>
+        <li onclick="window.location.href='reports.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+          <span class="material-symbols-outlined">analytics</span>
+          <span class="font-button-app text-button-app">Reports & Insights</span>
+        </li>
+  </ul>
+  <div class="mt-auto">
+    <div onclick="window.location.href='settings.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="font-button-app text-button-app">Settings</span>
+    </div>
+  </div>
+</nav>
+<div class="mt-auto">
+<a class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col md:ml-64 h-full relative">
+<!-- Header for desktop (optional but good for consistency if no TopNavBar) -->
+<header class="hidden md:flex justify-between items-center h-16 px-xl border-b border-hairline bg-canvas z-10 shrink-0">
+<div class="font-headline-md text-headline-md font-semibold text-ink">Marine Assistant</div>
+<div class="flex items-center gap-lg">
+<span class="material-symbols-outlined cursor-pointer hover:text-ink text-mute" data-icon="notifications">notifications</span>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-hairline object-cover" data-alt="Small circular user profile avatar showing a professional seafarer in a bright modern bridge setting with technical gear." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4jj2HVLxlQFxvYLR2mVi5PmnaapjsyG21GMbCBDyRL0AZP4XnPTrvLocpNMVtXLFsvVMiFOXe68li8v3eMptPEG3XUZESt97vvrEx5VCCeonVx2WhjU-u_xcfU0R3J-EB_xH2lZuQC2nyvKX3wSq9ooBLJNPs97fdH0tzVdn_ynFPOzcRrkB5SD1LE8Uz04t5p_IrOYNK3YrmfijIh7a0e7JeemSv2m-nDYKHMKyEmyijZkN14s-XEw"/>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<!-- Chat Interface -->
+<section class="flex-1 flex flex-col min-w-0 border-r border-hairline bg-canvas">
+<!-- Chat History -->
+<div class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-xl">
+<!-- Date Separator -->
+<div class="flex justify-center">
+<span class="font-label-mono text-label-mono text-mute bg-surface-container-low px-sm py-xxs rounded">TODAY, 08:42 UTC</span>
+</div>
+<!-- User Message -->
+<div class="flex gap-md max-w-3xl ml-auto justify-end">
+<div class="bg-surface-container-low border border-hairline rounded-lg p-md max-w-[85%]">
+<p class="font-body-md text-body-md text-ink">Assess weather risk for route planning from Dutch Harbor to St. Paul Island over the next 48 hours. Focus on sea state and wind conditions.</p>
+</div>
+<img alt="User" class="w-8 h-8 rounded-full border border-hairline shrink-0" data-alt="Small circular user profile avatar showing a professional seafarer in a bright modern bridge setting with technical gear." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCDHocDLJxg8FZdt5C1bahCr5WPZ__uVVKo1T5abYysjPKgXVBhz3IekebbhsvdJCnWb5PFVX0zIFY0Oh0tk4QGhgbOubQ4NS794WOxV0FwgJ4LsS0omCd1Ux_Gg33S9NWfdKhnJ5HZ8hLekHvvmLNDrbLvWvU60lNiW9YxpgcQ0Z1PHgxJs2bZ3TYDs5A58YS4jD74b0P7yzPQAdh6r-3vdbwrZkqBlMX4dOLs2N98KxgfdxPiNsT1A"/>
+</div>
+<!-- Agent Response -->
+<div class="flex gap-md max-w-3xl">
+<div class="w-8 h-8 bg-ink rounded flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary text-[18px]" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="space-y-sm max-w-[85%]">
+<div class="bg-canvas-elevated border border-hairline rounded-lg p-md">
+<p class="font-body-md text-body-md text-ink mb-md">I have analyzed the current forecasts and historical buoy data for the Bering Sea corridor between Dutch Harbor and St. Paul Island.</p>
+<!-- Risk Alert Box -->
+<div class="bg-error-container/20 border border-error/30 rounded-lg p-sm flex gap-sm mb-md">
+<span class="material-symbols-outlined text-error shrink-0" data-icon="warning">warning</span>
+<div>
+<h4 class="font-button-app text-button-app text-error mb-xxs">Elevated Risk Detected</h4>
+<p class="font-body-md text-body-md text-ink text-sm">A low-pressure system is developing west of the Pribilof Islands, expected to bring severe gale-force winds (35-45 knots) and significant wave heights exceeding 6 meters within the next 36 hours.</p>
+</div>
+</div>
+<p class="font-body-md text-body-md text-ink">Key observations:</p>
+<ul class="list-disc list-inside font-body-md text-body-md text-ink space-y-xs ml-xs text-sm">
+<li><span class="font-semibold">Wind:</span> Currently NE 15-20kt, shifting to NW and increasing to 35-45kt by 1800 UTC tomorrow.</li>
+<li><span class="font-semibold">Sea State:</span> Building from 2m to 6m+. Peak waves expected around 0600 UTC on day 2.</li>
+<li><span class="font-semibold">Visibility:</span> Reduced in heavy rain and blowing spray later tomorrow.</li>
+</ul>
+<div class="mt-md pt-md border-t border-hairline flex items-center gap-sm">
+<button class="font-button-app text-button-app text-secondary hover:text-ink transition-colors flex items-center gap-xxs">
+<span class="material-symbols-outlined text-[16px]" data-icon="map">map</span> View on Chart
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-md lg:p-lg bg-surface-bright border-t border-hairline shrink-0">
+<!-- Suggestions -->
+<div class="flex gap-sm mb-sm overflow-x-auto pb-xxs scrollbar-hide">
+<button class="shrink-0 font-label-mono text-label-mono text-body bg-canvas-elevated border border-hairline px-sm py-xxs rounded hover:border-outline-variant hover:text-ink transition-colors">/show_buoy_data</button>
+<button class="shrink-0 font-label-mono text-label-mono text-body bg-canvas-elevated border border-hairline px-sm py-xxs rounded hover:border-outline-variant hover:text-ink transition-colors">/alt_routes</button>
+<button class="shrink-0 font-label-mono text-label-mono text-body bg-canvas-elevated border border-hairline px-sm py-xxs rounded hover:border-outline-variant hover:text-ink transition-colors">/detailed_forecast</button>
+</div>
+<div class="relative flex items-center">
+<input class="w-full bg-canvas-elevated border border-hairline rounded-lg py-sm pl-sm pr-12 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary font-body-md text-body-md text-ink placeholder:text-mute placeholder:font-label-mono placeholder:text-label-mono" placeholder="Ask ORCA Assistant..." type="text"/>
+<button class="absolute right-sm p-xxs text-secondary hover:text-ink transition-colors rounded">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Agent Activity Feed (Right Sidebar) -->
+<aside class="hidden xl:flex w-80 flex-col bg-surface-bright border-l border-hairline shrink-0">
+<div class="p-md border-b border-hairline flex items-center gap-sm bg-canvas">
+<span class="material-symbols-outlined text-body" data-icon="terminal">terminal</span>
+<h3 class="font-button-app text-button-app text-ink">Agent Activity</h3>
+<div class="ml-auto flex items-center gap-xxs">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gradient-cyan opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-gradient-cyan"></span>
+</span>
+<span class="font-label-mono text-[10px] text-mute uppercase">Active</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-sm space-y-sm bg-canvas">
+<div class="font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs">
+<div class="flex justify-between items-center text-[10px] text-mute">
+<span>SYSTEM_CALL</span>
+<span>08:42:15</span>
+</div>
+<div class="text-ink break-all">&gt; query_noaa_buoys(region="bering_sea", params=["wind", "wave"])</div>
+<div class="flex items-center gap-xs text-[10px] text-secondary mt-xxs">
+<span class="material-symbols-outlined text-[12px]" data-icon="check_circle">check_circle</span>
+                            Success: 12 nodes retrieved
+                        </div>
+</div>
+<div class="font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs">
+<div class="flex justify-between items-center text-[10px] text-mute">
+<span>MODEL_INFERENCE</span>
+<span>08:42:18</span>
+</div>
+<div class="text-ink break-all">&gt; analyze_risk_factors(data=buoy_data, threshold="high")</div>
+<div class="flex items-center gap-xs text-[10px] text-warning mt-xxs">
+<span class="material-symbols-outlined text-[12px]" data-icon="warning">warning</span>
+                            Alert: Sea state exceeds safety margin
+                        </div>
+</div>
+<div class="font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs">
+<div class="flex justify-between items-center text-[10px] text-mute">
+<span>DATA_FETCH</span>
+<span>08:42:22</span>
+</div>
+<div class="text-ink break-all">&gt; fetch_gfs_forecast(lat=54.5, lon=-168.5, hours=48)</div>
+<div class="flex items-center gap-xs text-[10px] text-secondary mt-xxs">
+<span class="material-symbols-outlined text-[12px] animate-spin" data-icon="sync">sync</span>
+                            Processing...
+                        </div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>
