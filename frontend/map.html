@@ -23,6 +23,10 @@
 <title>ORCA - Intelligence Map</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
+<!-- Leaflet.js for Interactive Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 
 <style>
         :root {
@@ -152,6 +156,57 @@
             color: #ffffff !important;
         }
 
+        /* Leaflet Marine Dark Theme Overrides */
+        #leaflet-map {
+            width: 100%;
+            height: 100%;
+            background-color: #090d16 !important;
+            z-index: 1;
+        }
+        .leaflet-container {
+            font-family: 'Inter', sans-serif !important;
+            background: #090d16 !important;
+        }
+        .leaflet-control-attribution {
+            background: rgba(10, 10, 10, 0.7) !important;
+            color: #94a3b8 !important;
+            font-size: 10px !important;
+            backdrop-filter: blur(4px);
+        }
+        .leaflet-control-attribution a {
+            color: #38bdf8 !important;
+        }
+        .leaflet-popup-content-wrapper {
+            background: #0a0f1d !important;
+            color: #f8fafc !important;
+            border: 1px solid #1e293b !important;
+            border-radius: 12px !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            padding: 4px !important;
+        }
+        .leaflet-popup-tip {
+            background: #0a0f1d !important;
+            border: 1px solid #1e293b !important;
+        }
+        .vessel-marker-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .vessel-pulse {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 223, 216, 0.25);
+            animation: vesselPulse 2s infinite ease-out;
+        }
+        @keyframes vesselPulse {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
       </style>
 <script id="tailwind-config">
         tailwind.config = {
@@ -367,203 +422,201 @@
 <!-- Main Content Canvas (Map Area) -->
 <main class="flex-1 relative w-full h-full pt-16 flex flex-col md:flex-row overflow-hidden bg-surface-bright">
 <!-- GIS Map Container -->
-<div class="flex-1 relative w-full h-full bg-[#e3ecf5]"> <!-- Subtle blue tint for map base -->
-<!-- Placeholder Map Image using Google Maps-like aesthetic -->
-<img class="absolute inset-0 w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="A highly detailed, light-themed digital maritime GIS map interface. The map shows ocean topography with subtle depth gradients in light blues and grays, landmasses in minimal beige. Overlaying the map are technical vector graphics: glowing cyan vessel icons, geometric yellow hazard zones, and intricate red restricted boundary lines. The aesthetic is clean, technical minimalism, optimized for a professional dashboard environment with high contrast and sharp data visualization." data-location="North Sea" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABb8T1b4ZHST4gFGtCgWWFKvxA4aR6JBVXAkJsiP3NSZ3StL-1RlzBegVUPIbRuvqftHDwGNGK2UxFVsfDVdIqF7FIAap4OscbAXrVgzO7jx7TbF6Zywr-uE0Lu183jkWRmwqlFnXou2RI6TcplCFjFBd2GEv10mM5ljTy7u2OFfJ3po88wImBYKpA_qXxp4wb9CeDGtodzywAVGfG56ZkdKSU_xO04dfaI0DFSSn7qieNkO_s8DDOww"/>
-<!-- Map Controls Overlay (Top Left) -->
-<div class="absolute top-md left-md flex flex-col gap-sm z-10">
-<div class="bg-surface-container-lowest rounded-lg border border-hairline shadow-sm p-xxs flex flex-col gap-xxs">
-<button class="w-10 h-10 flex items-center justify-center rounded text-ink hover:bg-surface-container-low transition-colors" title="Zoom In">
-<span class="material-symbols-outlined">add</span>
-</button>
-<div class="h-px bg-hairline w-full"></div>
-<button class="w-10 h-10 flex items-center justify-center rounded text-ink hover:bg-surface-container-low transition-colors" title="Zoom Out">
-<span class="material-symbols-outlined">remove</span>
-</button>
-</div>
-<button class="w-10 h-10 bg-surface-container-lowest border border-hairline shadow-sm rounded-lg flex items-center justify-center text-ink hover:bg-surface-container-low transition-colors" title="My Location">
-<span class="material-symbols-outlined">my_location</span>
-</button>
-</div>
-<!-- Data Layers Toggle Overlay (Bottom Left) -->
-<div class="absolute bottom-lg left-md z-10 w-64 bg-surface-container-lowest rounded-xl border border-hairline shadow-[0px_8px_16px_-4px_rgba(0,0,0,0.1)] overflow-hidden">
-<div class="p-sm border-b border-hairline bg-surface/50 backdrop-blur-sm flex items-center justify-between">
-<h3 class="font-headline-md text-[14px] font-semibold text-ink">Active Layers</h3>
-<span class="material-symbols-outlined text-body text-[18px]">layers</span>
-</div>
-<div class="p-sm flex flex-col gap-sm">
-<label class="flex items-center gap-sm cursor-pointer group">
-<div class="relative flex items-center">
-<input checked="" class="peer sr-only" type="checkbox"/>
-<div class="w-8 h-4 bg-surface-variant rounded-full peer-checked:bg-secondary transition-colors duration-200"></div>
-<div class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-4 shadow-sm"></div>
-</div>
-<span class="font-body-md text-body-md text-ink group-hover:text-primary transition-colors">Vessel AIS (Live)</span>
-</label>
-<label class="flex items-center gap-sm cursor-pointer group">
-<div class="relative flex items-center">
-<input checked="" class="peer sr-only" type="checkbox"/>
-<div class="w-8 h-4 bg-surface-variant rounded-full peer-checked:bg-warning transition-colors duration-200"></div>
-<div class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-4 shadow-sm"></div>
-</div>
-<span class="font-body-md text-body-md text-ink group-hover:text-primary transition-colors">Weather Hazards</span>
-</label>
-<label class="flex items-center gap-sm cursor-pointer group">
-<div class="relative flex items-center">
-<input class="peer sr-only" type="checkbox"/>
-<div class="w-8 h-4 bg-surface-variant rounded-full peer-checked:bg-error transition-colors duration-200"></div>
-<div class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform duration-200 peer-checked:translate-x-4 shadow-sm"></div>
-</div>
-<span class="font-body-md text-body-md text-body group-hover:text-ink transition-colors">Restricted Zones</span>
-</label>
-</div>
-</div>
-<!-- Simulated Map Elements (Markers) -->
-<!-- Selected Vessel Marker -->
-<div class="absolute top-[45%] left-[55%] -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer group">
-<div class="relative flex items-center justify-center">
-<div class="absolute w-12 h-12 bg-secondary/20 rounded-full animate-ping"></div>
-<div class="w-4 h-4 bg-secondary rounded-full border-2 border-white shadow-sm z-10 group-hover:scale-125 transition-transform"></div>
-<div class="absolute top-full mt-1 bg-surface-container-lowest px-2 py-1 rounded border border-hairline shadow-sm whitespace-nowrap opacity-100 transition-opacity">
-<span class="font-label-mono text-label-mono text-ink">MV Oceanic Alpha</span>
-</div>
-</div>
-</div>
-<!-- Other Vessel Marker -->
-<div class="absolute top-[30%] left-[40%] -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer group">
-<div class="w-3 h-3 bg-surface-tint rounded-full border border-white shadow-sm group-hover:bg-primary transition-colors"></div>
-</div>
-<!-- Weather Hazard Area (Simulated polygon) -->
-<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40" preserveaspectratio="none" viewbox="0 0 1000 1000">
-<path d="M 200,800 L 350,700 L 400,850 Z" fill="#f5a623" stroke="#f5a623" stroke-dasharray="5,5" stroke-width="2"></path>
-</svg>
+<div class="flex-1 relative w-full h-full bg-[#090d16]">
+  <!-- Real Interactive Leaflet Map Div -->
+  <div id="leaflet-map"></div>
+
+  <!-- Map Controls Overlay (Top Left) -->
+  <div class="absolute top-md left-md flex flex-col gap-sm z-10">
+    <div class="bg-surface-container-lowest dark:bg-slate-900/90 border border-hairline dark:border-slate-800 shadow-md p-xxs flex flex-col gap-xxs rounded-lg backdrop-blur-md">
+      <button id="btn-zoom-in" class="w-9 h-9 flex items-center justify-center rounded text-ink dark:text-white hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors" title="Zoom In">
+        <span class="material-symbols-outlined text-lg">add</span>
+      </button>
+      <div class="h-px bg-hairline dark:bg-slate-800 w-full"></div>
+      <button id="btn-zoom-out" class="w-9 h-9 flex items-center justify-center rounded text-ink dark:text-white hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors" title="Zoom Out">
+        <span class="material-symbols-outlined text-lg">remove</span>
+      </button>
+    </div>
+    <button id="btn-recenter" class="w-9 h-9 bg-surface-container-lowest dark:bg-slate-900/90 border border-hairline dark:border-slate-800 shadow-md rounded-lg flex items-center justify-center text-ink dark:text-white hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors backdrop-blur-md" title="Recenter Map">
+      <span class="material-symbols-outlined text-lg">my_location</span>
+    </button>
+  </div>
+
+  <!-- Data Layers Toggle Overlay (Bottom Left) -->
+  <div class="absolute bottom-lg left-md z-10 w-72 bg-surface-container-lowest dark:bg-slate-900/90 rounded-xl border border-hairline dark:border-slate-800 shadow-xl backdrop-blur-md overflow-hidden">
+    <div class="p-sm border-b border-hairline dark:border-slate-800 bg-surface/50 dark:bg-slate-950/50 flex items-center justify-between">
+      <h3 class="font-headline-md text-xs font-bold text-ink dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-secondary text-base">layers</span>
+        Active Layers
+      </h3>
+      <span id="active-layers-count" class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold">5 ACTIVE</span>
+    </div>
+    <div class="p-sm flex flex-col gap-2.5">
+      <!-- AIS Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-secondary transition-colors">
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+          Vessel AIS (Live)
+        </span>
+        <input id="toggle-layer-ais" type="checkbox" checked class="rounded border-slate-700 text-cyan-500 focus:ring-cyan-500 bg-slate-950 cursor-pointer"/>
+      </label>
+
+      <!-- Weather Hazards Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-warning transition-colors">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          Weather Hazards
+        </span>
+        <input id="toggle-layer-weather" type="checkbox" checked class="rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-950 cursor-pointer"/>
+      </label>
+
+      <!-- Restricted Zones Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-rose-400 transition-colors">
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+          Restricted Zones
+        </span>
+        <input id="toggle-layer-restricted" type="checkbox" checked class="rounded border-slate-700 text-rose-500 focus:ring-rose-500 bg-slate-950 cursor-pointer"/>
+      </label>
+
+      <!-- Fishing Intelligence Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-emerald-400 transition-colors">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          Fishing Grounds (SST)
+        </span>
+        <input id="toggle-layer-fishing" type="checkbox" checked class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-950 cursor-pointer"/>
+      </label>
+
+      <!-- Vessel Routes Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-blue-400 transition-colors">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+          Vessel Routes
+        </span>
+        <input id="toggle-layer-routes" type="checkbox" checked class="rounded border-slate-700 text-blue-500 focus:ring-blue-500 bg-slate-950 cursor-pointer"/>
+      </label>
+    </div>
+  </div>
 </div>
 <!-- Right Side Detail Panel (Selected Vessel) -->
-<aside class="w-full md:w-[360px] h-[409px] md:h-full bg-surface-container-lowest border-t md:border-t-0 md:border-l border-hairline flex flex-col z-30 shadow-[-4px_0_16px_rgba(0,0,0,0.02)] transition-transform duration-300 translate-y-0 md:translate-x-0">
-<!-- Panel Header -->
-<div class="p-lg border-b border-hairline flex items-start justify-between bg-surface/50 backdrop-blur-sm sticky top-0 z-10">
-<div>
-<div class="flex items-center gap-xs mb-1">
-<span class="px-2 py-0.5 rounded bg-[#f2f2f2] text-[#4d4d4d] font-label-mono text-label-mono border border-hairline">CARGO</span>
-<div class="w-2 h-2 rounded-full bg-gradient-cyan"></div>
-<span class="font-label-mono text-[10px] text-mute uppercase tracking-widest">Live</span>
-</div>
-<h2 class="font-headline-md text-headline-md text-ink font-bold leading-tight">MV Oceanic Alpha</h2>
-<p class="font-label-mono text-label-mono text-body mt-2">MMSI: <span class="text-ink font-medium">352898000</span></p>
-</div>
-<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low text-mute hover:text-ink transition-colors">
-<span class="material-symbols-outlined text-[20px]">close</span>
-</button>
-</div>
-<!-- Panel Content Scrollable -->
-<div class="flex-1 overflow-y-auto p-lg flex flex-col gap-xl">
-<!-- Key Telemetry Grid -->
-<div class="grid grid-cols-2 gap-md">
-<div class="flex flex-col gap-xs">
-<span class="font-body-md text-[12px] text-mute">Speed Over Ground</span>
-<div class="flex items-baseline gap-1">
-<span class="font-display-xl text-[28px] leading-none text-ink font-semibold">14.2</span>
-<span class="font-label-mono text-label-mono text-body">kn</span>
-</div>
-</div>
-<div class="flex flex-col gap-xs">
-<span class="font-body-md text-[12px] text-mute">Heading</span>
-<div class="flex items-baseline gap-1">
-<span class="font-display-xl text-[28px] leading-none text-ink font-semibold">275</span>
-<span class="font-label-mono text-label-mono text-body">deg</span>
-</div>
-</div>
-<div class="flex flex-col gap-xs">
-<span class="font-body-md text-[12px] text-mute">Draft</span>
-<div class="flex items-baseline gap-1">
-<span class="font-display-xl text-[28px] leading-none text-ink font-semibold">10.5</span>
-<span class="font-label-mono text-label-mono text-body">m</span>
-</div>
-</div>
-<div class="flex flex-col gap-xs">
-<span class="font-body-md text-[12px] text-mute">Status</span>
-<div class="flex items-baseline gap-1 mt-1">
-<span class="px-2 py-1 rounded-sm bg-[#e8f5e9] text-[#2e7d32] border border-[#c8e6c9] font-label-mono text-[11px]">Underway</span>
-</div>
-</div>
-</div>
-<!-- Divider -->
-<div class="h-px w-full bg-hairline"></div>
-<!-- Voyage Details -->
-<div class="flex flex-col gap-md">
-<h3 class="font-body-md text-body-md font-semibold text-ink uppercase tracking-wide">Voyage Data</h3>
-<div class="bg-surface rounded-lg p-md border border-hairline flex flex-col gap-sm relative overflow-hidden">
-<!-- Decorative route line -->
-<div class="absolute left-6 top-6 bottom-6 w-px bg-outline-variant/30 border-l border-dashed border-outline-variant"></div>
-<div class="flex gap-md relative z-10">
-<div class="mt-1 w-2.5 h-2.5 rounded-full border-2 border-mute bg-surface"></div>
-<div class="flex-1">
-<span class="font-label-mono text-[10px] text-mute block mb-1">ORIGIN</span>
-<p class="font-body-md text-body-md text-ink font-medium">Rotterdam (NL ROT)</p>
-<p class="font-label-mono text-label-mono text-body mt-0.5">Dep: 2023-10-24 08:30Z</p>
-</div>
-</div>
-<div class="flex gap-md relative z-10 mt-2">
-<div class="mt-1 w-2.5 h-2.5 rounded-full bg-secondary border-2 border-secondary-container ring-2 ring-surface"></div>
-<div class="flex-1">
-<span class="font-label-mono text-[10px] text-secondary block mb-1 font-semibold">DESTINATION</span>
-<p class="font-body-md text-body-md text-ink font-medium">New York (US NYC)</p>
-<p class="font-label-mono text-label-mono text-body mt-0.5">ETA: 2023-11-02 14:00Z</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Location Logs (Geist Mono focused) -->
-<div class="flex flex-col gap-md">
-<div class="flex justify-between items-end">
-<h3 class="font-body-md text-body-md font-semibold text-ink uppercase tracking-wide">Recent Telemetry</h3>
-<button class="font-button-app text-[12px] text-secondary hover:underline">Export Log</button>
-</div>
-<div class="border border-hairline rounded-lg overflow-hidden bg-canvas">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="bg-surface-container-low border-b border-hairline">
-<th class="py-2 px-3 font-label-mono text-[10px] text-mute uppercase font-normal">Time (UTC)</th>
-<th class="py-2 px-3 font-label-mono text-[10px] text-mute uppercase font-normal">Coordinates</th>
-</tr>
-</thead>
-<tbody class="font-label-mono text-label-mono text-body divide-y divide-hairline">
-<tr class="hover:bg-surface-bright transition-colors">
-<td class="py-2 px-3">10:45:02</td>
-<td class="py-2 px-3 text-ink">51°24'N 02°12'E</td>
-</tr>
-<tr class="hover:bg-surface-bright transition-colors">
-<td class="py-2 px-3">10:30:15</td>
-<td class="py-2 px-3 text-ink">51°22'N 02°15'E</td>
-</tr>
-<tr class="hover:bg-surface-bright transition-colors">
-<td class="py-2 px-3">10:15:44</td>
-<td class="py-2 px-3 text-ink">51°20'N 02°18'E</td>
-</tr>
-<tr class="hover:bg-surface-bright transition-colors">
-<td class="py-2 px-3">10:00:10</td>
-<td class="py-2 px-3 text-ink">51°18'N 02°22'E</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<!-- Action Buttons -->
-<div class="mt-auto pt-lg flex flex-col gap-sm">
-<button class="w-full py-2.5 px-4 bg-primary text-on-primary rounded-lg font-button-app text-button-app hover:bg-primary-container transition-colors shadow-sm">
-                        View Full Dossier
-                    </button>
-<button class="w-full py-2.5 px-4 bg-surface text-ink border border-outline-variant rounded-lg font-button-app text-button-app hover:bg-surface-container-low transition-colors">
-                        Add to Watchlist
-                    </button>
-</div>
-</div>
+<aside id="vessel-detail-panel" class="w-full md:w-[360px] h-[409px] md:h-full bg-surface-container-lowest border-t md:border-t-0 md:border-l border-hairline flex flex-col z-30 shadow-[-4px_0_16px_rgba(0,0,0,0.02)] transition-transform duration-300 translate-y-0 md:translate-x-0">
+  <!-- Panel Header -->
+  <div class="p-lg border-b border-hairline flex items-start justify-between bg-surface/50 backdrop-blur-sm sticky top-0 z-10">
+    <div>
+      <div class="flex items-center gap-xs mb-1">
+        <span id="panel-vessel-type" class="px-2 py-0.5 rounded bg-[#f2f2f2] dark:bg-slate-800 text-[#4d4d4d] dark:text-cyan-400 font-label-mono text-label-mono border border-hairline dark:border-slate-700">CARGO</span>
+        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <span class="font-label-mono text-[10px] text-mute uppercase tracking-widest">Live AIS</span>
+      </div>
+      <h2 id="panel-vessel-name" class="font-headline-md text-headline-md text-ink dark:text-white font-bold leading-tight">MV Oceanic Alpha</h2>
+      <p class="font-label-mono text-label-mono text-body mt-1">MMSI: <span id="panel-vessel-mmsi" class="text-ink dark:text-slate-200 font-medium">352898000</span></p>
+    </div>
+    <button id="panel-close-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low dark:hover:bg-slate-800 text-mute hover:text-ink dark:hover:text-white transition-colors" title="Close Panel">
+      <span class="material-symbols-outlined text-[20px]">close</span>
+    </button>
+  </div>
+  <!-- Panel Content Scrollable -->
+  <div class="flex-1 overflow-y-auto p-lg flex flex-col gap-xl">
+    <!-- Key Telemetry Grid -->
+    <div class="grid grid-cols-2 gap-md">
+      <div class="flex flex-col gap-xs">
+        <span class="font-body-md text-[12px] text-mute">Speed Over Ground</span>
+        <div class="flex items-baseline gap-1">
+          <span id="panel-vessel-speed" class="font-display-xl text-[28px] leading-none text-ink dark:text-white font-semibold">14.2</span>
+          <span class="font-label-mono text-label-mono text-body">kn</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-xs">
+        <span class="font-body-md text-[12px] text-mute">Heading</span>
+        <div class="flex items-baseline gap-1">
+          <span id="panel-vessel-heading" class="font-display-xl text-[28px] leading-none text-ink dark:text-white font-semibold">275</span>
+          <span class="font-label-mono text-label-mono text-body">deg</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-xs">
+        <span class="font-body-md text-[12px] text-mute">Draft</span>
+        <div class="flex items-baseline gap-1">
+          <span id="panel-vessel-draft" class="font-display-xl text-[28px] leading-none text-ink dark:text-white font-semibold">10.5</span>
+          <span class="font-label-mono text-label-mono text-body">m</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-xs">
+        <span class="font-body-md text-[12px] text-mute">Status</span>
+        <div class="flex items-baseline gap-1 mt-1">
+          <span id="panel-vessel-status" class="px-2 py-1 rounded-sm bg-[#e8f5e9] dark:bg-emerald-950/60 text-[#2e7d32] dark:text-emerald-400 border border-[#c8e6c9] dark:border-emerald-800 font-label-mono text-[11px]">Underway</span>
+        </div>
+      </div>
+    </div>
+    <!-- Divider -->
+    <div class="h-px w-full bg-hairline dark:bg-slate-800"></div>
+    <!-- Voyage Details -->
+    <div class="flex flex-col gap-md">
+      <h3 class="font-body-md text-body-md font-semibold text-ink dark:text-white uppercase tracking-wide">Voyage Data</h3>
+      <div class="bg-surface dark:bg-slate-900/60 rounded-lg p-md border border-hairline dark:border-slate-800 flex flex-col gap-sm relative overflow-hidden">
+        <!-- Decorative route line -->
+        <div class="absolute left-6 top-6 bottom-6 w-px bg-outline-variant/30 border-l border-dashed border-outline-variant"></div>
+        <div class="flex gap-md relative z-10">
+          <div class="mt-1 w-2.5 h-2.5 rounded-full border-2 border-mute bg-surface dark:bg-slate-900"></div>
+          <div class="flex-1">
+            <span class="font-label-mono text-[10px] text-mute block mb-1">ORIGIN</span>
+            <p id="panel-vessel-origin" class="font-body-md text-body-md text-ink dark:text-white font-medium">Rotterdam (NL ROT)</p>
+            <p id="panel-vessel-dep" class="font-label-mono text-label-mono text-body mt-0.5">Dep: 2023-10-24 08:30Z</p>
+          </div>
+        </div>
+        <div class="flex gap-md relative z-10 mt-2">
+          <div class="mt-1 w-2.5 h-2.5 rounded-full bg-secondary border-2 border-secondary-container ring-2 ring-surface dark:ring-slate-900"></div>
+          <div class="flex-1">
+            <span class="font-label-mono text-[10px] text-secondary block mb-1 font-semibold">DESTINATION</span>
+            <p id="panel-vessel-dest" class="font-body-md text-body-md text-ink dark:text-white font-medium">New York (US NYC)</p>
+            <p id="panel-vessel-eta" class="font-label-mono text-label-mono text-body mt-0.5">ETA: 2023-11-02 14:00Z</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Location Logs -->
+    <div class="flex flex-col gap-md">
+      <div class="flex justify-between items-end">
+        <h3 class="font-body-md text-body-md font-semibold text-ink dark:text-white uppercase tracking-wide">Recent Telemetry</h3>
+        <button class="font-button-app text-[12px] text-secondary hover:underline">Export Log</button>
+      </div>
+      <div class="border border-hairline dark:border-slate-800 rounded-lg overflow-hidden bg-canvas dark:bg-slate-950">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-surface-container-low dark:bg-slate-900 border-b border-hairline dark:border-slate-800">
+              <th class="py-2 px-3 font-label-mono text-[10px] text-mute uppercase font-normal">Time (UTC)</th>
+              <th class="py-2 px-3 font-label-mono text-[10px] text-mute uppercase font-normal">Coordinates</th>
+            </tr>
+          </thead>
+          <tbody id="panel-vessel-telemetry" class="font-label-mono text-label-mono text-body divide-y divide-hairline dark:divide-slate-800">
+            <tr class="hover:bg-surface-bright dark:hover:bg-slate-900 transition-colors">
+              <td class="py-2 px-3">10:45:02</td>
+              <td class="py-2 px-3 text-ink dark:text-slate-200">51°24'N 02°12'E</td>
+            </tr>
+            <tr class="hover:bg-surface-bright dark:hover:bg-slate-900 transition-colors">
+              <td class="py-2 px-3">10:30:15</td>
+              <td class="py-2 px-3 text-ink dark:text-slate-200">51°22'N 02°15'E</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Action Buttons -->
+    <div class="mt-auto pt-lg flex flex-col gap-sm">
+      <button class="w-full py-2.5 px-4 bg-ink dark:bg-white text-on-primary dark:text-black rounded-lg font-button-app text-button-app hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shadow-sm font-semibold">
+        View Full Dossier
+      </button>
+      <button class="w-full py-2.5 px-4 bg-surface dark:bg-slate-900 text-ink dark:text-white border border-outline-variant dark:border-slate-800 rounded-lg font-button-app text-button-app hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors">
+        Add to Watchlist
+      </button>
+    </div>
+  </div>
 </aside>
 </main>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Mobile menu toggle
+    // 1. Mobile menu toggle
     const menuBtn = document.getElementById('mobile-menu-btn');
     const navMenu = document.getElementById('mobile-nav-menu');
     if (menuBtn && navMenu) {
@@ -572,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Theme Toggle logic
+    // 2. Theme Toggle logic
     const handleThemeToggle = () => {
         const isDark = document.documentElement.classList.contains('dark');
         if (isDark) {
@@ -586,14 +639,346 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const toggleBtn = document.getElementById('theme-toggle-btn');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', handleThemeToggle);
-    }
     const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
     if (toggleBtnNav) {
         toggleBtnNav.addEventListener('click', handleThemeToggle);
     }
+
+    // 3. Initialize Leaflet Map
+    const mapCenter = [51.45, 2.35]; // North Sea / English Channel Maritime Corridor
+    const map = L.map('leaflet-map', {
+        center: mapCenter,
+        zoom: 8,
+        zoomControl: false
+    });
+
+    // Dark Map Tile Layer (CartoDB Dark Matter)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Dynamic Layer Groups
+    const aisLayer = L.layerGroup().addTo(map);
+    const weatherLayer = L.layerGroup().addTo(map);
+    const restrictedLayer = L.layerGroup().addTo(map);
+    const fishingLayer = L.layerGroup().addTo(map);
+    const routesLayer = L.layerGroup().addTo(map);
+
+    // Sample Vessels Data (Structured for Real-time Backend Sync)
+    const vessels = [
+        {
+            id: 'v1',
+            name: 'MV Oceanic Alpha',
+            mmsi: '352898000',
+            type: 'CARGO',
+            lat: 51.45,
+            lng: 2.35,
+            speed: '14.2',
+            heading: '275',
+            draft: '10.5',
+            status: 'Underway',
+            origin: 'Rotterdam (NL ROT)',
+            dep: 'Dep: 2026-08-24 08:30Z',
+            dest: 'New York (US NYC)',
+            eta: 'ETA: 2026-09-02 14:00Z',
+            telemetry: [
+                { time: '10:45:02', coords: '51°27\'N 02°21\'E' },
+                { time: '10:30:15', coords: '51°24\'N 02°18\'E' },
+                { time: '10:15:44', coords: '51°20\'N 02°14\'E' }
+            ],
+            color: '#00dfd8'
+        },
+        {
+            id: 'v2',
+            name: 'SS Bering Kraken',
+            mmsi: '413902110',
+            type: 'FISHING',
+            lat: 51.78,
+            lng: 2.95,
+            speed: '8.4',
+            heading: '140',
+            draft: '6.2',
+            status: 'Active Fishing',
+            origin: 'Dutch Harbor (US DTH)',
+            dep: 'Dep: 2026-08-25 02:00Z',
+            dest: 'Sector B-3 Catch Zone',
+            eta: 'ETA: Active Operation',
+            telemetry: [
+                { time: '10:40:12', coords: '51°46\'N 02°57\'E' },
+                { time: '10:15:00', coords: '51°45\'N 02°52\'E' }
+            ],
+            color: '#34d399'
+        },
+        {
+            id: 'v3',
+            name: 'Titan Mariner',
+            mmsi: '228941000',
+            type: 'TANKER',
+            lat: 50.95,
+            lng: 1.42,
+            speed: '11.0',
+            heading: '045',
+            draft: '14.8',
+            status: 'Underway',
+            origin: 'Ras Tanura (SA RTN)',
+            dep: 'Dep: 2026-08-10 12:00Z',
+            dest: 'Le Havre (FR LEH)',
+            eta: 'ETA: 2026-08-26 09:00Z',
+            telemetry: [
+                { time: '10:42:19', coords: '50°57\'N 01°25\'E' },
+                { time: '10:20:00', coords: '50°52\'N 01°18\'E' }
+            ],
+            color: '#38bdf8'
+        },
+        {
+            id: 'v4',
+            name: 'ORCA Guardian',
+            mmsi: '538009120',
+            type: 'PATROL',
+            lat: 51.25,
+            lng: 2.82,
+            speed: '22.5',
+            heading: '190',
+            draft: '4.1',
+            status: 'On Patrol',
+            origin: 'Dover Port (GB DOV)',
+            dep: 'Dep: 2026-08-25 06:00Z',
+            dest: 'Channel Zone Patrol',
+            eta: 'ETA: Continuous Patrol',
+            telemetry: [
+                { time: '10:44:55', coords: '51°15\'N 02°49\'E' },
+                { time: '10:30:10', coords: '51°18\'N 02°51\'E' }
+            ],
+            color: '#fbbf24'
+        },
+        {
+            id: 'v5',
+            name: 'Atlantic Star',
+            mmsi: '636018442',
+            type: 'CARGO',
+            lat: 51.62,
+            lng: 1.85,
+            speed: '16.8',
+            heading: '260',
+            draft: '11.2',
+            status: 'Underway',
+            origin: 'Hamburg (DE HAM)',
+            dep: 'Dep: 2026-08-23 20:00Z',
+            dest: 'Charleston (US CHS)',
+            eta: 'ETA: 2026-09-04 18:30Z',
+            telemetry: [
+                { time: '10:41:00', coords: '51°37\'N 01°51\'E' },
+                { time: '10:10:00', coords: '51°39\'N 02°05\'E' }
+            ],
+            color: '#a78bfa'
+        }
+    ];
+
+    // Function to populate right detail panel
+    function selectVessel(vessel) {
+        document.getElementById('panel-vessel-name').innerText = vessel.name;
+        document.getElementById('panel-vessel-mmsi').innerText = vessel.mmsi;
+        document.getElementById('panel-vessel-type').innerText = vessel.type;
+        document.getElementById('panel-vessel-speed').innerText = vessel.speed;
+        document.getElementById('panel-vessel-heading').innerText = vessel.heading;
+        document.getElementById('panel-vessel-draft').innerText = vessel.draft;
+        document.getElementById('panel-vessel-status').innerText = vessel.status;
+        document.getElementById('panel-vessel-origin').innerText = vessel.origin;
+        document.getElementById('panel-vessel-dep').innerText = vessel.dep;
+        document.getElementById('panel-vessel-dest').innerText = vessel.dest;
+        document.getElementById('panel-vessel-eta').innerText = vessel.eta;
+
+        const tbody = document.getElementById('panel-vessel-telemetry');
+        tbody.innerHTML = vessel.telemetry.map(row => `
+            <tr class="hover:bg-surface-bright dark:hover:bg-slate-900 transition-colors">
+              <td class="py-2 px-3">${row.time}</td>
+              <td class="py-2 px-3 text-ink dark:text-slate-200 font-mono">${row.coords}</td>
+            </tr>
+        `).join('');
+
+        map.panTo([vessel.lat, vessel.lng], { animate: true, duration: 0.8 });
+    }
+
+    // Add AIS Vessel Markers to Map
+    vessels.forEach(vessel => {
+        const iconSvg = `
+            <div class="vessel-marker-wrapper" title="${vessel.name}">
+                <div class="vessel-pulse" style="background:${vessel.color}33"></div>
+                <div style="transform: rotate(${vessel.heading}deg); width:24px; height:24px; display:flex; align-items:center; justify-content:center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L19 21L12 17L5 21L12 2Z" fill="${vessel.color}" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+        `;
+
+        const customIcon = L.divIcon({
+            html: iconSvg,
+            className: 'custom-vessel-div-icon',
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
+        });
+
+        const marker = L.marker([vessel.lat, vessel.lng], { icon: customIcon }).addTo(aisLayer);
+        
+        marker.bindPopup(`
+            <div class="p-2 text-xs">
+                <div class="font-bold text-sm text-cyan-400 mb-1">${vessel.name}</div>
+                <div class="text-slate-300">Type: <span class="text-white font-semibold">${vessel.type}</span></div>
+                <div class="text-slate-300">Speed: <span class="text-white font-semibold">${vessel.speed} kn</span></div>
+                <div class="text-slate-300 mb-2">Heading: <span class="text-white font-semibold">${vessel.heading}°</span></div>
+                <button onclick="window.selectVesselById('${vessel.id}')" class="w-full py-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded text-[11px] transition-colors">Select Vessel</button>
+            </div>
+        `);
+
+        marker.on('click', () => {
+            selectVessel(vessel);
+        });
+    });
+
+    window.selectVesselById = function(id) {
+        const vessel = vessels.find(v => v.id === id);
+        if (vessel) selectVessel(vessel);
+    };
+
+    // 4. Add Weather Hazards Polygon & Markers
+    const hazardPolygon = L.polygon([
+        [51.8, 1.5],
+        [52.1, 2.2],
+        [51.9, 2.8],
+        [51.5, 2.1]
+    ], {
+        color: '#f5a623',
+        fillColor: '#f5a623',
+        fillOpacity: 0.18,
+        dashArray: '6, 6',
+        weight: 2
+    }).addTo(weatherLayer);
+
+    hazardPolygon.bindPopup(`
+        <div class="p-2 text-xs">
+            <div class="font-bold text-amber-400 text-sm mb-1">GALE WARNING (SECTOR 4B)</div>
+            <p class="text-slate-300">Sustained winds 45-55 kts. Significant wave height 4.2m. Advisory for small vessels.</p>
+        </div>
+    `);
+
+    // 5. Add Restricted Zones Polygon
+    const restrictedPolygon = L.polygon([
+        [51.1, 1.8],
+        [51.3, 2.0],
+        [51.2, 2.4],
+        [51.0, 2.2]
+    ], {
+        color: '#f43f5e',
+        fillColor: '#f43f5e',
+        fillOpacity: 0.22,
+        dashArray: '4, 4',
+        weight: 2
+    }).addTo(restrictedLayer);
+
+    restrictedPolygon.bindPopup(`
+        <div class="p-2 text-xs">
+            <div class="font-bold text-rose-400 text-sm mb-1">RESTRICTED ZONE (EXERCISE BRAVO)</div>
+            <p class="text-slate-300">Naval live-firing exercise active. No unauthorized transit allowed without clearance.</p>
+        </div>
+    `);
+
+    // 6. Add Fishing Grounds (SST Front) Polygon
+    const fishingPolygon = L.polygon([
+        [51.65, 2.7],
+        [51.95, 3.2],
+        [51.75, 3.5],
+        [51.50, 3.0]
+    ], {
+        color: '#10b981',
+        fillColor: '#10b981',
+        fillOpacity: 0.2,
+        weight: 1.5
+    }).addTo(fishingLayer);
+
+    fishingPolygon.bindPopup(`
+        <div class="p-2 text-xs">
+            <div class="font-bold text-emerald-400 text-sm mb-1">FISHING GROUND (SECTOR B-3)</div>
+            <p class="text-slate-300">High SST chlorophyll gradient. Projected yield score: 94%. Optimal tuna & mackerel corridor.</p>
+        </div>
+    `);
+
+    // 7. Add Vessel Routes Layer (Rotterdam to Atlantic Corridor)
+    const routeCoordinates = [
+        [51.95, 4.12], // Rotterdam Port
+        [51.82, 3.10],
+        [51.45, 2.35], // Oceanic Alpha position
+        [51.10, 1.40], // Dover Strait
+        [50.20, -0.5]  // Atlantic Channel
+    ];
+
+    const routePolyline = L.polyline(routeCoordinates, {
+        color: '#3b82f6',
+        weight: 3,
+        dashArray: '8, 8',
+        opacity: 0.85
+    }).addTo(routesLayer);
+
+    routePolyline.bindPopup(`
+        <div class="p-2 text-xs">
+            <div class="font-bold text-blue-400 text-sm mb-1">ACTIVE VOYAGE ROUTE</div>
+            <p class="text-slate-300">Rotterdam (NL) &rarr; New York (US). Total distance: 3,420 NM.</p>
+        </div>
+    `);
+
+    // Waypoint markers for Route
+    L.circleMarker([51.95, 4.12], { radius: 5, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 1 }).addTo(routesLayer).bindTooltip("Origin: Rotterdam");
+    L.circleMarker([50.20, -0.5], { radius: 5, color: '#38bdf8', fillColor: '#38bdf8', fillOpacity: 1 }).addTo(routesLayer).bindTooltip("Waypoint: Atlantic Corridor");
+
+    // 8. Map Controls (Zoom In, Zoom Out, Recenter)
+    document.getElementById('btn-zoom-in')?.addEventListener('click', () => map.zoomIn());
+    document.getElementById('btn-zoom-out')?.addEventListener('click', () => map.zoomOut());
+    document.getElementById('btn-recenter')?.addEventListener('click', () => {
+        map.setView(mapCenter, 8, { animate: true });
+    });
+
+    // 9. Active Layer Checkboxes Management
+    const layerMap = {
+        'toggle-layer-ais': aisLayer,
+        'toggle-layer-weather': weatherLayer,
+        'toggle-layer-restricted': restrictedLayer,
+        'toggle-layer-fishing': fishingLayer,
+        'toggle-layer-routes': routesLayer
+    };
+
+    function updateActiveLayerBadge() {
+        let count = 0;
+        Object.keys(layerMap).forEach(id => {
+            const checkbox = document.getElementById(id);
+            if (checkbox && checkbox.checked) count++;
+        });
+        const badge = document.getElementById('active-layers-count');
+        if (badge) badge.innerText = `${count} ACTIVE`;
+    }
+
+    Object.keys(layerMap).forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+            checkbox.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    map.addLayer(layerMap[id]);
+                } else {
+                    map.removeLayer(layerMap[id]);
+                }
+                updateActiveLayerBadge();
+            });
+        }
+    });
+
+    // Panel Close Button
+    document.getElementById('panel-close-btn')?.addEventListener('click', () => {
+        const panel = document.getElementById('vessel-detail-panel');
+        if (panel) {
+            panel.classList.toggle('hidden');
+        }
+    });
 });
 </script>
 
