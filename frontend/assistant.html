@@ -425,7 +425,7 @@
 <button class="shrink-0 font-label-mono text-label-mono text-body bg-canvas-elevated border border-hairline px-sm py-xxs rounded hover:border-outline-variant hover:text-ink transition-colors">/detailed_forecast</button>
 </div>
 <div class="relative flex items-center">
-<input class="w-full bg-canvas-elevated border border-hairline rounded-lg py-sm pl-sm pr-12 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary font-body-md text-body-md text-ink placeholder:text-mute placeholder:font-label-mono placeholder:text-label-mono" placeholder="Ask ORCA Assistant..." type="text"/>
+<input id="chat-input" class="w-full bg-canvas-elevated border border-hairline rounded-lg py-sm pl-sm pr-12 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary font-body-md text-body-md text-ink placeholder:text-mute placeholder:font-label-mono placeholder:text-label-mono" placeholder="Ask ORCA Assistant..." type="text"/>
 <button class="absolute right-sm p-xxs text-secondary hover:text-ink transition-colors rounded">
 <span class="material-symbols-outlined" data-icon="send">send</span>
 </button>
@@ -582,6 +582,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
     if (toggleBtnNav) {
         toggleBtnNav.addEventListener('click', handleThemeToggle);
+    }
+
+    // Auto-fill prompt if passed from homepage Ask ORCA bar
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('q');
+    const inputEl = document.getElementById('chat-input');
+    if (query && inputEl) {
+        inputEl.value = query;
+        inputEl.focus();
     }
 });
 </script>

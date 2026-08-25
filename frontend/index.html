@@ -882,13 +882,35 @@
 <p class="font-body-lg text-body-lg text-body max-w-2xl mt-4">
     ORCA leverages advanced agentic AI reasoning to synthesize complex meteorological, navigational, and operational marine data into clear, actionable intelligence for professionals at sea.
 </p>
-<div class="mt-xl flex flex-wrap gap-md justify-center">
-<button class="bg-ink text-on-primary font-button-marketing text-button-marketing px-xl py-sm rounded-full hover:opacity-90 transition-opacity">
-                        Explore Platform
-                    </button>
-<button class="bg-surface border border-hairline text-ink font-button-app text-button-app px-xl py-sm rounded-lg hover:bg-surface-container-lowest transition-colors">
-                        Read Documentation
-                    </button>
+<!-- AI Assistant Quick Prompt Input -->
+<div class="mt-xl w-full max-w-xl mx-auto">
+  <form action="assistant.html" method="GET" class="relative flex items-center bg-surface-container-lowest dark:bg-slate-900/90 border border-hairline dark:border-slate-800 hover:border-cyan-500/50 focus-within:border-cyan-500 rounded-full p-2 pl-4 shadow-xl backdrop-blur-md transition-all duration-300 group">
+    <!-- AI Pulsing Dot Indicator -->
+    <div class="flex items-center justify-center text-gradient-cyan mr-3 shrink-0">
+      <span class="relative flex h-3 w-3">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+      </span>
+    </div>
+    
+    <!-- Input Field -->
+    <input 
+      type="text" 
+      name="q" 
+      placeholder="Ask ORCA anything about the ocean..." 
+      class="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-sm md:text-base text-ink dark:text-white placeholder:text-slate-400 font-sans"
+      autocomplete="off"
+    />
+
+    <!-- Return / Submit Button -->
+    <button 
+      type="submit" 
+      class="flex items-center justify-center w-10 h-10 rounded-full bg-ink text-on-primary dark:bg-white dark:text-black hover:scale-105 transition-transform shadow-md ml-2 shrink-0" 
+      title="Ask ORCA Assistant"
+    >
+      <span class="material-symbols-outlined text-lg">arrow_forward</span>
+    </button>
+  </form>
 </div>
 </div>
 <!-- Decorative technical elements -->
