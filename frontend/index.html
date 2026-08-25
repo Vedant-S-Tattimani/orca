@@ -739,67 +739,110 @@
       </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 </head>
-<body class="bg-canvas text-body font-body-md antialiased min-h-screen flex">
+<body class="bg-canvas text-body font-body-md antialiased min-h-screen">
 
-<!-- Persistent Top-Right Dark Mode Toggle Button -->
-<button id="theme-toggle-btn" aria-label="Toggle Dark Mode" class="fixed top-4 right-6 z-50 flex items-center gap-2 px-3.5 py-2 rounded-full bg-surface-container-lowest/90 dark:bg-slate-800/90 backdrop-blur-md border border-hairline dark:border-slate-700 text-ink dark:text-slate-100 shadow-lg hover:scale-105 transition-all duration-200 group cursor-pointer">
-    <span class="material-symbols-outlined text-lg text-amber-500 dark:hidden">light_mode</span>
-    <span class="material-symbols-outlined text-lg text-cyan-400 hidden dark:inline">dark_mode</span>
-    <span class="font-button-app text-xs font-semibold select-none">
-        <span class="dark:hidden">Light</span>
-        <span class="hidden dark:inline">Dark</span>
-    </span>
-</button>
+<!-- Top Header / Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 h-16 z-50 bg-surface/80 dark:bg-black/80 backdrop-blur-md border-b border-hairline dark:border-slate-800 transition-colors duration-200">
+  <div class="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+    <!-- Logo section -->
+    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+      <div class="w-8 h-8 bg-ink dark:bg-white rounded-lg flex items-center justify-center text-on-primary dark:text-black">
+        <span class="material-symbols-outlined text-[20px] font-bold">sailing</span>
+      </div>
+      <div>
+        <h1 class="font-headline-md text-sm md:text-base font-bold text-ink dark:text-white leading-tight">ORCA Marine</h1>
+        <p class="font-label-mono text-[9px] text-mute uppercase tracking-widest leading-none">Intelligence</p>
+      </div>
+    </div>
 
-<!-- SideNavBar (Shared Component) -->
-<nav class="fixed left-0 top-0 h-screen flex flex-col pt-20 pb-lg px-md w-64 z-40 bg-surface border-r border-hairline hidden md:flex">
-  <div class="mb-xl px-sm cursor-pointer" onclick="window.location.href='index.html'">
-    <h1 class="font-headline-md text-headline-md font-bold text-ink">ORCA Marine</h1>
-    <p class="font-label-mono text-label-mono text-mute mt-1">Intelligence Platform</p>
-  </div>
-  <ul class="flex flex-col gap-xs flex-1">
-        <li onclick="window.location.href='index.html'" class="group flex items-center gap-sm p-sm cursor-pointer bg-surface-container-low text-ink font-medium rounded-lg">
-          <span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">info</span>
-          <span class="font-button-app text-button-app">About ORCA</span>
-        </li>
-        <li onclick="window.location.href='dashboard.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
-          <span class="material-symbols-outlined">dashboard</span>
-          <span class="font-button-app text-button-app">Dashboard</span>
-        </li>
-        <li onclick="window.location.href='assistant.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
-          <span class="material-symbols-outlined">smart_toy</span>
-          <span class="font-button-app text-button-app">Marine Assistant</span>
-        </li>
-        <li onclick="window.location.href='map.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
-          <span class="material-symbols-outlined">map</span>
-          <span class="font-button-app text-button-app">Intelligence Map</span>
-        </li>
-        <li onclick="window.location.href='safety.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
-          <span class="material-symbols-outlined">warning</span>
-          <span class="font-button-app text-button-app">Safety & Alerts</span>
-        </li>
-        <li onclick="window.location.href='fishing.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
-          <span class="material-symbols-outlined">sailing</span>
-          <span class="font-button-app text-button-app">Fishing Intelligence</span>
-        </li>
-        <li onclick="window.location.href='route.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
-          <span class="material-symbols-outlined">route</span>
-          <span class="font-button-app text-button-app">Route Planning</span>
-        </li>
-        <li onclick="window.location.href='reports.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
-          <span class="material-symbols-outlined">analytics</span>
-          <span class="font-button-app text-button-app">Reports & Insights</span>
-        </li>
-  </ul>
-  <div class="mt-auto">
-    <div onclick="window.location.href='settings.html'" class="group flex items-center gap-sm p-sm cursor-pointer text-body hover:bg-surface-container-lowest transition-all duration-200 rounded-lg">
-      <span class="material-symbols-outlined">settings</span>
-      <span class="font-button-app text-button-app">Settings</span>
+    <!-- Navigation links -->
+    <nav class="hidden lg:flex items-center gap-1">
+      <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-on-primary dark:bg-white dark:text-black shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">info</span>
+        <span>About</span>
+      </a>
+      <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+        <span>Assistant</span>
+      </a>
+      <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">map</span>
+        <span>Map</span>
+      </a>
+      <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">warning</span>
+        <span>Safety & Alerts</span>
+      </a>
+      <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">sailing</span>
+        <span>Fishing</span>
+      </a>
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Agent Status Indicator Button -->
+      <button onclick="window.location.href='status.html'" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-hairline dark:border-slate-800 bg-surface-container-low/50 dark:bg-slate-900/50 hover:bg-surface-container-highest/50 dark:hover:bg-slate-800/50 transition-all text-xs font-semibold">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-ink dark:text-slate-200">Agent Status</span>
+      </button>
+
+      <!-- Settings Icon Button -->
+      <a href="settings.html" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center" title="Settings">
+        <span class="material-symbols-outlined">settings</span>
+      </a>
+
+      <!-- Theme Toggle inside Navbar -->
+      <button id="theme-toggle-btn-nav" aria-label="Toggle Dark Mode" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg text-amber-500 dark:hidden">light_mode</span>
+        <span class="material-symbols-outlined text-lg text-cyan-400 hidden dark:inline">dark_mode</span>
+      </button>
+
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
     </div>
   </div>
-</nav>
+
+  <!-- Mobile Navigation Menu dropdown -->
+  <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
+    <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
+      <span class="material-symbols-outlined">info</span>
+      <span>About</span>
+    </a>
+    <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">smart_toy</span>
+      <span>Assistant</span>
+    </a>
+    <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">map</span>
+      <span>Map</span>
+    </a>
+    <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">warning</span>
+      <span>Safety & Alerts</span>
+    </a>
+    <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">sailing</span>
+      <span>Fishing</span>
+    </a>
+  </div>
+</header>
+
 <!-- Main Content -->
-<main class="flex-1 md:ml-64 w-full">
+<main class="flex-1 w-full pt-16">
 <!-- Hero Section -->
 <section class="relative min-h-[921px] flex flex-col items-center justify-center text-center px-4 md:px-3xl py-section mesh-gradient overflow-hidden border-b border-hairline">
 <div class="z-10 max-w-4xl mx-auto flex flex-col items-center gap-lg">
@@ -1005,42 +1048,6 @@
                 </div>
             </div>
 
-            <!-- Card 3: Route Planning -->
-            <div onclick="window.location.href='route.html'" class="bento-card bg-canvas-elevated rounded-[16px] p-lg flex flex-col justify-between cursor-pointer group">
-                <div>
-                    <div class="flex items-center justify-between mb-md">
-                        <div class="w-10 h-10 rounded-xl bg-ink text-gradient-cyan flex items-center justify-center shadow-md">
-                            <span class="material-symbols-outlined">route</span>
-                        </div>
-                        <span class="font-label-mono text-xs bg-blue-500/10 text-blue-600 border border-blue-500/20 px-2 py-0.5 rounded-full font-medium">-14.2% FUEL</span>
-                    </div>
-                    <h3 class="font-headline-md text-headline-md text-ink font-bold group-hover:text-secondary transition-colors">Route Planning</h3>
-                    <p class="font-body-md text-body-md text-body mt-1">
-                        Weather-routing algorithms calculating real-time ocean currents, wave resistance, and speed optimization.
-                    </p>
-                </div>
-
-                <!-- Animated Waypoint Path graphic -->
-                <div class="my-md h-32 rounded-xl bg-slate-900 p-3 relative overflow-hidden flex flex-col justify-between border border-slate-800">
-                    <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 200 100">
-                        <path d="M 10 80 Q 80 10 190 50" fill="none" stroke="#007cf0" stroke-width="2" class="animate-dash" />
-                    </svg>
-                    <div class="flex justify-between items-start z-10">
-                        <span class="bg-slate-800 text-slate-200 text-[10px] font-mono px-2 py-0.5 rounded border border-slate-700">PORT A (ORIGIN)</span>
-                        <span class="bg-slate-800 text-slate-200 text-[10px] font-mono px-2 py-0.5 rounded border border-slate-700">PORT B (DEST)</span>
-                    </div>
-                    <div class="z-10 self-center bg-gradient-cyan/20 border border-gradient-cyan text-gradient-cyan text-[10px] font-mono px-2 py-1 rounded-full flex items-center gap-1">
-                        <span class="material-symbols-outlined text-xs">tune</span>
-                        <span>WEATHER OPTIMIZED</span>
-                    </div>
-                </div>
-
-                <div class="pt-md border-t border-hairline flex items-center justify-between text-body hover:text-ink font-medium">
-                    <span class="font-button-app">Plan Vessel Route</span>
-                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                </div>
-            </div>
-
             <!-- Card 4: Interactive Marine Maps -->
             <div onclick="window.location.href='map.html'" class="bento-card bg-canvas-elevated rounded-[16px] p-lg flex flex-col justify-between cursor-pointer group">
                 <div>
@@ -1114,45 +1121,6 @@
                     <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
                 </div>
             </div>
-
-            <!-- Card 6: Reports & Insights -->
-            <div onclick="window.location.href='reports.html'" class="bento-card bg-canvas-elevated rounded-[16px] p-lg flex flex-col justify-between cursor-pointer group">
-                <div>
-                    <div class="flex items-center justify-between mb-md">
-                        <div class="w-10 h-10 rounded-xl bg-ink text-gradient-cyan flex items-center justify-center shadow-md">
-                            <span class="material-symbols-outlined">analytics</span>
-                        </div>
-                        <span class="font-label-mono text-xs bg-indigo-500/10 text-indigo-600 border border-indigo-500/20 px-2 py-0.5 rounded-full font-medium">ANALYTICS & PDF</span>
-                    </div>
-                    <h3 class="font-headline-md text-headline-md text-ink font-bold group-hover:text-secondary transition-colors">Reports & Insights</h3>
-                    <p class="font-body-md text-body-md text-body mt-1">
-                        Comprehensive fleet performance reports, fuel consumption logs, and automated compliance summaries.
-                    </p>
-                </div>
-
-                <!-- Animated Analytics Graph -->
-                <div class="my-md h-32 rounded-xl bg-slate-950 p-3 relative overflow-hidden border border-slate-800 flex flex-col justify-between">
-                    <div class="flex items-center justify-between">
-                        <span class="font-mono text-[10px] text-slate-400">FLEET EFFICIENCY SCORE</span>
-                        <span class="font-mono text-xs text-gradient-cyan font-bold">96.8%</span>
-                    </div>
-                    <!-- Mini Bar Chart -->
-                    <div class="flex items-end justify-between h-14 gap-1.5 pt-2">
-                        <div class="w-full bg-slate-800 hover:bg-gradient-cyan transition-colors h-[40%] rounded-t"></div>
-                        <div class="w-full bg-slate-800 hover:bg-gradient-cyan transition-colors h-[65%] rounded-t"></div>
-                        <div class="w-full bg-slate-800 hover:bg-gradient-cyan transition-colors h-[50%] rounded-t"></div>
-                        <div class="w-full bg-gradient-cyan h-[85%] rounded-t animate-pulse"></div>
-                        <div class="w-full bg-slate-800 hover:bg-gradient-cyan transition-colors h-[70%] rounded-t"></div>
-                        <div class="w-full bg-slate-800 hover:bg-gradient-cyan transition-colors h-[90%] rounded-t"></div>
-                    </div>
-                </div>
-
-                <div class="pt-md border-t border-hairline flex items-center justify-between text-body hover:text-ink font-medium">
-                    <span class="font-button-app">Generate Intelligence Report</span>
-                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                </div>
-            </div>
-
         </div>
     </div>
 
@@ -1564,10 +1532,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const toggleBtn = document.getElementById('theme-toggle-btn');
-    if (!toggleBtn) return;
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const navMenu = document.getElementById('mobile-nav-menu');
+    if (menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('hidden');
+        });
+    }
 
-    toggleBtn.addEventListener('click', () => {
+    // Theme Toggle logic
+    const handleThemeToggle = () => {
         const isDark = document.documentElement.classList.contains('dark');
         if (isDark) {
             document.documentElement.classList.remove('dark');
@@ -1578,7 +1553,16 @@ document.addEventListener('DOMContentLoaded', () => {
             document.documentElement.classList.remove('light');
             localStorage.setItem('orca_theme', 'dark');
         }
-    });
+    };
+
+    const toggleBtn = document.getElementById('theme-toggle-btn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', handleThemeToggle);
+    }
+    const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
+    if (toggleBtnNav) {
+        toggleBtnNav.addEventListener('click', handleThemeToggle);
+    }
 });
 </script>
 
