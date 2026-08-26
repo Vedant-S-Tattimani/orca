@@ -452,7 +452,8 @@ async def get_pfz_data(request: PFZRequest):
                 "confidence": pfz_data.get("confidence", 0.0),
                 "data_origin": pfz_data.get("data_origin", {}),
                 "rejection_reasons": rejection_reasons,
-                "evidence": evidence
+                "evidence": evidence,
+                "forecast_24h": weather_data.get("forecast_24h", [])
             })
         except Exception as e:
             logger.error(f"Error fetching PFZ for {sector.name}: {e}")

@@ -155,6 +155,18 @@ class OpenMeteoWeatherClient(BaseAPIClient):
                 # We can map weather_code to a description if needed
                 parsed["weather_condition"] = self._weather_code_to_description(hourly_data["weather_code"][0])
 
+            # Extract next 24 hours of forecast for graphs
+            forecast_24h = []
+            if "time" in hourly_data:
+                for i in range(min(24, len(hourly_data["time"]))):
+                    forecast_24h.append({
+                        "time": hourly_data["time"][i],
+                        "temperature_c": float(hourly_data["temperature_2m"][i]) if "temperature_2m" in hourly_data and len(hourly_data["temperature_2m"]) > i else None,
+                        "wind_speed_kmh": float(hourly_data["wind_speed_10m"][i]) * 3.6 if "wind_speed_10m" in hourly_data and len(hourly_data["wind_speed_10m"]) > i else None,
+                        "wind_direction_deg": float(hourly_data["wind_direction_10m"][i]) if "wind_direction_10m" in hourly_data and len(hourly_data["wind_direction_10m"]) > i else None,
+                    })
+            parsed["forecast_24h"] = forecast_24h
+
         # Extract daily forecast summary (today)
         if "daily" in raw_data and raw_data["daily"]:
             daily_data = raw_data["daily"]

@@ -104,7 +104,7 @@ class OpenMeteoWeatherAgent(BaseAgent):
             "wind_speed_kmh", "wind_direction_deg", "visibility_km",
             "pressure_hpa", "forecast_hours", "weather_code", "weather_condition",
             "temperature_max_c", "temperature_min_c", "precipitation_sum_mm",
-            "wind_speed_max_kmh"
+            "wind_speed_max_kmh", "forecast_24h"
         ]
 
         for field in weather_fields:
@@ -164,6 +164,25 @@ class OpenMeteoWeatherAgent(BaseAgent):
         # Add some optional fields that might be present in real data
         weather_data["weather_code"] = random.choice([0, 1, 2, 3, 61, 63, 65])
         weather_data["weather_condition"] = self._weather_code_to_description(weather_data["weather_code"])
+
+        # Generate mock 24-hour forecast
+        from datetime import timedelta
+        forecast_24h = []
+        base_wind_dir = weather_data["wind_direction_deg"]
+        for i in range(24):
+            ftime = start_time + timedelta(hours=i)
+            # Add some sinusoidal diurnal variation for temperature
+            hour_offset = (ftime.hour - 14) / 24.0 * 2 * 3.14159
+            import math
+            temp_var = math.cos(hour_offset) * 4.0
+            
+            forecast_24h.append({
+                "time": ftime.isoformat() + "Z",
+                "temperature_c": round(base_temp + temp_var + random.uniform(-0.5, 0.5), 1),
+                "wind_speed_kmh": max(0, round(base_wind + random.uniform(-5, 5), 1)),
+                "wind_direction_deg": round((base_wind_dir + random.uniform(-15, 15)) % 360, 1)
+            })
+        weather_data["forecast_24h"] = forecast_24h
 
         self.logger.debug(f"Generated mock Open-Meteo weather data: {weather_data}")
         return weather_data

@@ -24,6 +24,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="api.js"></script>
 
 
@@ -451,7 +452,7 @@
                         </button>
 </div>
 <!-- Marine Indicators Brief -->
-<div class="bg-surface-container-lowest border border-hairline rounded-[12px] p-lg flex-1 overflow-y-auto">
+<div class="bg-surface-container-lowest border border-hairline rounded-[12px] p-lg flex-shrink-0">
 <h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md">Marine Indicators</h3>
 <div class="space-y-md">
 <!-- Indicator 1 -->
@@ -483,6 +484,15 @@
 <div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden flex">
 <div id="bar-wind" class="h-full bg-ink w-0"></div>
 </div>
+</div>
+</div>
+</div>
+
+<!-- 24-Hour Forecast Graph -->
+<div class="bg-surface-container-lowest border border-hairline rounded-[12px] p-lg flex-shrink-0">
+<h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md">24-Hour Prediction</h3>
+<div class="w-full h-[250px] relative">
+<canvas id="weather-forecast-chart"></canvas>
 </div>
 </div>
 </div>
@@ -569,6 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let pfzZones = [];
     let markersLayer = L.layerGroup().addTo(map);
     let customPointMarker = null;
+    window.weatherChartInstance = null;
 
     // Click anywhere on map to fetch data
     map.on('click', async (e) => {
@@ -730,6 +741,83 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="font-body-md text-body-md text-body">${rr}</span>
             </li>`;
         });
+        
+        // 24-Hour Forecast Graph
+        const canvas = document.getElementById('weather-forecast-chart');
+        if (canvas && zone.forecast_24h && zone.forecast_24h.length > 0) {
+            if (window.weatherForecastChart) {
+                window.weatherForecastChart.destroy();
+            }
+            
+            const labels = zone.forecast_24h.map(f => {
+                const d = new Date(f.time);
+                return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            });
+            const tempData = zone.forecast_24h.map(f => f.temperature_c);
+            const windData = zone.forecast_24h.map(f => f.wind_speed_kmh);
+            
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#a3a3a3' : '#737373';
+            const gridColor = isDark ? '#262626' : '#ebebeb';
+            
+            window.weatherForecastChart = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Temp (°C)',
+                            data: tempData,
+                            borderColor: '#007cf0',
+                            backgroundColor: 'rgba(0, 124, 240, 0.1)',
+                            yAxisID: 'y',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 0,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Wind (km/h)',
+                            data: windData,
+                            borderColor: '#00dfd8',
+                            backgroundColor: 'rgba(0, 223, 216, 0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.4,
+                            borderDash: [4, 4],
+                            pointRadius: 0,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: textColor, font: { family: 'Inter', size: 10 } } },
+                        tooltip: { titleFont: { family: 'Geist Mono' }, bodyFont: { family: 'Inter' } }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: textColor, font: { family: 'Geist Mono', size: 9 }, maxTicksLimit: 6 },
+                            grid: { color: gridColor, drawBorder: false }
+                        },
+                        y: {
+                            type: 'linear', display: true, position: 'left',
+                            ticks: { color: textColor, font: { family: 'Geist Mono', size: 9 } },
+                            grid: { color: gridColor, drawBorder: false },
+                            title: { display: true, text: '°C', color: textColor, font: { size: 10 } }
+                        },
+                        y1: {
+                            type: 'linear', display: true, position: 'right',
+                            ticks: { color: textColor, font: { family: 'Geist Mono', size: 9 } },
+                            grid: { drawOnChartArea: false },
+                            title: { display: true, text: 'km/h', color: textColor, font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
     }
     
     window.selectZoneFromTable = function(index) {
