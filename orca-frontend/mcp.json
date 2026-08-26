@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "stitch": {
+      "serverUrl": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "apiKey": "YOUR_API_KEY_HERE"
+      }
+    }
+  }
+}

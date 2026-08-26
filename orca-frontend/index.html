@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<script>
+    (function() {
+      const savedTheme = localStorage.getItem('orca_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+    })();
+</script>
+<!-- Google Fonts & Material Symbols -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORCA Marine Intelligence - Landing Page</title>
+
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ee0000",
+                      "secondary": "#0057c0",
+                      "on-primary": "#ffffff",
+                      "body": "#4d4d4d",
+                      "on-tertiary": "#ffffff",
+                      "inverse-surface": "#2f3131",
+                      "surface-dim": "#dadada",
+                      "on-surface-variant": "#444748",
+                      "surface-bright": "#f9f9f9",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed-variant": "#004397",
+                      "on-background": "#1a1c1c",
+                      "outline-variant": "#c4c7c7",
+                      "surface-container": "#eeeeee",
+                      "on-tertiary-fixed-variant": "#484645",
+                      "surface": "#f9f9f9",
+                      "outline": "#747878",
+                      "mute": "#8f8f8f",
+                      "primary-fixed": "#e5e2e1",
+                      "tertiary-fixed-dim": "#cac6c4",
+                      "background": "#f9f9f9",
+                      "tertiary": "#000000",
+                      "primary-container": "#1c1b1b",
+                      "surface-container-highest": "#e2e2e2",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#006ff0",
+                      "on-tertiary-container": "#868382",
+                      "inverse-primary": "#c8c6c5",
+                      "tertiary-container": "#1c1b1a",
+                      "on-primary-container": "#858383",
+                      "ink": "#171717",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "hairline": "#ebebeb",
+                      "surface-container-low": "#f3f3f3",
+                      "surface-tint": "#5f5e5e",
+                      "on-tertiary-fixed": "#1c1b1a",
+                      "on-primary-fixed": "#1c1b1b",
+                      "primary": "#000000",
+                      "gradient-cyan": "#00dfd8",
+                      "on-secondary-fixed": "#001a43",
+                      "secondary-fixed": "#d8e2ff",
+                      "tertiary-fixed": "#e6e2df",
+                      "gradient-blue": "#007cf0",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "on-surface": "#1a1c1c",
+                      "canvas": "#fafafa",
+                      "warning": "#f5a623",
+                      "surface-variant": "#e2e2e2",
+                      "secondary-fixed-dim": "#aec6ff",
+                      "on-primary-fixed-variant": "#474746",
+                      "surface-container-high": "#e8e8e8",
+                      "canvas-elevated": "#ffffff",
+                      "gradient-violet": "#7928ca",
+                      "inverse-on-surface": "#f0f1f1",
+                      "on-secondary-container": "#fefcff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "2xl": "40px",
+                      "xs": "8px",
+                      "sm": "12px",
+                      "section": "128px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "4xl": "96px",
+                      "xxs": "4px",
+                      "xl": "32px",
+                      "3xl": "64px"
+              },
+              "fontFamily": {
+                      "sans": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+                      "mono": ["Geist Mono", "monospace"],
+                      "label-mono": ["Geist Mono", "monospace"],
+                      "display-xl": ["Inter", "sans-serif"],
+                      "button-app": ["Inter", "sans-serif"],
+                      "body-md": ["Inter", "sans-serif"],
+                      "button-marketing": ["Inter", "sans-serif"],
+                      "headline-md": ["Inter", "sans-serif"],
+                      "headline-lg": ["Inter", "sans-serif"],
+                      "body-lg": ["Inter", "sans-serif"]
+              },
+              "fontSize": {
+                      "label-mono": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                      "display-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-1.5px", "fontWeight": "600" }],
+                      "button-app": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                      "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+                      "button-marketing": ["15px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                      "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.4px", "fontWeight": "600" }],
+                      "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.8px", "fontWeight": "600" }],
+                      "body-lg": ["15px", { "lineHeight": "22px", "letterSpacing": "0", "fontWeight": "400" }]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        :root {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+        }
+        body, button, input, select, textarea {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        code, kbd, samp, pre, .font-mono, .font-label-mono {
+            font-family: 'Geist Mono', monospace !important;
+        }
+        .mesh-gradient {
+            background-color: #fafafa;
+            background-image: 
+                radial-gradient(at 10% 20%, hsla(178,100%,44%,0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(209,100%,47%,0.15) 0px, transparent 50%),
+                radial-gradient(at 40% 80%, hsla(270,66%,63%,0.15) 0px, transparent 50%);
+        }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined' !important;
+            font-weight: normal;
+            font-style: normal;
+            font-size: 20px;
+            line-height: 1;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+        }
+      
+        /* Bento Grid Animation Styles */
+        @keyframes radarPulse {
+            0% { transform: scale(0.2); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        @keyframes scanLine {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(300%); }
+        }
+
+        @keyframes dashFlow {
+            to { stroke-dashoffset: -32; }
+        }
+
+        @keyframes floatGlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .animate-radar {
+            animation: radarPulse 3s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        }
+
+        .animate-scanline {
+            animation: scanLine 4s linear infinite;
+        }
+
+        .animate-dash {
+            stroke-dasharray: 8, 6;
+            animation: dashFlow 2s linear infinite;
+        }
+
+        .animate-float {
+            animation: floatGlow 4s ease-in-out infinite;
+        }
+
+        .bento-card {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(235, 235, 235, 1);
+        }
+
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 35px -10px rgba(0, 223, 216, 0.2), 0 0 0 1px rgba(0, 223, 216, 0.5);
+            border-color: rgba(0, 223, 216, 0.6) !important;
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 223, 216, 0.08), transparent);
+            transition: 0.6s;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .bento-card:hover::before {
+            left: 100%;
+        }
+
+      
+        /* MaskedHeading Component Styles */
+        .masked-heading-container {
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .masked-heading {
+            position: relative;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            text-wrap: balance;
+            -webkit-font-smoothing: antialiased;
+            display: block;
+            user-select: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            font-size: clamp(48px, 8.5vw, 110px);
+            text-align: center;
+        }
+
+        .masked-heading__measure {
+            color: transparent;
+            opacity: 0;
+            display: block;
+            pointer-events: none;
+        }
+
+        .masked-heading__word {
+            display: inline-block;
+            white-space: pre;
+        }
+
+        .masked-heading__word:not(:last-child)::after {
+            content: ' ';
+        }
+
+        .masked-heading__defs {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .masked-heading__reveal {
+            position: absolute;
+            inset: 0;
+            display: block;
+            pointer-events: none;
+        }
+
+        .masked-heading__clip {
+            position: absolute;
+            inset: 0;
+            display: block;
+            clip-path: url(#mh-hero-clip);
+            -webkit-clip-path: url(#mh-hero-clip);
+        }
+
+        .masked-heading__media {
+            position: absolute;
+            inset: 0;
+            display: block;
+            will-change: transform, filter;
+            transition: filter 0.3s ease;
+        }
+
+        .masked-heading__source {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Video Background Clip Fallback / Enhancer */
+        .masked-text-video-fill {
+            background: linear-gradient(135deg, #171717 0%, #007cf0 50%, #00dfd8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+      
+        /* Pure Dark Mode Styles */
+        html.dark {
+            color-scheme: dark;
+            background-color: #000000 !important;
+        }
+
+        html.dark body {
+            background-color: #000000 !important;
+            color: #d4d4d4 !important;
+        }
+
+        html.dark nav, 
+        html.dark header, 
+        html.dark aside {
+            background-color: #0a0a0a !important;
+            border-color: #262626 !important;
+        }
+
+        html.dark .bg-surface,
+        html.dark .bg-canvas,
+        html.dark .bg-surface-container-low,
+        html.dark .bg-surface-container-high,
+        html.dark .bg-surface-container-highest,
+        html.dark .bg-surface-container {
+            background-color: #050505 !important;
+        }
+
+        html.dark .bg-canvas-elevated,
+        html.dark .bg-surface-container-lowest {
+            background-color: #121212 !important;
+        }
+
+        html.dark .text-ink,
+        html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+            color: #ffffff !important;
+        }
+
+        html.dark .text-body,
+        html.dark p {
+            color: #a3a3a3 !important;
+        }
+
+        html.dark .text-mute {
+            color: #737373 !important;
+        }
+
+        html.dark .border-hairline,
+        html.dark .border-outline-variant,
+        html.dark .border-slate-200,
+        html.dark .border-slate-800 {
+            border-color: #262626 !important;
+        }
+
+        html.dark .hover\:bg-surface-container-lowest:hover {
+            background-color: #1f1f1f !important;
+        }
+
+        html.dark .bg-surface-container-low.text-ink {
+            background-color: #171717 !important;
+            color: #00dfd8 !important;
+        }
+
+        html.dark input, 
+        html.dark select, 
+        html.dark textarea {
+            background-color: #0a0a0a !important;
+            color: #ffffff !important;
+            border-color: #262626 !important;
+        }
+
+        html.dark table {
+            border-color: #262626 !important;
+        }
+
+        html.dark th {
+            background-color: #121212 !important;
+            color: #ffffff !important;
+        }
+
+        html.dark td {
+            border-color: #262626 !important;
+        }
+
+        html.dark .mesh-gradient {
+            background-color: #000000 !important;
+            background-image: 
+                radial-gradient(at 10% 20%, hsla(178,100%,44%,0.12) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(209,100%,47%,0.12) 0px, transparent 50%),
+                radial-gradient(at 40% 80%, hsla(270,66%,63%,0.1) 0px, transparent 50%) !important;
+        }
+
+        html.dark #theme-toggle-btn {
+            background-color: rgba(18, 18, 18, 0.9) !important;
+            border-color: #262626 !important;
+            color: #ffffff !important;
+        }
+
+      
+        /* 3D Interactive Book 2-Page Spread Architecture */
+        .book-stage {
+            perspective: 2000px;
+        }
+
+        .book-wrapper {
+            position: relative;
+            width: 320px;
+            height: 480px;
+            margin: 0 auto;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.25, 0, 0, 1);
+        }
+
+        @media (min-width: 768px) {
+            .book-wrapper {
+                width: 370px;
+                height: 520px;
+            }
+        }
+
+        .book-wrapper.is-open {
+            transform: translateX(50%);
+        }
+
+        @media (max-width: 767px) {
+            .book-wrapper.is-open {
+                transform: translateX(0);
+            }
+        }
+
+        /* Front Cover Leaf */
+        .book-cover-leaf {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 0.9s cubic-bezier(0.25, 0, 0, 1);
+            z-index: 100;
+            cursor: pointer;
+        }
+
+        .book-cover-leaf.is-flipped {
+            transform: rotateY(-180deg) !important;
+            z-index: 0 !important;
+        }
+
+        .book-cover-front {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 3px 10px 10px 3px;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            transform: translateZ(0.5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .book-cover-back {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: rotateY(180deg) translateZ(0.5px);
+            background-color: #fdfbf7;
+            color: #171717;
+            border-radius: 10px 3px 3px 10px;
+            border-right: 1px solid #e5e5e5;
+            padding: 2.25rem 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        html.dark .book-cover-back {
+            background-color: #121212;
+            color: #f5f5f5;
+            border-right-color: #262626;
+        }
+
+        .book-spine {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 18px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.4), transparent 80%);
+            opacity: 0.6;
+        }
+
+        /* Double-Sided Paper Leaf */
+        .book-leaf {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 0.75s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .book-leaf.is-flipped {
+            transform: rotateY(-180deg) !important;
+        }
+
+        /* Front Face (Right Page) */
+        .leaf-face-front {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 2px 8px 8px 2px;
+            border: 1px solid #e7e5e4;
+            background-color: #fdfbf7;
+            color: #1c1917;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 1.75rem 1.5rem;
+            overflow-y: auto;
+            cursor: pointer;
+            user-select: none;
+            transform: translateZ(0.5px);
+        }
+
+        html.dark .leaf-face-front {
+            background-color: #121212;
+            color: #e5e5e5;
+            border-color: #262626;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Back Face (Left Page) */
+        .leaf-face-back {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 8px 2px 2px 8px;
+            border: 1px solid #e7e5e4;
+            border-right: 1px solid #d6d3d1;
+            background-color: #fdfbf7;
+            color: #1c1917;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 1.75rem 1.5rem;
+            overflow-y: auto;
+            cursor: pointer;
+            user-select: none;
+            transform: rotateY(180deg) translateZ(0.5px);
+        }
+
+        html.dark .leaf-face-back {
+            background-color: #121212;
+            color: #e5e5e5;
+            border-color: #262626;
+            border-right-color: #262626;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Crease Shading */
+        .leaf-face-front::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 24px;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.06), transparent);
+            pointer-events: none;
+        }
+
+        .leaf-face-back::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 24px;
+            background: linear-gradient(to left, rgba(0, 0, 0, 0.06), transparent);
+            pointer-events: none;
+        }
+
+        /* Static Back Cover */
+        .book-back-cover {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 2px 8px 8px 2px;
+            border: 1px solid #e7e5e4;
+            background-color: #fdfbf7;
+            color: #1c1917;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transform: translateZ(-1px);
+            z-index: -1;
+        }
+
+        html.dark .book-back-cover {
+            background-color: #121212;
+            color: #e5e5e5;
+            border-color: #262626;
+        }
+
+      
+        /* ScrollExpand Component Styles */
+        .scroll-expand {
+            position: relative;
+            width: 100%;
+            height: auto;
+            background-color: #000000;
+        }
+
+        .scroll-expand__track {
+            position: relative;
+            width: 100%;
+        }
+
+        .scroll-expand__stage {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            overflow: hidden;
+            background-color: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scroll-expand__frame {
+            position: absolute;
+            inset: 0;
+            will-change: clip-path;
+            overflow: hidden;
+        }
+
+        .scroll-expand__media {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            will-change: transform;
+            transform-origin: center;
+        }
+
+        .scroll-expand__scrim {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.7) 100%);
+            opacity: 0;
+            will-change: opacity;
+        }
+
+        .scroll-expand__overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6%;
+            opacity: 0;
+            will-change: opacity, transform;
+            pointer-events: none;
+        }
+
+        .scroll-expand__title {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0 6%;
+            text-align: center;
+            font-size: var(--se-title-size, 3rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            color: #ffffff;
+            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
+            pointer-events: none;
+            will-change: opacity, transform;
+        }
+
+        .scroll-expand__hint {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 2.5rem;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            will-change: opacity, transform;
+            text-transform: uppercase;
+        }
+
+      </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body class="bg-canvas text-body font-body-md antialiased min-h-screen">
+
+<!-- Top Header / Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 h-16 z-50 bg-surface/80 dark:bg-black/80 backdrop-blur-md border-b border-hairline dark:border-slate-800 transition-colors duration-200">
+  <div class="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+    <!-- Logo section -->
+    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+      <div class="w-8 h-8 bg-ink dark:bg-white rounded-lg flex items-center justify-center text-on-primary dark:text-black">
+        <span class="material-symbols-outlined text-[20px] font-bold">sailing</span>
+      </div>
+      <div>
+        <h1 class="font-headline-md text-sm md:text-base font-bold text-ink dark:text-white leading-tight">ORCA Marine</h1>
+        <p class="font-label-mono text-[9px] text-mute uppercase tracking-widest leading-none">Intelligence</p>
+      </div>
+    </div>
+
+    <!-- Navigation links -->
+    <nav class="hidden lg:flex items-center gap-1">
+      <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-on-primary dark:bg-white dark:text-black shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">info</span>
+        <span>About</span>
+      </a>
+      <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+        <span>Assistant</span>
+      </a>
+      <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">map</span>
+        <span>Map</span>
+      </a>
+      <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">warning</span>
+        <span>Safety & Alerts</span>
+      </a>
+      <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">sailing</span>
+        <span>Fishing</span>
+      </a>
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Agent Status Indicator Button -->
+      <button onclick="window.location.href='status.html'" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-hairline dark:border-slate-800 bg-surface-container-low/50 dark:bg-slate-900/50 hover:bg-surface-container-highest/50 dark:hover:bg-slate-800/50 transition-all text-xs font-semibold">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-ink dark:text-slate-200">Agent Status</span>
+      </button>
+
+      <!-- Settings Icon Button -->
+      <a href="settings.html" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center" title="Settings">
+        <span class="material-symbols-outlined">settings</span>
+      </a>
+
+      <!-- Theme Toggle inside Navbar -->
+      <button id="theme-toggle-btn-nav" aria-label="Toggle Dark Mode" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg text-amber-500 dark:hidden">light_mode</span>
+        <span class="material-symbols-outlined text-lg text-cyan-400 hidden dark:inline">dark_mode</span>
+      </button>
+
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Menu dropdown -->
+  <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
+    <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
+      <span class="material-symbols-outlined">info</span>
+      <span>About</span>
+    </a>
+    <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">smart_toy</span>
+      <span>Assistant</span>
+    </a>
+    <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">map</span>
+      <span>Map</span>
+    </a>
+    <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">warning</span>
+      <span>Safety & Alerts</span>
+    </a>
+    <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">sailing</span>
+      <span>Fishing</span>
+    </a>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="flex-1 w-full pt-16">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex flex-col items-center justify-center text-center px-4 md:px-3xl py-section mesh-gradient overflow-hidden border-b border-hairline">
+<div class="z-10 max-w-4xl mx-auto flex flex-col items-center gap-lg">
+<div class="font-label-mono text-label-mono bg-surface-container-highest px-sm py-xxs rounded-DEFAULT text-body border border-hairline mb-4">
+                    INTRODUCING ORCA v1.0
+                </div>
+<div class="masked-heading-container my-4">
+    <h1 id="masked-heading-root" class="masked-heading cursor-pointer">
+        <span class="masked-heading__measure">
+            <span class="masked-heading__word">Marine</span>
+            <span class="masked-heading__word">Intelligence,</span>
+            <br />
+            <span class="masked-heading__word">Made</span>
+            <span class="masked-heading__word">Actionable</span>
+        </span>
+
+        <svg class="masked-heading__defs" aria-hidden="true" focusable="false">
+            <defs>
+                <clipPath id="mh-hero-clip" clipPathUnits="userSpaceOnUse">
+                    <text class="masked-heading__glyph">Marine</text>
+                    <text class="masked-heading__glyph">Intelligence,</text>
+                    <text class="masked-heading__glyph">Made</text>
+                    <text class="masked-heading__glyph">Actionable</text>
+                </clipPath>
+            </defs>
+        </svg>
+
+        <span class="masked-heading__reveal">
+            <span class="masked-heading__clip">
+                <span class="masked-heading__media">
+                    <video class="masked-heading__source" src="wildwanderlustinfinity_pindown.io_1787584028.mp4" autoPlay muted loop playsInline></video>
+                </span>
+            </span>
+        </span>
+    </h1>
+</div>
+<p class="font-body-lg text-body-lg text-body max-w-2xl mt-4">
+    ORCA leverages advanced agentic AI reasoning to synthesize complex meteorological, navigational, and operational marine data into clear, actionable intelligence for professionals at sea.
+</p>
+<!-- AI Assistant Quick Prompt Input -->
+<div class="mt-xl w-full max-w-xl mx-auto">
+  <form action="assistant.html" method="GET" class="relative flex items-center bg-surface-container-lowest dark:bg-slate-900/90 border border-hairline dark:border-slate-800 hover:border-cyan-500/50 focus-within:border-cyan-500 rounded-full p-2 pl-4 shadow-xl backdrop-blur-md transition-all duration-300 group">
+    <!-- AI Pulsing Dot Indicator -->
+    <div class="flex items-center justify-center text-gradient-cyan mr-3 shrink-0">
+      <span class="relative flex h-3 w-3">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+      </span>
+    </div>
+    
+    <!-- Input Field -->
+    <input 
+      type="text" 
+      name="q" 
+      placeholder="Ask ORCA anything about the ocean..." 
+      class="w-full bg-transparent border-none focus:outline-none focus:ring-0 text-sm md:text-base text-ink dark:text-white placeholder:text-slate-400 font-sans"
+      autocomplete="off"
+    />
+
+    <!-- Return / Submit Button -->
+    <button 
+      type="submit" 
+      class="flex items-center justify-center w-10 h-10 rounded-full bg-ink text-on-primary dark:bg-white dark:text-black hover:scale-105 transition-transform shadow-md ml-2 shrink-0" 
+      title="Ask ORCA Assistant"
+    >
+      <span class="material-symbols-outlined text-lg">arrow_forward</span>
+    </button>
+  </form>
+</div>
+</div>
+<!-- Decorative technical elements -->
+<div class="absolute bottom-10 left-10 font-label-mono text-label-mono text-mute hidden md:block">
+                SYS_STATUS: OPTIMAL<br/>LAT: 45.1234 N | LON: 12.5678 E
+            </div>
+</section>
+
+
+<!-- ScrollExpand Dynamic Section -->
+<section class="scroll-expand">
+    <div class="scroll-expand__track">
+        <div class="scroll-expand__stage">
+            <div class="scroll-expand__frame">
+                <img class="scroll-expand__media" src="2.jpg" alt="ORCA Maritime Journey" />
+                <div class="scroll-expand__scrim"></div>
+                <div class="scroll-expand__overlay">
+                    <div class="max-w-3xl px-6 text-white flex flex-col items-center gap-6">
+                        <span class="inline-flex items-center gap-xs font-label-mono text-label-mono bg-gradient-cyan/20 border border-gradient-cyan/50 text-gradient-cyan px-sm py-xxs rounded-full uppercase tracking-wider mb-2">
+                            Empowering Maritime Communities
+                        </span>
+                        <h2 class="font-headline-xl text-3xl md:text-5xl font-black tracking-tight leading-tight text-white">
+                            Smarter Decisions. <br class="hidden md:inline"/>Better Days at Sea.
+                        </h2>
+                        <p class="font-body-lg text-sm md:text-lg text-slate-300 max-w-2xl leading-relaxed">
+                            ORCA combines marine intelligence, environmental data, and AI-powered insights to help fishing communities better understand ocean conditions before heading out to sea.
+                        </p>
+                        <div class="mt-4 flex gap-md justify-center">
+                            <a href="fishing.html" class="inline-flex items-center gap-xs font-button-app text-button-app bg-ink text-on-primary border border-hairline hover:bg-gradient-blue transition-colors px-lg py-sm rounded-lg">
+                                <span>Explore Fishing Intelligence</span>
+                                <span class="material-symbols-outlined text-sm">sailing</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-expand__title">
+                Smarter Decisions. Better Days at Sea.
+            </div>
+            <div class="scroll-expand__hint">
+                Scroll to Expand
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Interactive Animated Bento Grid Section (ORCA Marine Intelligence Modules) -->
+<section class="py-section px-4 md:px-3xl bg-surface-container-low border-t border-hairline relative overflow-hidden">
+    <!-- Subtle Background Mesh Accents -->
+    <div class="absolute inset-0 pointer-events-none opacity-40">
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-gradient-cyan opacity-20 blur-3xl rounded-full"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-gradient-blue opacity-20 blur-3xl rounded-full"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Section Header -->
+        <div class="mb-2xl text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-md">
+            <div>
+                <div class="inline-flex items-center gap-xs font-label-mono text-label-mono bg-ink text-gradient-cyan px-sm py-xxs rounded-full mb-3 uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full bg-gradient-cyan animate-pulse"></span>
+                    ORCA Platform Architecture
+                </div>
+                <h2 class="font-headline-lg text-headline-lg text-ink font-bold">Why ORCA Marine Intelligence</h2>
+                <p class="font-body-md text-body-md text-body mt-2 max-w-2xl">
+                    Six specialized agentic modules working together to deliver real-time operational clarity, predictive safety, and environmental efficiency.
+                </p>
+            </div>
+            <a href="dashboard.html" class="inline-flex items-center gap-xs font-button-app text-button-app bg-ink text-on-primary px-lg py-sm rounded-lg hover:bg-gradient-blue transition-colors self-start md:self-auto">
+                <span>Open Dashboard</span>
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </a>
+        </div>
+
+        <!-- Bento Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+            
+            <!-- Card 1: AI Marine Intelligence (Featured Wide Card) -->
+            <div onclick="window.location.href='assistant.html'" class="bento-card bg-canvas-elevated rounded-[16px] p-lg md:col-span-2 flex flex-col justify-between cursor-pointer group">
+                <div>
+                    <div class="flex items-center justify-between mb-md">
+                        <div class="w-10 h-10 rounded-xl bg-ink text-gradient-cyan flex items-center justify-center shadow-md">
+                            <span class="material-symbols-outlined">smart_toy</span>
+                        </div>
+                        <span class="font-label-mono text-xs bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                            GEMINI 3.0 REASONING
+                        </span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-ink font-bold group-hover:text-secondary transition-colors">AI Marine Intelligence</h3>
+                    <p class="font-body-md text-body-md text-body mt-1 max-w-xl">
+                        Natural language interface capable of solving complex meteorological queries, fuel optimization math, and real-time vessel diagnostics instantly.
+                    </p>
+                </div>
+
+                <!-- Animated Interactive UI Box -->
+                <div class="mt-lg bg-ink text-slate-100 rounded-xl p-md font-mono text-xs relative overflow-hidden border border-slate-800 shadow-inner">
+                    <div class="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-gradient-cyan via-gradient-blue to-gradient-violet"></div>
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3 text-slate-400">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                            <span class="ml-2 font-sans font-medium text-slate-300">orca-agent-terminal v1.0</span>
+                        </span>
+                        <span class="text-[10px] text-gradient-cyan">LAT 34.05°N LON 118.24°W</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex gap-2 text-slate-400">
+                            <span class="text-gradient-cyan font-bold">&gt;</span>
+                            <span>USER: "Find fuel-optimal heading around incoming 3.5m wave swell at 14 knots."</span>
+                        </div>
+                        <div class="flex gap-2 text-emerald-400 font-sans bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                            <span class="material-symbols-outlined text-sm text-gradient-cyan">auto_awesome</span>
+                            <span>ORCA: Recommended course shift to <strong>214° SW</strong>. Avoids peak swell, saving <strong>11.4% fuel</strong>. ETA +12 mins.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-lg pt-md border-t border-hairline flex items-center justify-between text-body hover:text-ink font-medium">
+                    <span class="font-button-app">Explore Marine Assistant</span>
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Fishing Intelligence -->
+            <div onclick="window.location.href='fishing.html'" class="bento-card bg-canvas-elevated rounded-[16px] p-lg flex flex-col justify-between cursor-pointer group">
+                <div>
+                    <div class="flex items-center justify-between mb-md">
+                        <div class="w-10 h-10 rounded-xl bg-ink text-gradient-cyan flex items-center justify-center shadow-md">
+                            <span class="material-symbols-outlined">sailing</span>
+                        </div>
+                        <span class="font-label-mono text-xs bg-surface-container px-2.5 py-1 rounded-full text-mute font-medium">SST & Chlorophyll</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-ink font-bold group-hover:text-secondary transition-colors">Fishing Intelligence</h3>
+                    <p class="font-body-md text-body-md text-body mt-1">
+                        Predictive modeling using sea surface temperature (SST) & chlorophyll fronts to pinpoint maximum yield zones.
+                    </p>
+                </div>
+
+                <!-- Animated Thermal Radar Graphic -->
+                <div class="my-md h-32 rounded-xl bg-slate-950 relative overflow-hidden flex items-center justify-center border border-slate-800">
+                    <div class="absolute inset-0 opacity-30 bg-[radial-gradient(#00dfd8_1px,transparent_1px)] [background-size:12px_12px]"></div>
+                    <!-- Radar Ring -->
+                    <div class="absolute w-24 h-24 rounded-full border border-gradient-cyan/40 animate-radar"></div>
+                    <div class="absolute w-16 h-16 rounded-full border border-gradient-blue/60"></div>
+                    <!-- High Catch Target -->
+                    <div class="absolute top-8 right-12 flex items-center gap-1.5 bg-gradient-cyan/20 border border-gradient-cyan text-gradient-cyan text-[10px] font-mono px-2 py-0.5 rounded-full animate-pulse">
+                        <span class="w-1.5 h-1.5 rounded-full bg-gradient-cyan"></span>
+                        <span>HIGH YIELD 92%</span>
+                    </div>
+                    <span class="material-symbols-outlined text-gradient-cyan text-3xl animate-float">phishing</span>
+                </div>
+
+                <div class="pt-md border-t border-hairline flex items-center justify-between text-body hover:text-ink font-medium">
+                    <span class="font-button-app">View Fishing Grounds</span>
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Interactive Marine Maps -->
+            <div onclick="window.location.href='map.html'" class="bento-card bg-canvas-elevated rounded-[16px] p-lg flex flex-col justify-between cursor-pointer group">
+                <div>
+                    <div class="flex items-center justify-between mb-md">
+                        <div class="w-10 h-10 rounded-xl bg-ink text-gradient-cyan flex items-center justify-center shadow-md">
+                            <span class="material-symbols-outlined">map</span>
+                        </div>
+                        <span class="font-label-mono text-xs bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 px-2 py-0.5 rounded-full font-medium">LIVE AIS</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-ink font-bold group-hover:text-secondary transition-colors">Interactive Marine Maps</h3>
+                    <p class="font-body-md text-body-md text-body mt-1">
+                        Vector bathymetry maps with real-time AIS vessel telemetry and environmental overlays.
+                    </p>
+                </div>
+
+                <!-- Animated Grid Map -->
+                <div class="my-md h-32 rounded-xl bg-slate-950 relative overflow-hidden border border-slate-800 p-3 flex flex-col justify-between">
+                    <div class="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#00dfd8_1px,transparent_1px),linear-gradient(to_bottom,#00dfd8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                    <!-- Scanline -->
+                    <div class="absolute inset-x-0 h-1 bg-gradient-cyan/30 animate-scanline"></div>
+                    <div class="flex justify-between z-10 text-[10px] font-mono text-slate-400">
+                        <span>SYS_FEED: ACTIVE</span>
+                        <span class="text-gradient-cyan font-bold">12 VESSELS IN RANGE</span>
+                    </div>
+                    <div class="z-10 flex items-center gap-2 self-start bg-slate-900/90 border border-slate-700 px-2 py-1 rounded">
+                        <span class="w-2 h-2 rounded-full bg-gradient-cyan animate-pulse"></span>
+                        <span class="font-mono text-[10px] text-slate-200">CARGO VESSEL #8941</span>
+                    </div>
+                </div>
+
+                <div class="pt-md border-t border-hairline flex items-center justify-between text-body hover:text-ink font-medium">
+                    <span class="font-button-app">Open Live Map</span>
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </div>
+            </div>
+
+            <!-- Card 5: Safety Monitoring & Alerts -->
+            <div onclick="window.location.href='safety.html'" class="bento-card bg-canvas-elevated rounded-[16px] p-lg flex flex-col justify-between cursor-pointer group">
+                <div>
+                    <div class="flex items-center justify-between mb-md">
+                        <div class="w-10 h-10 rounded-xl bg-ink text-amber-400 flex items-center justify-center shadow-md">
+                            <span class="material-symbols-outlined">warning</span>
+                        </div>
+                        <span class="font-label-mono text-xs bg-amber-500/10 text-amber-600 border border-amber-500/20 px-2 py-0.5 rounded-full font-medium">REAL-TIME RISKS</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-ink font-bold group-hover:text-secondary transition-colors">Safety Monitoring</h3>
+                    <p class="font-body-md text-body-md text-body mt-1">
+                        Instant threat detection for adverse weather conditions, shallow reef warnings, and collision proximity.
+                    </p>
+                </div>
+
+                <!-- Animated Alert Gauge -->
+                <div class="my-md h-32 rounded-xl bg-slate-950 p-3 relative overflow-hidden border border-slate-800 flex flex-col justify-between">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                        <span class="font-mono text-[10px] text-slate-400">ALERT INDEX</span>
+                        <span class="font-mono text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">STATUS: OPTIMAL</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full border-2 border-amber-400/40 border-t-amber-400 animate-spin flex items-center justify-center">
+                            <span class="material-symbols-outlined text-amber-400 text-lg">shield</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-xs font-semibold text-slate-200">Squall Proximity Warning</div>
+                            <div class="text-[11px] font-mono text-slate-400">Wind Speed 24kts | Swell 2.4m</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-md border-t border-hairline flex items-center justify-between text-body hover:text-ink font-medium">
+                    <span class="font-button-app">View Safety Center</span>
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+<!-- Cinematic Video Showcase Section -->
+<section class="py-section px-4 md:px-3xl bg-canvas border-t border-hairline relative overflow-hidden">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-xl text-center">
+            <div class="inline-flex items-center gap-xs font-label-mono text-label-mono bg-surface-container-highest text-ink border border-hairline px-sm py-xxs rounded-full mb-3 uppercase tracking-wider">
+                <span class="w-2 h-2 rounded-full bg-gradient-cyan animate-ping"></span>
+                CINEMATIC PLATFORM OVERVIEW
+            </div>
+            <h2 class="font-headline-lg text-headline-lg text-ink font-bold">ORCA Marine Intelligence in Action</h2>
+            <p class="font-body-md text-body-md text-body mt-2 max-w-2xl mx-auto">
+                Witness real-time oceanographic visualization, agentic vessel routing, and predictive marine safety operations at sea.
+            </p>
+        </div>
+
+        <!-- Video Player Container with Glassmorphism Border & Glow -->
+        <div class="relative rounded-2xl overflow-hidden border border-hairline bg-slate-950 shadow-2xl group">
+            <div class="absolute inset-0 pointer-events-none z-10 rounded-2xl ring-1 ring-white/10"></div>
+            
+            <video 
+                autoplay 
+                loop 
+                muted 
+                playsinline 
+                preload="auto"
+                class="w-full h-auto max-h-[640px] object-cover rounded-2xl transition-transform duration-700 group-hover:scale-[1.01]"
+            >
+                <source src="Create_a_professional_cinemat.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+
+            <!-- Video Overlay Badges -->
+            <div class="absolute top-4 left-4 z-20 flex items-center gap-2 bg-slate-950/80 backdrop-blur-md border border-slate-800 text-slate-200 text-xs font-mono px-3 py-1.5 rounded-lg shadow-lg">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                <span>AUTOPLAYING OVERVIEW</span>
+            </div>
+
+            <div class="absolute bottom-4 right-4 z-20 flex items-center gap-2 bg-slate-950/80 backdrop-blur-md border border-slate-800 text-gradient-cyan text-xs font-mono px-3 py-1.5 rounded-lg shadow-lg">
+                <span class="material-symbols-outlined text-sm text-gradient-cyan">volume_off</span>
+                <span>MUTED FOR SEAMLESS PLAYBACK</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Interactive 3D Book Section -->
+<section id="interactive-book-section" class="py-section px-4 md:px-3xl bg-canvas border-t border-hairline relative overflow-hidden book-section">
+    <div class="max-w-6xl mx-auto relative z-10">
+        <!-- Section Header -->
+        <div class="mb-2xl text-center">
+            <div class="inline-flex items-center gap-xs font-label-mono text-label-mono bg-surface-container-highest text-ink border border-hairline px-sm py-xxs rounded-full mb-3 uppercase tracking-wider">
+                <span class="w-2 h-2 rounded-full bg-gradient-cyan animate-pulse"></span>
+                INTERACTIVE PLATFORM MANUAL
+            </div>
+            <h2 class="font-headline-lg text-headline-lg text-ink font-bold">ORCA Intelligence Manual</h2>
+            <p class="font-body-md text-body-md text-body mt-2 max-w-xl mx-auto">
+                Click the book cover below to open our interactive 3D manual and flip through all 6 chapters.
+            </p>
+        </div>
+
+        <!-- Book Stage & Frame -->
+        <div class="flex flex-col items-center justify-center min-h-[580px] relative py-6">
+            
+            <!-- Floating Navigation Controls -->
+            <div id="book-controls" class="hidden opacity-0 transition-opacity duration-500 mb-6 flex items-center gap-4 bg-surface-container-lowest/90 dark:bg-slate-900/90 backdrop-blur-md px-5 py-2.5 rounded-full border border-hairline dark:border-slate-800 shadow-xl z-50">
+                <button id="book-prev-btn" aria-label="Previous Page" class="p-1.5 rounded-full hover:bg-surface-container-highest dark:hover:bg-slate-800 text-ink transition-colors disabled:opacity-30">
+                    <span class="material-symbols-outlined text-xl">arrow_back</span>
+                </button>
+                <span id="book-page-indicator" class="font-mono text-xs font-semibold text-ink px-2">Cover</span>
+                <button id="book-next-btn" aria-label="Next Page" class="p-1.5 rounded-full hover:bg-surface-container-highest dark:hover:bg-slate-800 text-ink transition-colors disabled:opacity-30">
+                    <span class="material-symbols-outlined text-xl">arrow_forward</span>
+                </button>
+                <div class="w-px h-4 bg-hairline mx-1"></div>
+                <button id="book-restart-btn" title="Restart Book" class="p-1.5 rounded-full hover:bg-surface-container-highest dark:hover:bg-slate-800 text-ink transition-colors">
+                    <span class="material-symbols-outlined text-lg">restart_alt</span>
+                </button>
+                <button id="book-close-btn" title="Close Book" class="p-1.5 rounded-full hover:bg-red-500/10 text-red-500 transition-colors">
+                    <span class="material-symbols-outlined text-lg">close</span>
+                </button>
+            </div>
+
+            <!-- 3D Book Container -->
+            <div id="orca-book-wrapper" class="book-wrapper">
+                
+                <!-- Front Cover Leaf -->
+                <div id="orca-book-cover" class="book-cover-leaf">
+                    <!-- Front Face -->
+                    <div class="book-cover-front" style="background-image: url('images/book_cover.jpg');">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                        <div class="book-spine"></div>
+                        <div class="absolute bottom-6 left-5 right-5 text-white">
+                            <span class="font-label-mono text-[10px] bg-gradient-cyan/20 border border-gradient-cyan/50 text-gradient-cyan px-2 py-0.5 rounded uppercase tracking-widest font-bold">OFFICIAL MANUAL</span>
+                            <h3 class="font-display-xl text-xl font-bold mt-2 drop-shadow-md text-white">ORCA Marine Intelligence</h3>
+                            <p class="font-body-md text-xs text-slate-300 border-t border-white/20 pt-2 mt-2 uppercase tracking-wider">Interactive Platform Guide</p>
+                        </div>
+                    </div>
+                    <!-- Back Face (Inside Cover) -->
+                    <div class="book-cover-back">
+                        <div>
+                            <span class="material-symbols-outlined text-gradient-cyan text-4xl mb-3">auto_awesome</span>
+                            <h4 class="font-headline-md text-lg font-bold text-ink mb-2">ORCA Platform Guide</h4>
+                            <div class="w-12 h-0.5 bg-gradient-cyan mx-auto mb-3"></div>
+                            <p class="font-body-md text-xs text-mute uppercase tracking-widest font-mono">Interactive Edition</p>
+                            <p class="font-body-md text-xs text-body mt-4">Click the right page or use the arrows above to turn the pages.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaf 1: Front = Page 1 (Right), Back = Page 2 (Left) -->
+                <div class="book-leaf" data-leaf="0" style="z-index: 3;">
+                    <!-- Front Face (Page 1 - Right Side) -->
+                    <div class="leaf-face-front">
+                        <div class="text-right text-[11px] font-mono text-mute mb-2">PAGE 01</div>
+                        <span class="font-label-mono text-[10px] bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 px-2 py-0.5 rounded font-semibold uppercase">01 — Overview</span>
+                        <h3 class="font-headline-md text-base font-bold text-ink mt-2 mb-2">Discover ORCA</h3>
+                        <h4 class="font-label-mono text-xs font-semibold text-gradient-cyan mb-2">What is ORCA?</h4>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            ORCA — Marine Intelligence Platform is designed to make complex ocean and marine information easier to understand and use. Marine data often comes from different sources and can be difficult to interpret. ORCA brings important information together into one intelligent platform.
+                        </p>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            Using interactive maps, data visualizations, analytical tools, and AI-powered assistance, ORCA helps users explore marine conditions and transform raw information into meaningful insights.
+                        </p>
+
+                        <div class="mt-3 pt-2.5 border-t border-hairline">
+                            <div class="font-label-mono text-[11px] font-bold text-ink mb-1.5">Related Questions</div>
+                            <div class="space-y-1.5 text-[11px]">
+                                <div class="bg-surface-container-low p-2 rounded border border-hairline">
+                                    <div class="font-semibold text-ink">Q: What problem does ORCA solve?</div>
+                                    <div class="text-mute mt-0.5">ORCA reduces the difficulty of accessing and understanding scattered and complex marine information.</div>
+                                </div>
+                                <div class="bg-surface-container-low p-2 rounded border border-hairline">
+                                    <div class="font-semibold text-ink">Q: What makes ORCA different?</div>
+                                    <div class="text-mute mt-0.5">Instead of presenting users with raw datasets alone, ORCA focuses on making marine information easier to explore, understand, and use for better decision-making.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back Face (Page 2 - Left Side) -->
+                    <div class="leaf-face-back">
+                        <div class="text-left text-[11px] font-mono text-mute mb-2">PAGE 02</div>
+                        <span class="font-label-mono text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded font-semibold uppercase">02 — Data Architecture</span>
+                        <h3 class="font-headline-md text-base font-bold text-ink mt-2 mb-2">Data & Intelligence</h3>
+                        <h4 class="font-label-mono text-xs font-semibold text-gradient-cyan mb-2">What information does ORCA work with?</h4>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            ORCA brings together different types of marine and environmental information to create a clearer picture of ocean conditions. Depending on the available data sources, users can explore information related to ocean surface conditions, weather, waves, environmental indicators, and geospatial marine observations.
+                        </p>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            The platform presents this information through visual dashboards and interactive maps, helping users understand relationships and patterns that may be difficult to identify from raw data.
+                        </p>
+
+                        <div class="mt-3 pt-2.5 border-t border-hairline">
+                            <div class="font-label-mono text-[11px] font-bold text-ink mb-1.5">Related Questions</div>
+                            <div class="space-y-1.5 text-[11px]">
+                                <div class="bg-surface-container-low p-2 rounded border border-hairline">
+                                    <div class="font-semibold text-ink">Q: Where does the information come from?</div>
+                                    <div class="text-mute mt-0.5">ORCA is designed to work with trusted marine, environmental, satellite, and weather data sources.</div>
+                                </div>
+                                <div class="bg-surface-container-low p-2 rounded border border-hairline">
+                                    <div class="font-semibold text-ink">Q: Is the information easy to understand?</div>
+                                    <div class="text-mute mt-0.5">Yes. One of ORCA's main goals is to transform complex information into clearer visualizations and understandable insights.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaf 2: Front = Page 3 (Right), Back = Page 4 (Left) -->
+                <div class="book-leaf" data-leaf="1" style="z-index: 2;">
+                    <!-- Front Face (Page 3 - Right Side) -->
+                    <div class="leaf-face-front">
+                        <div class="text-right text-[11px] font-mono text-mute mb-2">PAGE 03</div>
+                        <span class="font-label-mono text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded font-semibold uppercase">03 — Yield Analytics</span>
+                        <h3 class="font-headline-md text-base font-bold text-ink mt-2 mb-2">Fishing Intelligence</h3>
+                        <h4 class="font-label-mono text-xs font-semibold text-gradient-cyan mb-2">How can ORCA support fishing decisions?</h4>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            Fishing decisions can depend on changing marine and environmental conditions. ORCA's Fishing Intelligence feature helps users explore relevant ocean indicators and identify areas that may be potentially suitable for fishing.
+                        </p>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            Instead of relying on a single piece of information, the platform brings multiple marine conditions into the decision-making process and presents them visually on an interactive map.
+                        </p>
+
+                        <div class="mt-3 pt-2.5 border-t border-hairline">
+                            <div class="font-label-mono text-[11px] font-bold text-ink mb-1.5">Related Questions</div>
+                            <div class="space-y-1.5 text-[11px]">
+                                <div class="bg-surface-container-low p-2 rounded border border-hairline">
+                                    <div class="font-semibold text-ink">Q: Does ORCA guarantee a catch?</div>
+                                    <div class="text-mute mt-0.5">No. ORCA provides information and insights to support decisions. Natural marine conditions and fishing outcomes can always vary.</div>
+                                </div>
+                                <div class="bg-surface-container-low p-2 rounded border border-hairline">
+                                    <div class="font-semibold text-ink">Q: Who can benefit from this feature?</div>
+                                    <div class="text-mute mt-0.5">Fishermen and marine stakeholders can use these insights to better understand surrounding conditions before planning activities at sea.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back Face (Page 4 - Left Side) -->
+                    <div class="leaf-face-back">
+                        <div class="text-left text-[11px] font-mono text-mute mb-2">PAGE 04</div>
+                        <span class="font-label-mono text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded font-semibold uppercase">04 — Safety & Navigation</span>
+                        <h3 class="font-headline-md text-base font-bold text-ink mt-2 mb-2">Maps, Routes & Safety</h3>
+                        <h4 class="font-label-mono text-xs font-semibold text-gradient-cyan mb-2">How does ORCA help users navigate marine conditions?</h4>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            ORCA provides interactive marine maps that help users visualize important ocean and environmental information geographically. Instead of reading large amounts of data, users can explore conditions directly on a map.
+                        </p>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            The Route Planning and Safety features can help users consider marine conditions when planning journeys and understanding potentially challenging situations at sea.
+                        </p>
+
+                        <div class="mt-3 pt-2.5 border-t border-hairline">
+                            <div class="font-label-mono text-[11px] font-bold text-ink mb-1.5">Related Questions</div>
+                            <div class="space-y-1.5 text-[11px]">
+                                <div class="bg-surface-container-low p-2 rounded border border-hairline">
+                                    <div class="font-semibold text-ink">Q: What can I explore on the map?</div>
+                                    <div class="text-mute mt-0.5">Users can explore available marine layers, environmental information, ocean conditions, and other geospatial insights.</div>
+                                </div>
+                                <div class="bg-surface-container-low p-2 rounded border border-hairline">
+                                    <div class="font-semibold text-ink">Q: Is ORCA a replacement for official safety systems?</div>
+                                    <div class="text-mute mt-0.5">No. ORCA is an information and decision-support platform. Users should always follow official warnings, regulations, and maritime safety guidance.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaf 3: Front = Page 5 (Right), Back = Page 6 (Left) -->
+                <div class="book-leaf" data-leaf="2" style="z-index: 1;">
+                    <!-- Front Face (Page 5 - Right Side) -->
+                    <div class="leaf-face-front">
+                        <div class="text-right text-[11px] font-mono text-mute mb-2">PAGE 05</div>
+                        <span class="font-label-mono text-[10px] bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded font-semibold uppercase">05 — Conversational AI</span>
+                        <h3 class="font-headline-md text-base font-bold text-ink mt-2 mb-2">The ORCA AI Assistant</h3>
+                        <h4 class="font-label-mono text-xs font-semibold text-gradient-cyan mb-2">How does the AI Assistant work?</h4>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            Marine information can be technical and difficult to search. The ORCA AI Assistant allows users to interact with the platform using natural language. Instead of navigating multiple datasets and technical interfaces, users can simply ask questions.
+                        </p>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            The assistant is designed to help explain available information, summarize conditions, and guide users toward useful insights in a more conversational way.
+                        </p>
+
+                        <div class="bg-surface-container-low p-2.5 rounded-lg border border-hairline mb-3">
+                            <div class="font-label-mono text-[11px] font-bold text-ink mb-1.5">Examples of questions you can ask:</div>
+                            <ul class="space-y-1 text-[11px] text-body list-disc pl-4">
+                                <li>"What are the current marine conditions in this area?"</li>
+                                <li>"Which factors should I consider before planning a route?"</li>
+                                <li>"Explain these ocean conditions in simple terms."</li>
+                                <li>"What information is available for this region?"</li>
+                            </ul>
+                        </div>
+                        <p class="font-body-md text-xs italic text-mute text-center font-medium">
+                            The goal is simple: make complex marine information more accessible to everyone.
+                        </p>
+                    </div>
+
+                    <!-- Back Face (Page 6 - Left Side) -->
+                    <div class="leaf-face-back">
+                        <div class="text-left text-[11px] font-mono text-mute mb-2">PAGE 06</div>
+                        <span class="font-label-mono text-[10px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded font-semibold uppercase">06 — Vision & Mission</span>
+                        <h3 class="font-headline-md text-base font-bold text-ink mt-2 mb-2">One Platform, Many Insights</h3>
+                        <h4 class="font-label-mono text-xs font-semibold text-gradient-cyan mb-2">Why ORCA?</h4>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-2.5">
+                            The ocean generates an enormous amount of valuable information, but that information is often spread across different systems and difficult for everyday users to interpret.
+                        </p>
+                        <p class="font-body-md text-xs leading-relaxed text-body mb-3">
+                            ORCA brings together marine intelligence, interactive mapping, fishing insights, route planning, safety monitoring, AI assistance, and analytical reports within a unified experience.
+                        </p>
+
+                        <div class="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 p-2.5 rounded-lg border border-gradient-cyan/30 text-center my-2.5">
+                            <div class="font-label-mono text-[11px] font-bold text-gradient-cyan uppercase">Our Mission</div>
+                            <p class="font-body-md text-xs text-ink mt-1 font-medium">
+                                Transform complex marine information into accessible intelligence that helps people better understand the ocean and make more informed decisions.
+                            </p>
+                        </div>
+
+                        <div class="text-center pt-1.5">
+                            <p class="font-label-mono text-[10px] text-mute uppercase mb-1">ORCA is built around one central idea:</p>
+                            <p class="font-display-xl text-xs font-bold text-ink italic">
+                                "The ocean is full of data. ORCA helps turn it into understanding."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Static Back Cover -->
+                <div class="book-back-cover">
+                    <span class="material-symbols-outlined text-gradient-cyan text-4xl mb-2">check_circle</span>
+                    <p class="font-serif text-ink italic text-sm font-semibold">End of Manual</p>
+                    <p class="font-body-md text-xs text-mute mt-1">Thank you for exploring ORCA Marine Intelligence.</p>
+                </div>
+
+            </div>
+
+            <!-- Hint text when closed -->
+            <div id="book-hint" class="mt-6 text-center text-xs font-mono text-mute tracking-widest uppercase cursor-pointer hover:text-ink transition-colors">
+                <span class="inline-block animate-bounce mr-1">👆</span> Click Book Cover to Open Manual
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('masked-heading-root');
+    if (!root) return;
+
+    const media = root.querySelector('.masked-heading__media');
+    const measure = root.querySelector('.masked-heading__measure');
+    const wordEls = root.querySelectorAll('.masked-heading__word');
+    const glyphEls = root.querySelectorAll('.masked-heading__glyph');
+
+    if (!media || !measure) return;
+
+    const fillScale = 1.35;
+    const parallax = 32;
+    const drift = 16;
+    const offset = { x: 0, y: 0, tx: 0, ty: 0 };
+
+    const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+
+    function place() {
+        const W = root.clientWidth;
+        const H = root.clientHeight;
+        const maxX = Math.max(0, ((fillScale - 1) / 2) * W);
+        const maxY = Math.max(0, ((fillScale - 1) / 2) * H);
+
+        media.style.transform = `translate3d(${clamp(offset.x, -maxX, maxX).toFixed(2)}px, ${clamp(offset.y, -maxY, maxY).toFixed(2)}px, 0) scale(${fillScale})`;
+    }
+
+    function sync() {
+        const W = root.clientWidth;
+        if (!W) return;
+
+        const cs = window.getComputedStyle(root);
+        const fontSize = parseFloat(cs.fontSize) || 64;
+
+        wordEls.forEach((box, i) => {
+            const glyph = glyphEls[i];
+            if (!glyph || !box) return;
+            glyph.setAttribute('x', box.offsetLeft.toFixed(1));
+            // y coordinate alignment to baseline
+            glyph.setAttribute('y', (box.offsetTop + fontSize * 0.82).toFixed(1));
+            glyph.style.fontFamily = cs.fontFamily;
+            glyph.style.fontSize = cs.fontSize;
+            glyph.style.fontWeight = cs.fontWeight;
+            glyph.style.letterSpacing = cs.letterSpacing;
+        });
+
+        place();
+    }
+
+    let last = performance.now();
+    let clock = 0;
+
+    function frame(now) {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        clock += dt;
+
+        const dx = Math.sin(clock * 0.21) * drift;
+        const dy = Math.cos(clock * 0.17) * drift * 0.6;
+
+        const ease = 1 - Math.exp(-dt / 0.18);
+        offset.x += (offset.tx + dx - offset.x) * ease;
+        offset.y += (offset.ty + dy - offset.y) * ease;
+
+        place();
+        requestAnimationFrame(frame);
+    }
+
+    root.addEventListener('pointermove', (e) => {
+        const r = root.getBoundingClientRect();
+        const nx = ((e.clientX - r.left) / (r.width || 1)) * 2 - 1;
+        const ny = ((e.clientY - r.top) / (r.height || 1)) * 2 - 1;
+        offset.tx = clamp(nx, -1, 1) * -parallax;
+        offset.ty = clamp(ny, -1, 1) * -parallax;
+    });
+
+    root.addEventListener('pointerleave', () => {
+        offset.tx = 0;
+        offset.ty = 0;
+    });
+
+    sync();
+    window.addEventListener('resize', sync);
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(sync);
+    }
+    requestAnimationFrame(frame);
+
+    // GSAP Entrance Animation
+    if (typeof gsap !== 'undefined') {
+        gsap.fromTo(glyphEls, 
+            { y: '+=40', opacity: 0 }, 
+            { y: 0, opacity: 1, duration: 1.1, stagger: 0.08, ease: 'power4.out' }
+        );
+    }
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const navMenu = document.getElementById('mobile-nav-menu');
+    if (menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Theme Toggle logic
+    const handleThemeToggle = () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        if (isDark) {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+            localStorage.setItem('orca_theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+            localStorage.setItem('orca_theme', 'dark');
+        }
+    };
+
+    const toggleBtn = document.getElementById('theme-toggle-btn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', handleThemeToggle);
+    }
+    const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
+    if (toggleBtnNav) {
+        toggleBtnNav.addEventListener('click', handleThemeToggle);
+    }
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const bookWrapper = document.getElementById('orca-book-wrapper');
+    const bookCover = document.getElementById('orca-book-cover');
+    const bookControls = document.getElementById('book-controls');
+    const bookHint = document.getElementById('book-hint');
+    const leaves = document.querySelectorAll('.book-leaf');
+    const prevBtn = document.getElementById('book-prev-btn');
+    const nextBtn = document.getElementById('book-next-btn');
+    const restartBtn = document.getElementById('book-restart-btn');
+    const closeBtn = document.getElementById('book-close-btn');
+    const pageIndicator = document.getElementById('book-page-indicator');
+
+    if (!bookWrapper || !bookCover) return;
+
+    let isOpen = false;
+    let currentFlippedIndex = -1; // -1 = closed cover, 0 = leaf 0 flipped (Page 2 left / Page 3 right), 1 = leaf 1 flipped (Page 4 left / Page 5 right), 2 = leaf 2 flipped (Page 6 left / Back Cover right)
+
+    const totalLeaves = leaves.length;
+
+    function updateBookState() {
+        if (isOpen) {
+            bookWrapper.classList.add('is-open');
+            bookCover.classList.add('is-flipped');
+            bookControls.classList.remove('hidden');
+            setTimeout(() => bookControls.classList.add('opacity-100'), 50);
+            if (bookHint) bookHint.classList.add('hidden');
+        } else {
+            bookWrapper.classList.remove('is-open');
+            bookCover.classList.remove('is-flipped');
+            bookControls.classList.remove('opacity-100');
+            setTimeout(() => bookControls.classList.add('hidden'), 400);
+            if (bookHint) bookHint.classList.remove('hidden');
+            currentFlippedIndex = -1;
+        }
+
+        leaves.forEach((leaf, idx) => {
+            if (idx <= currentFlippedIndex) {
+                leaf.classList.add('is-flipped');
+                leaf.style.zIndex = idx + 1;
+            } else {
+                leaf.classList.remove('is-flipped');
+                leaf.style.zIndex = totalLeaves - idx;
+            }
+        });
+
+        // Update Page Indicator Label
+        if (pageIndicator) {
+            if (!isOpen) {
+                pageIndicator.textContent = "Cover";
+            } else if (currentFlippedIndex === -1) {
+                pageIndicator.textContent = "Pages 1 - 2";
+            } else if (currentFlippedIndex === 0) {
+                pageIndicator.textContent = "Pages 2 - 3";
+            } else if (currentFlippedIndex === 1) {
+                pageIndicator.textContent = "Pages 4 - 5";
+            } else {
+                pageIndicator.textContent = "Pages 6";
+            }
+        }
+
+        if (prevBtn) prevBtn.disabled = (!isOpen || currentFlippedIndex < -1);
+        if (nextBtn) nextBtn.disabled = (!isOpen || currentFlippedIndex >= totalLeaves - 1);
+    }
+
+    // Open Cover
+    bookCover.addEventListener('click', () => {
+        if (!isOpen) {
+            isOpen = true;
+            currentFlippedIndex = -1;
+            updateBookState();
+        }
+    });
+
+    if (bookHint) {
+        bookHint.addEventListener('click', () => {
+            isOpen = true;
+            currentFlippedIndex = -1;
+            updateBookState();
+        });
+    }
+
+    // Click Leaf to Flip
+    leaves.forEach((leaf, idx) => {
+        leaf.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!isOpen) return;
+            if (idx <= currentFlippedIndex) {
+                // Clicked left side -> flip back
+                currentFlippedIndex = idx - 1;
+            } else {
+                // Clicked right side -> flip forward
+                currentFlippedIndex = idx;
+            }
+            updateBookState();
+        });
+    });
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentFlippedIndex >= 0) {
+                currentFlippedIndex--;
+                updateBookState();
+            } else if (currentFlippedIndex === -1) {
+                isOpen = false;
+                updateBookState();
+            }
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!isOpen) {
+                isOpen = true;
+                currentFlippedIndex = -1;
+                updateBookState();
+            } else if (currentFlippedIndex < totalLeaves - 1) {
+                currentFlippedIndex++;
+                updateBookState();
+            }
+        });
+    }
+
+    if (restartBtn) {
+        restartBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isOpen = true;
+            currentFlippedIndex = -1;
+            updateBookState();
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isOpen = false;
+            updateBookState();
+        });
+    }
+
+    // Keyboard Controls
+    window.addEventListener('keydown', (e) => {
+        if (!isOpen) return;
+        if (e.key === 'ArrowRight') {
+            if (currentFlippedIndex < totalLeaves - 1) {
+                currentFlippedIndex++;
+                updateBookState();
+            }
+        } else if (e.key === 'ArrowLeft') {
+            if (currentFlippedIndex >= 0) {
+                currentFlippedIndex--;
+                updateBookState();
+            } else if (currentFlippedIndex === -1) {
+                isOpen = false;
+                updateBookState();
+            }
+        } else if (e.key === 'Escape') {
+            isOpen = false;
+            updateBookState();
+        }
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const root = document.querySelector('.scroll-expand');
+    const track = document.querySelector('.scroll-expand__track');
+    const stage = document.querySelector('.scroll-expand__stage');
+    const frame = document.querySelector('.scroll-expand__frame');
+    const media = document.querySelector('.scroll-expand__media');
+    const title = document.querySelector('.scroll-expand__title');
+    const overlay = document.querySelector('.scroll-expand__overlay');
+    const scrim = document.querySelector('.scroll-expand__scrim');
+    const hint = document.querySelector('.scroll-expand__hint');
+
+    if (!root || !track || !stage || !frame || !media) return;
+
+    const startWidth = 42;
+    const startHeight = 58;
+    const startRadius = 24;
+    const endRadius = 0;
+    const mediaZoom = 1.35;
+    const scrollDistance = 1.2;
+    const holdDistance = 0.35;
+    const smoothing = 0.1;
+    const overlayScrim = 0.65;
+
+    const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+    const smoothstep = (edge0, edge1, x) => {
+        const t = clamp((x - edge0) / (edge1 - edge0 || 1e-6), 0, 1);
+        return t * t * (3 - 2 * t);
+    };
+
+    let stageH = 0;
+    let target = 0;
+    let current = 0;
+    let running = false;
+    let raf = 0;
+
+    function measure() {
+        stageH = window.innerHeight;
+        if (stageH <= 0) return;
+        stage.style.height = `${stageH}px`;
+        track.style.height = `${stageH * (1 + scrollDistance + holdDistance)}px`;
+        
+        const w = root.clientWidth || stageH;
+        stage.style.setProperty('--se-title-size', `${clamp(w * 0.05, 24, 72)}px`);
+    }
+
+    function applyProgress(p) {
+        const e = smoothstep(0, 1, p);
+
+        const w = startWidth + (100 - startWidth) * e;
+        const h = startHeight + (100 - startHeight) * e;
+        const ix = Math.max(0, (100 - w) / 2);
+        const iy = Math.max(0, (100 - h) / 2);
+        const r = startRadius + (endRadius - startRadius) * e;
+        frame.style.clipPath = `inset(${iy}% ${ix}% ${iy}% ${ix}% round ${r}px)`;
+
+        media.style.transform = `scale(${mediaZoom + (1 - mediaZoom) * e})`;
+
+        if (scrim) scrim.style.opacity = `${overlayScrim * e}`;
+
+        if (title) {
+            const out = smoothstep(0.4, 0.88, p);
+            title.style.opacity = `${1 - out}`;
+            title.style.transform = `translate3d(0, ${-28 * out}px, 0) scale(${1 + 0.06 * out})`;
+        }
+
+        if (hint) {
+            const gone = smoothstep(0, 0.12, p);
+            hint.style.opacity = `${1 - gone}`;
+            hint.style.transform = `translate3d(0, ${8 * gone}px, 0)`;
+        }
+
+        if (overlay) {
+            const inn = smoothstep(0.68, 1, p);
+            overlay.style.opacity = `${inn}`;
+            overlay.style.transform = `translate3d(0, ${18 * (1 - inn)}px, 0)`;
+            if (inn > 0.05) {
+                overlay.style.pointerEvents = 'auto';
+            } else {
+                overlay.style.pointerEvents = 'none';
+            }
+        }
+    }
+
+    function readProgress() {
+        const rect = track.getBoundingClientRect();
+        const span = stageH * scrollDistance;
+        return clamp(-rect.top / span, 0, 1);
+    }
+
+    function tick() {
+        const k = smoothing <= 0 ? 1 : 1 - Math.exp(-1 / (60 * smoothing));
+        current += (target - current) * k;
+        if (Math.abs(target - current) < 0.0004) {
+            current = target;
+            running = false;
+        }
+        applyProgress(current);
+        raf = running ? requestAnimationFrame(tick) : 0;
+    }
+
+    function kick() {
+        if (running) return;
+        running = true;
+        if (!raf) raf = requestAnimationFrame(tick);
+    }
+
+    function onScroll() {
+        target = readProgress();
+        kick();
+    }
+
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', measure);
+
+    // Initial render
+    target = readProgress();
+    current = target;
+    applyProgress(current);
+});
+</script>
+</body></html>

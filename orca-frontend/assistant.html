@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<script>
+    (function() {
+      const savedTheme = localStorage.getItem('orca_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+    })();
+</script>
+<!-- Google Fonts & Material Symbols -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORCA Marine Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+
+
+
+
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ee0000",
+                      "secondary": "#0057c0",
+                      "on-primary": "#ffffff",
+                      "body": "#4d4d4d",
+                      "on-tertiary": "#ffffff",
+                      "inverse-surface": "#2f3131",
+                      "surface-dim": "#dadada",
+                      "on-surface-variant": "#444748",
+                      "surface-bright": "#f9f9f9",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed-variant": "#004397",
+                      "on-background": "#1a1c1c",
+                      "outline-variant": "#c4c7c7",
+                      "surface-container": "#eeeeee",
+                      "on-tertiary-fixed-variant": "#484645",
+                      "surface": "#f9f9f9",
+                      "outline": "#747878",
+                      "mute": "#8f8f8f",
+                      "primary-fixed": "#e5e2e1",
+                      "tertiary-fixed-dim": "#cac6c4",
+                      "background": "#f9f9f9",
+                      "tertiary": "#000000",
+                      "primary-container": "#1c1b1b",
+                      "surface-container-highest": "#e2e2e2",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#006ff0",
+                      "on-tertiary-container": "#868382",
+                      "inverse-primary": "#c8c6c5",
+                      "tertiary-container": "#1c1b1a",
+                      "on-primary-container": "#858383",
+                      "ink": "#171717",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "hairline": "#ebebeb",
+                      "surface-container-low": "#f3f3f3",
+                      "surface-tint": "#5f5e5e",
+                      "on-tertiary-fixed": "#1c1b1a",
+                      "on-primary-fixed": "#1c1b1b",
+                      "primary": "#000000",
+                      "gradient-cyan": "#00dfd8",
+                      "on-secondary-fixed": "#001a43",
+                      "secondary-fixed": "#d8e2ff",
+                      "tertiary-fixed": "#e6e2df",
+                      "gradient-blue": "#007cf0",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "on-surface": "#1a1c1c",
+                      "canvas": "#fafafa",
+                      "warning": "#f5a623",
+                      "surface-variant": "#e2e2e2",
+                      "secondary-fixed-dim": "#aec6ff",
+                      "on-primary-fixed-variant": "#474746",
+                      "surface-container-high": "#e8e8e8",
+                      "canvas-elevated": "#ffffff",
+                      "gradient-violet": "#7928ca",
+                      "inverse-on-surface": "#f0f1f1",
+                      "on-secondary-container": "#fefcff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "2xl": "40px",
+                      "xs": "8px",
+                      "sm": "12px",
+                      "section": "128px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "4xl": "96px",
+                      "xxs": "4px",
+                      "xl": "32px",
+                      "3xl": "64px"
+              },
+              "fontFamily": {
+                      "sans": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+                      "mono": ["Geist Mono", "monospace"],
+                      "label-mono": ["Geist Mono", "monospace"],
+                      "display-xl": ["Inter", "sans-serif"],
+                      "button-app": ["Inter", "sans-serif"],
+                      "body-md": ["Inter", "sans-serif"],
+                      "button-marketing": ["Inter", "sans-serif"],
+                      "headline-md": ["Inter", "sans-serif"],
+                      "headline-lg": ["Inter", "sans-serif"],
+                      "body-lg": ["Inter", "sans-serif"]
+              },
+              "fontSize": {
+                      "label-mono": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                      "display-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-1.5px", "fontWeight": "600" }],
+                      "button-app": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                      "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+                      "button-marketing": ["15px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                      "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.4px", "fontWeight": "600" }],
+                      "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.8px", "fontWeight": "600" }],
+                      "body-lg": ["15px", { "lineHeight": "22px", "letterSpacing": "0", "fontWeight": "400" }]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        :root {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+        }
+        body, button, input, select, textarea {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        code, kbd, samp, pre, .font-mono, .font-label-mono {
+            font-family: 'Geist Mono', monospace !important;
+        }
+        .mesh-gradient {
+            background-color: #fafafa;
+            background-image: 
+                radial-gradient(at 10% 20%, hsla(178,100%,44%,0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(209,100%,47%,0.15) 0px, transparent 50%),
+                radial-gradient(at 40% 80%, hsla(270,66%,63%,0.15) 0px, transparent 50%);
+        }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined' !important;
+            font-weight: normal;
+            font-style: normal;
+            font-size: 20px;
+            line-height: 1;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+        }
+      
+        /* Pure Dark Mode Styles */
+        html.dark {
+            color-scheme: dark;
+            background-color: #000000 !important;
+        }
+
+        html.dark body {
+            background-color: #000000 !important;
+            color: #d4d4d4 !important;
+        }
+
+        html.dark nav, 
+        html.dark header, 
+        html.dark aside {
+            background-color: #0a0a0a !important;
+            border-color: #262626 !important;
+        }
+
+        html.dark .bg-surface,
+        html.dark .bg-canvas,
+        html.dark .bg-surface-container-low,
+        html.dark .bg-surface-container-high,
+        html.dark .bg-surface-container-highest,
+        html.dark .bg-surface-container {
+            background-color: #050505 !important;
+        }
+
+        html.dark .bg-canvas-elevated,
+        html.dark .bg-surface-container-lowest {
+            background-color: #121212 !important;
+        }
+
+        html.dark .text-ink,
+        html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+            color: #ffffff !important;
+        }
+
+        html.dark .text-body,
+        html.dark p {
+            color: #a3a3a3 !important;
+        }
+
+        html.dark .text-mute {
+            color: #737373 !important;
+        }
+
+        html.dark .border-hairline,
+        html.dark .border-outline-variant,
+        html.dark .border-slate-200,
+        html.dark .border-slate-800 {
+            border-color: #262626 !important;
+        }
+
+        html.dark .hover\:bg-surface-container-lowest:hover {
+            background-color: #1f1f1f !important;
+        }
+
+        html.dark .bg-surface-container-low.text-ink {
+            background-color: #171717 !important;
+            color: #00dfd8 !important;
+        }
+
+        html.dark input, 
+        html.dark select, 
+        html.dark textarea {
+            background-color: #0a0a0a !important;
+            color: #ffffff !important;
+            border-color: #262626 !important;
+        }
+
+        html.dark table {
+            border-color: #262626 !important;
+        }
+
+        html.dark th {
+            background-color: #121212 !important;
+            color: #ffffff !important;
+        }
+
+        html.dark td {
+            border-color: #262626 !important;
+        }
+
+        html.dark .mesh-gradient {
+            background-color: #000000 !important;
+            background-image: 
+                radial-gradient(at 10% 20%, hsla(178,100%,44%,0.12) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(209,100%,47%,0.12) 0px, transparent 50%),
+                radial-gradient(at 40% 80%, hsla(270,66%,63%,0.1) 0px, transparent 50%) !important;
+        }
+
+        html.dark #theme-toggle-btn {
+            background-color: rgba(18, 18, 18, 0.9) !important;
+            border-color: #262626 !important;
+            color: #ffffff !important;
+        }
+
+      </style>
+</head>
+<body class="text-on-surface flex flex-col h-screen overflow-hidden">
+
+<!-- Top Header / Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 h-16 z-50 bg-surface/80 dark:bg-black/80 backdrop-blur-md border-b border-hairline dark:border-slate-800 transition-colors duration-200">
+  <div class="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+    <!-- Logo section -->
+    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+      <div class="w-8 h-8 bg-ink dark:bg-white rounded-lg flex items-center justify-center text-on-primary dark:text-black">
+        <span class="material-symbols-outlined text-[20px] font-bold">sailing</span>
+      </div>
+      <div>
+        <h1 class="font-headline-md text-sm md:text-base font-bold text-ink dark:text-white leading-tight">ORCA Marine</h1>
+        <p class="font-label-mono text-[9px] text-mute uppercase tracking-widest leading-none">Intelligence</p>
+      </div>
+    </div>
+
+    <!-- Navigation links -->
+    <nav class="hidden lg:flex items-center gap-1">
+      <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">info</span>
+        <span>About</span>
+      </a>
+      <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-on-primary dark:bg-white dark:text-black shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+        <span>Assistant</span>
+      </a>
+      <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">map</span>
+        <span>Map</span>
+      </a>
+      <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">warning</span>
+        <span>Safety & Alerts</span>
+      </a>
+      <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">sailing</span>
+        <span>Fishing</span>
+      </a>
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Agent Status Indicator Button -->
+      <button onclick="window.location.href='status.html'" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-hairline dark:border-slate-800 bg-surface-container-low/50 dark:bg-slate-900/50 hover:bg-surface-container-highest/50 dark:hover:bg-slate-800/50 transition-all text-xs font-semibold">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-ink dark:text-slate-200">Agent Status</span>
+      </button>
+
+      <!-- Settings Icon Button -->
+      <a href="settings.html" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center" title="Settings">
+        <span class="material-symbols-outlined">settings</span>
+      </a>
+
+      <!-- Theme Toggle inside Navbar -->
+      <button id="theme-toggle-btn-nav" aria-label="Toggle Dark Mode" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg text-amber-500 dark:hidden">light_mode</span>
+        <span class="material-symbols-outlined text-lg text-cyan-400 hidden dark:inline">dark_mode</span>
+      </button>
+
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Menu dropdown -->
+  <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
+    <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">info</span>
+      <span>About</span>
+    </a>
+    <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
+      <span class="material-symbols-outlined">smart_toy</span>
+      <span>Assistant</span>
+    </a>
+    <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">map</span>
+      <span>Map</span>
+    </a>
+    <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">warning</span>
+      <span>Safety & Alerts</span>
+    </a>
+    <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">sailing</span>
+      <span>Fishing</span>
+    </a>
+  </div>
+</header>
+
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full pt-16 relative overflow-hidden">
+<div class="flex-1 flex overflow-hidden">
+<!-- Chat Interface -->
+<section class="flex-1 flex flex-col min-w-0 border-r border-hairline bg-canvas">
+<!-- Chat History -->
+<div class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-xl">
+<!-- Date Separator -->
+<div class="flex justify-center">
+<span class="font-label-mono text-label-mono text-mute bg-surface-container-low px-sm py-xxs rounded">TODAY, 08:42 UTC</span>
+</div>
+<!-- User Message -->
+<div class="flex gap-md max-w-3xl ml-auto justify-end">
+<div class="bg-surface-container-low border border-hairline rounded-lg p-md max-w-[85%]">
+<p class="font-body-md text-body-md text-ink">Assess weather risk for route planning from Dutch Harbor to St. Paul Island over the next 48 hours. Focus on sea state and wind conditions.</p>
+</div>
+<img alt="User" class="w-8 h-8 rounded-full border border-hairline shrink-0" data-alt="Small circular user profile avatar showing a professional seafarer in a bright modern bridge setting with technical gear." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCDHocDLJxg8FZdt5C1bahCr5WPZ__uVVKo1T5abYysjPKgXVBhz3IekebbhsvdJCnWb5PFVX0zIFY0Oh0tk4QGhgbOubQ4NS794WOxV0FwgJ4LsS0omCd1Ux_Gg33S9NWfdKhnJ5HZ8hLekHvvmLNDrbLvWvU60lNiW9YxpgcQ0Z1PHgxJs2bZ3TYDs5A58YS4jD74b0P7yzPQAdh6r-3vdbwrZkqBlMX4dOLs2N98KxgfdxPiNsT1A"/>
+</div>
+<!-- Agent Response -->
+<div class="flex gap-md max-w-3xl">
+<div class="w-8 h-8 bg-ink rounded flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary text-[18px]" data-icon="smart_toy">smart_toy</span>
+</div>
+<div class="space-y-sm max-w-[85%]">
+<div class="bg-canvas-elevated border border-hairline rounded-lg p-md">
+<p class="font-body-md text-body-md text-ink mb-md">I have analyzed the current forecasts and historical buoy data for the Bering Sea corridor between Dutch Harbor and St. Paul Island.</p>
+<!-- Risk Alert Box -->
+<div class="bg-error-container/20 border border-error/30 rounded-lg p-sm flex gap-sm mb-md">
+<span class="material-symbols-outlined text-error shrink-0" data-icon="warning">warning</span>
+<div>
+<h4 class="font-button-app text-button-app text-error mb-xxs">Elevated Risk Detected</h4>
+<p class="font-body-md text-body-md text-ink text-sm">A low-pressure system is developing west of the Pribilof Islands, expected to bring severe gale-force winds (35-45 knots) and significant wave heights exceeding 6 meters within the next 36 hours.</p>
+</div>
+</div>
+<p class="font-body-md text-body-md text-ink">Key observations:</p>
+<ul class="list-disc list-inside font-body-md text-body-md text-ink space-y-xs ml-xs text-sm">
+<li><span class="font-semibold">Wind:</span> Currently NE 15-20kt, shifting to NW and increasing to 35-45kt by 1800 UTC tomorrow.</li>
+<li><span class="font-semibold">Sea State:</span> Building from 2m to 6m+. Peak waves expected around 0600 UTC on day 2.</li>
+<li><span class="font-semibold">Visibility:</span> Reduced in heavy rain and blowing spray later tomorrow.</li>
+</ul>
+<div class="mt-md pt-md border-t border-hairline flex items-center gap-sm">
+<button class="font-button-app text-button-app text-secondary hover:text-ink transition-colors flex items-center gap-xxs">
+<span class="material-symbols-outlined text-[16px]" data-icon="map">map</span> View on Chart
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-md lg:p-lg bg-surface-bright border-t border-hairline shrink-0">
+<!-- Suggestions -->
+<div class="flex gap-sm mb-sm overflow-x-auto pb-xxs scrollbar-hide">
+<button class="shrink-0 font-label-mono text-label-mono text-body bg-canvas-elevated border border-hairline px-sm py-xxs rounded hover:border-outline-variant hover:text-ink transition-colors">/show_buoy_data</button>
+<button class="shrink-0 font-label-mono text-label-mono text-body bg-canvas-elevated border border-hairline px-sm py-xxs rounded hover:border-outline-variant hover:text-ink transition-colors">/alt_routes</button>
+<button class="shrink-0 font-label-mono text-label-mono text-body bg-canvas-elevated border border-hairline px-sm py-xxs rounded hover:border-outline-variant hover:text-ink transition-colors">/detailed_forecast</button>
+</div>
+<div class="relative flex items-center">
+<input id="chat-input" class="w-full bg-canvas-elevated border border-hairline rounded-lg py-sm pl-sm pr-12 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary font-body-md text-body-md text-ink placeholder:text-mute placeholder:font-label-mono placeholder:text-label-mono" placeholder="Ask ORCA Assistant..." type="text"/>
+<button class="absolute right-sm p-xxs text-secondary hover:text-ink transition-colors rounded">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Agent Activity Feed (Right Sidebar) -->
+<aside class="hidden xl:flex w-80 flex-col bg-surface-bright border-l border-hairline shrink-0">
+<div class="p-md border-b border-hairline flex items-center gap-sm bg-canvas">
+<span class="material-symbols-outlined text-body" data-icon="terminal">terminal</span>
+<h3 class="font-button-app text-button-app text-ink">Agent Activity</h3>
+<div class="ml-auto flex items-center gap-xxs">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gradient-cyan opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-gradient-cyan"></span>
+</span>
+<span class="font-label-mono text-[10px] text-mute uppercase">Active</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-sm space-y-sm bg-canvas">
+<div class="font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs">
+<div class="flex justify-between items-center text-[10px] text-mute">
+<span>SYSTEM_CALL</span>
+<span>08:42:15</span>
+</div>
+<div class="text-ink break-all">&gt; query_noaa_buoys(region="bering_sea", params=["wind", "wave"])</div>
+<div class="flex items-center gap-xs text-[10px] text-secondary mt-xxs">
+<span class="material-symbols-outlined text-[12px]" data-icon="check_circle">check_circle</span>
+                            Success: 12 nodes retrieved
+                        </div>
+</div>
+<div class="font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs">
+<div class="flex justify-between items-center text-[10px] text-mute">
+<span>MODEL_INFERENCE</span>
+<span>08:42:18</span>
+</div>
+<div class="text-ink break-all">&gt; analyze_risk_factors(data=buoy_data, threshold="high")</div>
+<div class="flex items-center gap-xs text-[10px] text-warning mt-xxs">
+<span class="material-symbols-outlined text-[12px]" data-icon="warning">warning</span>
+                            Alert: Sea state exceeds safety margin
+                        </div>
+</div>
+<div class="font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs">
+<div class="flex justify-between items-center text-[10px] text-mute">
+<span>DATA_FETCH</span>
+<span>08:42:22</span>
+</div>
+<div class="text-ink break-all">&gt; fetch_gfs_forecast(lat=54.5, lon=-168.5, hours=48)</div>
+<div class="flex items-center gap-xs text-[10px] text-secondary mt-xxs">
+<span class="material-symbols-outlined text-[12px] animate-spin" data-icon="sync">sync</span>
+                            Processing...
+                        </div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<style>
+        :root {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+        }
+        body, button, input, select, textarea {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        code, kbd, samp, pre, .font-mono, .font-label-mono {
+            font-family: 'Geist Mono', monospace !important;
+        }
+        .mesh-gradient {
+            background-color: #fafafa;
+            background-image: 
+                radial-gradient(at 10% 20%, hsla(178,100%,44%,0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(209,100%,47%,0.15) 0px, transparent 50%),
+                radial-gradient(at 40% 80%, hsla(270,66%,63%,0.15) 0px, transparent 50%);
+        }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined' !important;
+            font-weight: normal;
+            font-style: normal;
+            font-size: 20px;
+            line-height: 1;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+        }
+      
+        /* Pure Dark Mode Styles */
+        html.dark {
+            color-scheme: dark;
+            background-color: #000000 !important;
+        }
+
+        html.dark body {
+            background-color: #000000 !important;
+            color: #d4d4d4 !important;
+        }
+
+        html.dark nav, 
+        html.dark header, 
+        html.dark aside {
+            background-color: #0a0a0a !important;
+            border-color: #262626 !important;
+        }
+
+        html.dark .bg-surface,
+        html.dark .bg-canvas,
+        html.dark .bg-surface-container-low,
+        html.dark .bg-surface-container-high,
+        html.dark .bg-surface-container-highest,
+        html.dark .bg-surface-container {
+            background-color: #050505 !important;
+        }
+
+        html.dark .bg-canvas-elevated,
+        html.dark .bg-surface-container-lowest {
+            background-color: #121212 !important;
+        }
+
+        html.dark .text-ink {
+            color: #ffffff !important;
+        }
+    </style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const navMenu = document.getElementById('mobile-nav-menu');
+    if (menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Theme Toggle logic
+    const handleThemeToggle = () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        if (isDark) {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+            localStorage.setItem('orca_theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+            localStorage.setItem('orca_theme', 'dark');
+        }
+    };
+
+    const toggleBtn = document.getElementById('theme-toggle-btn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', handleThemeToggle);
+    }
+    const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
+    if (toggleBtnNav) {
+        toggleBtnNav.addEventListener('click', handleThemeToggle);
+    }
+
+    // Auto-fill prompt if passed from homepage Ask ORCA bar
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('q');
+    const inputEl = document.getElementById('chat-input');
+    if (query && inputEl) {
+        inputEl.value = query;
+        inputEl.focus();
+    }
+});
+</script>
+
+</body></html>

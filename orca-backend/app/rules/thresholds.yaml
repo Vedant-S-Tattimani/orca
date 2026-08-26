@@ -1,0 +1,119 @@
+# Risk thresholds for ORCA specialist agents
+# These thresholds are used by the risk_engine to convert structured agent outputs into risk flags
+# Values are based on domain expertise and should be validated with marine safety experts
+
+weather:
+  # Wind speed thresholds (km/h)
+  wind_speed:
+    low: 0
+    moderate: 20
+    high: 40
+    extreme: 60
+
+  # Rainfall thresholds (mm/h)
+  rainfall:
+    low: 0
+    moderate: 2.5
+    high: 7.5
+    extreme: 15
+
+  # Visibility thresholds (km) - lower visibility is riskier
+  visibility:
+    extreme: 1
+    high: 2
+    moderate: 5
+    low: 10
+
+  # Temperature thresholds (°C) - for heat stress or hypothermia risk
+  temperature:
+    low: 10
+    moderate: 20
+    high: 35
+    extreme: 40
+
+sea_state:
+  # Wave height thresholds (meters)
+  wave_height:
+    low: 0
+    moderate: 1.5
+    high: 2.5
+    extreme: 4
+
+  # Wave period thresholds (seconds) - short period waves are more choppy
+  wave_period:
+    low: 0
+    moderate: 5
+    high: 8
+    extreme: 12
+
+  # Swell height thresholds (meters)
+  swell_height:
+    low: 0
+    moderate: 1
+    high: 2
+    extreme: 3
+
+  # Current speed thresholds (knots)
+  current_speed:
+    low: 0
+    moderate: 1
+    high: 2
+    extreme: 3
+
+  # Tide height thresholds (meters) - relative to mean sea level
+  tide_height:
+    low: -2
+    moderate: -0.5
+    high: 0.5
+    extreme: 2
+
+hazard:
+  # Cyclone wind speed thresholds (km/h)
+  cyclone_wind_speed:
+    low: 0
+    moderate: 63  # Tropical storm
+    high: 118     # Category 1 hurricane
+    extreme: 178  # Category 3+
+
+  # Lightning probability (%)
+  lightning_probability:
+    low: 0
+    moderate: 30
+    high: 60
+    extreme: 80
+
+  # Tsunami wave height thresholds (meters)
+  tsunami_wave_height:
+    low: 0
+    moderate: 0.5
+    high: 1
+    extreme: 3
+
+pfz_satellite:
+  # Sea Surface Temperature thresholds (°C) - for fishing comfort and fish behavior
+  sst:
+    low: 24
+    moderate: 27
+    high: 30
+    extreme: 32
+
+  # Chlorophyll-a concentration thresholds (mg/m³) - indicator of phytoplankton and fish food
+  chlorophyll_a:
+    low: 0
+    moderate: 0.5
+    high: 2
+    extreme: 5
+
+  # Potential Fishing Zone confidence (%) - lower confidence is riskier
+  pfz_confidence:
+    extreme: 30
+    high: 50
+    moderate: 70
+    low: 100
+
+# General risk levels for synthesis
+risk_levels:
+  low: 0
+  moderate: 1
+  high: 2
+  extreme: 3

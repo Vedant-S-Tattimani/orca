@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<script>
+    (function() {
+      const savedTheme = localStorage.getItem('orca_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+    })();
+</script>
+<!-- Google Fonts & Material Symbols -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Geist+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORCA - Intelligence Map</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="api.js"></script>
+
+<!-- Leaflet.js for Interactive Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+
+<style>
+        :root {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+        }
+        body, button, input, select, textarea {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
+        code, kbd, samp, pre, .font-mono, .font-label-mono {
+            font-family: 'Geist Mono', monospace !important;
+        }
+        .mesh-gradient {
+            background-color: #fafafa;
+            background-image: 
+                radial-gradient(at 10% 20%, hsla(178,100%,44%,0.15) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(209,100%,47%,0.15) 0px, transparent 50%),
+                radial-gradient(at 40% 80%, hsla(270,66%,63%,0.15) 0px, transparent 50%);
+        }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined' !important;
+            font-weight: normal;
+            font-style: normal;
+            font-size: 20px;
+            line-height: 1;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-smoothing: antialiased;
+        }
+      
+        /* Pure Dark Mode Styles */
+        html.dark {
+            color-scheme: dark;
+            background-color: #000000 !important;
+        }
+
+        html.dark body {
+            background-color: #000000 !important;
+            color: #d4d4d4 !important;
+        }
+
+        html.dark nav, 
+        html.dark header, 
+        html.dark aside {
+            background-color: #0a0a0a !important;
+            border-color: #262626 !important;
+        }
+
+        html.dark .bg-surface,
+        html.dark .bg-canvas,
+        html.dark .bg-surface-container-low,
+        html.dark .bg-surface-container-high,
+        html.dark .bg-surface-container-highest,
+        html.dark .bg-surface-container {
+            background-color: #050505 !important;
+        }
+
+        html.dark .bg-canvas-elevated,
+        html.dark .bg-surface-container-lowest {
+            background-color: #121212 !important;
+        }
+
+        html.dark .text-ink,
+        html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+            color: #ffffff !important;
+        }
+
+        html.dark .text-body,
+        html.dark p {
+            color: #a3a3a3 !important;
+        }
+
+        html.dark .text-mute {
+            color: #737373 !important;
+        }
+
+        html.dark .border-hairline,
+        html.dark .border-outline-variant,
+        html.dark .border-slate-200,
+        html.dark .border-slate-800 {
+            border-color: #262626 !important;
+        }
+
+        html.dark .hover\:bg-surface-container-lowest:hover {
+            background-color: #1f1f1f !important;
+        }
+
+        html.dark .bg-surface-container-low.text-ink {
+            background-color: #171717 !important;
+            color: #00dfd8 !important;
+        }
+
+        html.dark input, 
+        html.dark select, 
+        html.dark textarea {
+            background-color: #0a0a0a !important;
+            color: #ffffff !important;
+            border-color: #262626 !important;
+        }
+
+        html.dark table {
+            border-color: #262626 !important;
+        }
+
+        html.dark th {
+            background-color: #121212 !important;
+            color: #ffffff !important;
+        }
+
+        html.dark td {
+            border-color: #262626 !important;
+        }
+
+        html.dark .mesh-gradient {
+            background-color: #000000 !important;
+            background-image: 
+                radial-gradient(at 10% 20%, hsla(178,100%,44%,0.12) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, hsla(209,100%,47%,0.12) 0px, transparent 50%),
+                radial-gradient(at 40% 80%, hsla(270,66%,63%,0.1) 0px, transparent 50%) !important;
+        }
+
+        html.dark #theme-toggle-btn {
+            background-color: rgba(18, 18, 18, 0.9) !important;
+            border-color: #262626 !important;
+            color: #ffffff !important;
+        }
+
+        /* Leaflet Marine Theme Overrides */
+        #leaflet-map, .leaflet-container {
+            width: 100%;
+            height: 100%;
+            background-color: #f8fafc !important;
+            z-index: 1;
+            font-family: 'Inter', sans-serif !important;
+        }
+        html.dark #leaflet-map, html.dark .leaflet-container {
+            background-color: #090d16 !important;
+        }
+        html.dark .leaflet-layer,
+        html.dark .leaflet-control-zoom-in,
+        html.dark .leaflet-control-zoom-out,
+        html.dark .leaflet-control-attribution {
+            filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+        .leaflet-control-attribution {
+            background: rgba(10, 10, 10, 0.7) !important;
+            color: #94a3b8 !important;
+            font-size: 10px !important;
+            backdrop-filter: blur(4px);
+        }
+        .leaflet-control-attribution a {
+            color: #38bdf8 !important;
+        }
+        .leaflet-popup-content-wrapper {
+            background: #0a0f1d !important;
+            color: #f8fafc !important;
+            border: 1px solid #1e293b !important;
+            border-radius: 12px !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            padding: 4px !important;
+        }
+        .leaflet-popup-tip {
+            background: #0a0f1d !important;
+            border: 1px solid #1e293b !important;
+        }
+        .vessel-marker-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .vessel-pulse {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 223, 216, 0.25);
+            animation: vesselPulse 2s infinite ease-out;
+        }
+        @keyframes vesselPulse {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+      </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ee0000",
+                      "secondary": "#0057c0",
+                      "on-primary": "#ffffff",
+                      "body": "#4d4d4d",
+                      "on-tertiary": "#ffffff",
+                      "inverse-surface": "#2f3131",
+                      "surface-dim": "#dadada",
+                      "on-surface-variant": "#444748",
+                      "surface-bright": "#f9f9f9",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed-variant": "#004397",
+                      "on-background": "#1a1c1c",
+                      "outline-variant": "#c4c7c7",
+                      "surface-container": "#eeeeee",
+                      "on-tertiary-fixed-variant": "#484645",
+                      "surface": "#f9f9f9",
+                      "outline": "#747878",
+                      "mute": "#8f8f8f",
+                      "primary-fixed": "#e5e2e1",
+                      "tertiary-fixed-dim": "#cac6c4",
+                      "background": "#f9f9f9",
+                      "tertiary": "#000000",
+                      "primary-container": "#1c1b1b",
+                      "surface-container-highest": "#e2e2e2",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#006ff0",
+                      "on-tertiary-container": "#868382",
+                      "inverse-primary": "#c8c6c5",
+                      "tertiary-container": "#1c1b1a",
+                      "on-primary-container": "#858383",
+                      "ink": "#171717",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "hairline": "#ebebeb",
+                      "surface-container-low": "#f3f3f3",
+                      "surface-tint": "#5f5e5e",
+                      "on-tertiary-fixed": "#1c1b1a",
+                      "on-primary-fixed": "#1c1b1b",
+                      "primary": "#000000",
+                      "gradient-cyan": "#00dfd8",
+                      "on-secondary-fixed": "#001a43",
+                      "secondary-fixed": "#d8e2ff",
+                      "tertiary-fixed": "#e6e2df",
+                      "gradient-blue": "#007cf0",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "on-surface": "#1a1c1c",
+                      "canvas": "#fafafa",
+                      "warning": "#f5a623",
+                      "surface-variant": "#e2e2e2",
+                      "secondary-fixed-dim": "#aec6ff",
+                      "on-primary-fixed-variant": "#474746",
+                      "surface-container-high": "#e8e8e8",
+                      "canvas-elevated": "#ffffff",
+                      "gradient-violet": "#7928ca",
+                      "inverse-on-surface": "#f0f1f1",
+                      "on-secondary-container": "#fefcff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "2xl": "40px",
+                      "xs": "8px",
+                      "sm": "12px",
+                      "section": "128px",
+                      "lg": "24px",
+                      "md": "16px",
+                      "4xl": "96px",
+                      "xxs": "4px",
+                      "xl": "32px",
+                      "3xl": "64px"
+              },
+              "fontFamily": {
+                      "sans": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+                      "mono": ["Geist Mono", "monospace"],
+                      "label-mono": ["Geist Mono", "monospace"],
+                      "display-xl": ["Inter", "sans-serif"],
+                      "button-app": ["Inter", "sans-serif"],
+                      "body-md": ["Inter", "sans-serif"],
+                      "button-marketing": ["Inter", "sans-serif"],
+                      "headline-md": ["Inter", "sans-serif"],
+                      "headline-lg": ["Inter", "sans-serif"],
+                      "body-lg": ["Inter", "sans-serif"]
+              },
+              "fontSize": {
+                      "label-mono": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                      "display-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-1.5px", "fontWeight": "600" }],
+                      "button-app": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                      "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+                      "button-marketing": ["15px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "500" }],
+                      "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.4px", "fontWeight": "600" }],
+                      "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.8px", "fontWeight": "600" }],
+                      "body-lg": ["15px", { "lineHeight": "22px", "letterSpacing": "0", "fontWeight": "400" }]
+              }
+            },
+          },
+        }
+      </script>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+</head>
+<body class="h-full bg-canvas text-ink overflow-hidden flex flex-col antialiased">
+
+<!-- Top Header / Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 h-16 z-50 bg-surface/80 dark:bg-black/80 backdrop-blur-md border-b border-hairline dark:border-slate-800 transition-colors duration-200">
+  <div class="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+    <!-- Logo section -->
+    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+      <div class="w-8 h-8 bg-ink dark:bg-white rounded-lg flex items-center justify-center overflow-hidden">
+        <img src="logo.svg" alt="ORCA Logo" class="w-full h-full object-contain p-[2px] invert dark:invert-0">
+      </div>
+      <div>
+        <h1 class="font-headline-md text-sm md:text-base font-bold text-ink dark:text-white leading-tight">ORCA Marine</h1>
+        <p class="font-label-mono text-[9px] text-mute uppercase tracking-widest leading-none">Intelligence</p>
+      </div>
+    </div>
+
+    <!-- Navigation links -->
+    <nav class="hidden lg:flex items-center gap-1">
+      <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">info</span>
+        <span>About</span>
+      </a>
+      <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">dashboard</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+        <span>Assistant</span>
+      </a>
+      <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-on-primary dark:bg-white dark:text-black shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">map</span>
+        <span>Map</span>
+      </a>
+      <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">warning</span>
+        <span>Safety & Alerts</span>
+      </a>
+      <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">sailing</span>
+        <span>Fishing</span>
+      </a>
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Agent Status Indicator Button -->
+      <button onclick="window.location.href='status.html'" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-hairline dark:border-slate-800 bg-surface-container-low/50 dark:bg-slate-900/50 hover:bg-surface-container-highest/50 dark:hover:bg-slate-800/50 transition-all text-xs font-semibold">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+        </span>
+        <span class="text-ink dark:text-slate-200">Agent Status</span>
+      </button>
+
+      <!-- Settings Icon Button -->
+      <a href="settings.html" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center" title="Settings">
+        <span class="material-symbols-outlined">settings</span>
+      </a>
+
+      <!-- Theme Toggle inside Navbar -->
+      <button id="theme-toggle-btn-nav" aria-label="Toggle Dark Mode" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg text-amber-500 dark:hidden">light_mode</span>
+        <span class="material-symbols-outlined text-lg text-cyan-400 hidden dark:inline">dark_mode</span>
+      </button>
+
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Menu dropdown -->
+  <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
+    <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">info</span>
+      <span>About</span>
+    </a>
+    <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">smart_toy</span>
+      <span>Assistant</span>
+    </a>
+    <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
+      <span class="material-symbols-outlined">map</span>
+      <span>Map</span>
+    </a>
+    <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">warning</span>
+      <span>Safety & Alerts</span>
+    </a>
+    <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">sailing</span>
+      <span>Fishing</span>
+    </a>
+  </div>
+</header>
+
+<!-- Main Content Canvas (Map Area) -->
+<main class="flex-1 relative w-full h-full pt-16 flex flex-col md:flex-row overflow-hidden bg-surface-bright">
+<!-- GIS Map Container -->
+<div class="flex-1 relative w-full h-full bg-surface-bright dark:bg-[#090d16]">
+  <!-- Real Interactive Leaflet Map Div -->
+  <div id="leaflet-map"></div>
+
+  <!-- Route Planning Overlay (Top Right) -->
+  <div class="absolute top-md right-md z-10 w-80 bg-surface-container-lowest dark:bg-slate-900/90 rounded-xl border border-hairline dark:border-slate-800 shadow-xl backdrop-blur-md overflow-hidden flex flex-col">
+    <div class="p-sm border-b border-hairline dark:border-slate-800 bg-surface/50 dark:bg-slate-950/50 flex justify-between items-center">
+      <h3 class="font-headline-md text-xs font-bold text-ink dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-secondary text-base">route</span>
+        Route Planning
+      </h3>
+      <span class="font-label-mono text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 font-bold">ORCA ENGINE</span>
+    </div>
+    <div class="p-sm flex flex-col gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-label-mono text-mute uppercase tracking-wider">Origin</label>
+        <div class="flex gap-2">
+            <input type="text" id="route-origin-input" readonly placeholder="Click map or select port..." class="w-full text-xs bg-canvas dark:bg-slate-950 border border-outline-variant dark:border-slate-700 rounded px-2 py-1.5 text-ink dark:text-white placeholder-mute cursor-pointer">
+            <button id="btn-clear-origin" class="w-8 flex items-center justify-center text-mute hover:text-ink dark:hover:text-white bg-surface-container-low dark:bg-slate-800 rounded">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-label-mono text-mute uppercase tracking-wider">Destination</label>
+        <div class="flex gap-2">
+            <input type="text" id="route-dest-input" readonly placeholder="Click map or select port..." class="w-full text-xs bg-canvas dark:bg-slate-950 border border-outline-variant dark:border-slate-700 rounded px-2 py-1.5 text-ink dark:text-white placeholder-mute cursor-pointer">
+            <button id="btn-clear-dest" class="w-8 flex items-center justify-center text-mute hover:text-ink dark:hover:text-white bg-surface-container-low dark:bg-slate-800 rounded">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
+      </div>
+      <button id="btn-swap-route" class="self-center p-1 mt-[-6px] mb-[-6px] text-mute hover:text-ink dark:hover:text-white bg-surface-container-low dark:bg-slate-800 rounded-full border border-outline-variant dark:border-slate-700 z-10" title="Swap">
+        <span class="material-symbols-outlined text-sm" style="transform: rotate(90deg)">sync_alt</span>
+      </button>
+      <button id="btn-calculate-route" class="w-full py-2 bg-secondary text-white rounded text-xs font-semibold hover:bg-secondary/90 transition-colors mt-1 flex justify-center items-center gap-2">
+        <span class="material-symbols-outlined text-sm">directions_boat</span> Calculate Route
+      </button>
+      
+      <div id="route-result-container" class="hidden flex-col gap-2 mt-2 pt-2 border-t border-hairline dark:border-slate-800">
+          <div class="text-[10px] font-label-mono text-mute uppercase tracking-wider mb-1">Route Geometry</div>
+          <div class="flex justify-between items-center text-xs text-ink dark:text-slate-200">
+              <span>Distance:</span> <span id="route-dist" class="font-bold"></span>
+          </div>
+          <div class="flex justify-between items-center text-xs text-ink dark:text-slate-200">
+              <span>Duration:</span> <span id="route-time" class="font-bold"></span>
+          </div>
+          <div class="flex justify-between items-center text-xs text-ink dark:text-slate-200">
+              <span>Type:</span> <span id="route-type" class="font-medium text-[10px]"></span>
+          </div>
+          <div class="text-[10px] font-label-mono text-mute uppercase tracking-wider mt-2 mb-1">Route Safety Assessment</div>
+          <div id="route-safety-status" class="text-xs font-bold px-2 py-1 rounded inline-block text-center w-full"></div>
+          <div id="route-hazards" class="flex flex-col gap-1 text-[11px] mt-1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map Controls Overlay (Top Left) -->
+  <div class="absolute top-md left-md flex flex-col gap-sm z-10">
+    <div class="bg-surface-container-lowest dark:bg-slate-900/90 border border-hairline dark:border-slate-800 shadow-md p-xxs flex flex-col gap-xxs rounded-lg backdrop-blur-md">
+      <button id="btn-zoom-in" class="w-9 h-9 flex items-center justify-center rounded text-ink dark:text-white hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors" title="Zoom In">
+        <span class="material-symbols-outlined text-lg">add</span>
+      </button>
+      <div class="h-px bg-hairline dark:bg-slate-800 w-full"></div>
+      <button id="btn-zoom-out" class="w-9 h-9 flex items-center justify-center rounded text-ink dark:text-white hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors" title="Zoom Out">
+        <span class="material-symbols-outlined text-lg">remove</span>
+      </button>
+    </div>
+    <button id="btn-recenter" class="w-9 h-9 bg-surface-container-lowest dark:bg-slate-900/90 border border-hairline dark:border-slate-800 shadow-md rounded-lg flex items-center justify-center text-ink dark:text-white hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors backdrop-blur-md" title="Recenter Map">
+      <span class="material-symbols-outlined text-lg">my_location</span>
+    </button>
+  </div>
+
+  <!-- Data Layers Toggle Overlay (Bottom Left) -->
+  <div class="absolute bottom-lg left-md z-10 w-72 bg-surface-container-lowest dark:bg-slate-900/90 rounded-xl border border-hairline dark:border-slate-800 shadow-xl backdrop-blur-md overflow-hidden">
+    <div class="p-sm border-b border-hairline dark:border-slate-800 bg-surface/50 dark:bg-slate-950/50 flex items-center justify-between">
+      <h3 class="font-headline-md text-xs font-bold text-ink dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-secondary text-base">layers</span>
+        Active Layers
+      </h3>
+      <span id="active-layers-count" class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold">5 ACTIVE</span>
+    </div>
+    <div class="p-sm flex flex-col gap-2.5">
+      <!-- AIS Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-secondary transition-colors">
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+          Vessel AIS (Live)
+        </span>
+        <input id="toggle-layer-ais" type="checkbox" checked class="rounded border-slate-700 text-cyan-500 focus:ring-cyan-500 bg-slate-950 cursor-pointer"/>
+      </label>
+
+      <!-- Weather Hazards Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-warning transition-colors">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          Weather Hazards
+        </span>
+        <input id="toggle-layer-weather" type="checkbox" checked class="rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-950 cursor-pointer"/>
+      </label>
+
+      <!-- Restricted Zones Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-rose-400 transition-colors">
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+          Restricted Zones
+        </span>
+        <input id="toggle-layer-restricted" type="checkbox" checked class="rounded border-slate-700 text-rose-500 focus:ring-rose-500 bg-slate-950 cursor-pointer"/>
+      </label>
+
+      <!-- Fishing Intelligence Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-emerald-400 transition-colors">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          Fishing Grounds (SST)
+        </span>
+        <input id="toggle-layer-fishing" type="checkbox" checked class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-950 cursor-pointer"/>
+      </label>
+
+      <!-- Vessel Routes Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-blue-400 transition-colors">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+          Vessel Routes
+        </span>
+        <input id="toggle-layer-routes" type="checkbox" checked class="rounded border-slate-700 text-blue-500 focus:ring-blue-500 bg-slate-950 cursor-pointer"/>
+      </label>
+
+      <!-- Ports Layer -->
+      <label class="flex items-center justify-between cursor-pointer group">
+        <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-[#00dfd8] transition-colors">
+          <span class="w-2 h-2 rounded-full bg-[#00dfd8]"></span>
+          Ports
+        </span>
+        <input id="toggle-layer-ports" type="checkbox" checked class="rounded border-slate-700 text-[#00dfd8] focus:ring-[#00dfd8] bg-slate-950 cursor-pointer"/>
+      </label>
+    </div>
+  </div>
+</div>
+<!-- Right Side Detail Panel (Selected Vessel) -->
+<aside id="vessel-detail-panel" class="hidden w-full md:w-[360px] h-[409px] md:h-full bg-surface-container-lowest border-t md:border-t-0 md:border-l border-hairline flex flex-col z-30 shadow-[-4px_0_16px_rgba(0,0,0,0.02)] transition-transform duration-300 translate-y-0 md:translate-x-0">
+  <!-- Panel Header -->
+  <div class="p-lg border-b border-hairline flex items-start justify-between bg-surface/50 backdrop-blur-sm sticky top-0 z-10">
+    <div>
+      <div class="flex items-center gap-xs mb-1" id="panel-vessel-badge-container">
+        <span id="panel-vessel-type" class="px-2 py-0.5 rounded bg-[#f2f2f2] dark:bg-slate-800 text-[#4d4d4d] dark:text-cyan-400 font-label-mono text-label-mono border border-hairline dark:border-slate-700">CARGO</span>
+        <div id="panel-vessel-live-dot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <span id="panel-vessel-live-text" class="font-label-mono text-[10px] text-mute uppercase tracking-widest">Live AIS</span>
+      </div>
+      <h2 id="panel-vessel-name" class="font-headline-md text-headline-md text-ink dark:text-white font-bold leading-tight">MV Oceanic Alpha</h2>
+      <p class="font-label-mono text-label-mono text-body mt-1">MMSI: <span id="panel-vessel-mmsi" class="text-ink dark:text-slate-200 font-medium">352898000</span></p>
+    </div>
+    <button id="panel-close-btn" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low dark:hover:bg-slate-800 text-mute hover:text-ink dark:hover:text-white transition-colors" title="Close Panel">
+      <span class="material-symbols-outlined text-[20px]">close</span>
+    </button>
+  </div>
+  <!-- Panel Content Scrollable -->
+  <div class="flex-1 overflow-y-auto p-lg flex flex-col gap-xl">
+    <!-- Key Telemetry Grid -->
+    <div class="grid grid-cols-2 gap-md">
+      <div class="flex flex-col gap-xs">
+        <span class="font-body-md text-[12px] text-mute">Speed Over Ground</span>
+        <div class="flex items-baseline gap-1">
+          <span id="panel-vessel-speed" class="font-display-xl text-[28px] leading-none text-ink dark:text-white font-semibold">14.2</span>
+          <span class="font-label-mono text-label-mono text-body">kn</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-xs">
+        <span class="font-body-md text-[12px] text-mute">Heading</span>
+        <div class="flex items-baseline gap-1">
+          <span id="panel-vessel-heading" class="font-display-xl text-[28px] leading-none text-ink dark:text-white font-semibold">275</span>
+          <span class="font-label-mono text-label-mono text-body">deg</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-xs">
+        <span class="font-body-md text-[12px] text-mute">Draft</span>
+        <div class="flex items-baseline gap-1">
+          <span id="panel-vessel-draft" class="font-display-xl text-[28px] leading-none text-ink dark:text-white font-semibold">10.5</span>
+          <span class="font-label-mono text-label-mono text-body">m</span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-xs">
+        <span class="font-body-md text-[12px] text-mute">Status</span>
+        <div class="flex items-baseline gap-1 mt-1">
+          <span id="panel-vessel-status" class="px-2 py-1 rounded-sm bg-[#e8f5e9] dark:bg-emerald-950/60 text-[#2e7d32] dark:text-emerald-400 border border-[#c8e6c9] dark:border-emerald-800 font-label-mono text-[11px]">Underway</span>
+        </div>
+      </div>
+    </div>
+    <!-- Divider -->
+    <div class="h-px w-full bg-hairline dark:bg-slate-800"></div>
+    <!-- Voyage Details -->
+    <div class="flex flex-col gap-md">
+      <h3 class="font-body-md text-body-md font-semibold text-ink dark:text-white uppercase tracking-wide">Voyage Data</h3>
+      <div class="bg-surface dark:bg-slate-900/60 rounded-lg p-md border border-hairline dark:border-slate-800 flex flex-col gap-sm relative overflow-hidden">
+        <!-- Decorative route line -->
+        <div class="absolute left-6 top-6 bottom-6 w-px bg-outline-variant/30 border-l border-dashed border-outline-variant"></div>
+        <div class="flex gap-md relative z-10">
+          <div class="mt-1 w-2.5 h-2.5 rounded-full border-2 border-mute bg-surface dark:bg-slate-900"></div>
+          <div class="flex-1">
+            <span class="font-label-mono text-[10px] text-mute block mb-1">ORIGIN</span>
+            <p id="panel-vessel-origin" class="font-body-md text-body-md text-ink dark:text-white font-medium">Rotterdam (NL ROT)</p>
+            <p id="panel-vessel-dep" class="font-label-mono text-label-mono text-body mt-0.5">Dep: 2023-10-24 08:30Z</p>
+          </div>
+        </div>
+        <div class="flex gap-md relative z-10 mt-2">
+          <div class="mt-1 w-2.5 h-2.5 rounded-full bg-secondary border-2 border-secondary-container ring-2 ring-surface dark:ring-slate-900"></div>
+          <div class="flex-1">
+            <span class="font-label-mono text-[10px] text-secondary block mb-1 font-semibold">DESTINATION</span>
+            <p id="panel-vessel-dest" class="font-body-md text-body-md text-ink dark:text-white font-medium">New York (US NYC)</p>
+            <p id="panel-vessel-eta" class="font-label-mono text-label-mono text-body mt-0.5">ETA: 2023-11-02 14:00Z</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Location Logs -->
+    <div class="flex flex-col gap-md">
+      <div class="flex justify-between items-end">
+        <h3 class="font-body-md text-body-md font-semibold text-ink dark:text-white uppercase tracking-wide">Recent Telemetry</h3>
+        <button class="font-button-app text-[12px] text-secondary hover:underline">Export Log</button>
+      </div>
+      <div class="border border-hairline dark:border-slate-800 rounded-lg overflow-hidden bg-canvas dark:bg-slate-950">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-surface-container-low dark:bg-slate-900 border-b border-hairline dark:border-slate-800">
+              <th class="py-2 px-3 font-label-mono text-[10px] text-mute uppercase font-normal">Time (UTC)</th>
+              <th class="py-2 px-3 font-label-mono text-[10px] text-mute uppercase font-normal">Coordinates</th>
+            </tr>
+          </thead>
+          <tbody id="panel-vessel-telemetry" class="font-label-mono text-label-mono text-body divide-y divide-hairline dark:divide-slate-800">
+            <tr class="hover:bg-surface-bright dark:hover:bg-slate-900 transition-colors">
+              <td class="py-2 px-3">10:45:02</td>
+              <td class="py-2 px-3 text-ink dark:text-slate-200">51°24'N 02°12'E</td>
+            </tr>
+            <tr class="hover:bg-surface-bright dark:hover:bg-slate-900 transition-colors">
+              <td class="py-2 px-3">10:30:15</td>
+              <td class="py-2 px-3 text-ink dark:text-slate-200">51°22'N 02°15'E</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Action Buttons -->
+    <div class="mt-auto pt-lg flex flex-col gap-sm">
+      <button class="w-full py-2.5 px-4 bg-ink dark:bg-white text-on-primary dark:text-black rounded-lg font-button-app text-button-app hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors shadow-sm font-semibold">
+        View Full Dossier
+      </button>
+      <button class="w-full py-2.5 px-4 bg-surface dark:bg-slate-900 text-ink dark:text-white border border-outline-variant dark:border-slate-800 rounded-lg font-button-app text-button-app hover:bg-surface-container-low dark:hover:bg-slate-800 transition-colors">
+        Add to Watchlist
+      </button>
+    </div>
+  </div>
+</aside>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Mobile menu toggle
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const navMenu = document.getElementById('mobile-nav-menu');
+    if (menuBtn && navMenu) {
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('hidden');
+        });
+    }
+
+    // 2. Theme Toggle logic
+    const handleThemeToggle = () => {
+        const isDark = document.documentElement.classList.contains('dark');
+        if (isDark) {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+            localStorage.setItem('orca_theme', 'light');
+        } else {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+            localStorage.setItem('orca_theme', 'dark');
+        }
+    };
+
+    const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
+    if (toggleBtnNav) {
+        toggleBtnNav.addEventListener('click', handleThemeToggle);
+    }
+
+    // 3. Initialize Leaflet Map
+    const mapCenter = [18.0, 77.0]; // Indian Maritime Region
+    const map = L.map('leaflet-map', {
+        center: mapCenter,
+        zoom: 8,
+        zoomControl: false
+    });
+
+    // Geographic Map Tile Layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+    // Dynamic Layer Groups
+    const aisLayer = L.layerGroup().addTo(map);
+    const weatherLayer = L.layerGroup().addTo(map);
+    const restrictedLayer = L.layerGroup().addTo(map);
+    const fishingLayer = L.layerGroup().addTo(map);
+    const routesLayer = L.layerGroup().addTo(map);
+    const portsLayer = L.layerGroup().addTo(map);
+
+    // Route Planning State
+    let routeOrigin = null; // { lat, lon, name }
+    let routeDest = null; // { lat, lon, name }
+
+    // Sample Vessels Data (Structured for Real-time Backend Sync)
+    
+    let vessels = [];
+
+    // Function to fetch vessels from API
+    async function loadVessels() {
+        try {
+            const apiVessels = await window.OrcaAPI.getVessels();
+            vessels = apiVessels.map(v => {
+                // Determine color by type
+                let color = '#00dfd8';
+                const t = v.type.toLowerCase();
+                if (t.includes('cargo')) color = '#a78bfa';
+                else if (t.includes('tanker')) color = '#38bdf8';
+                else if (t.includes('fishing')) color = '#34d399';
+                else if (t.includes('patrol')) color = '#fbbf24';
+                
+                return {
+                    id: v.mmsi,
+                    name: v.name,
+                    mmsi: v.mmsi,
+                    type: v.type.toUpperCase(),
+                    lat: v.latitude,
+                    lng: v.longitude,
+                    speed: v.speed_knots,
+                    heading: v.heading_deg,
+                    draft: v.draft_m,
+                    status: v.status,
+                    origin: v.origin,
+                    dep: 'Dep: ' + v.departure_time,
+                    dest: v.destination,
+                    eta: 'ETA: ' + v.eta,
+                    telemetry: [
+                        { time: new Date().toLocaleTimeString('en-US',{hour12:false}), coords: `${v.latitude.toFixed(4)}°N ${v.longitude.toFixed(4)}°E` }
+                    ],
+                    color: color
+                };
+            });
+            renderVessels();
+        } catch (e) {
+            console.error('Failed to load vessels', e);
+        }
+    }
+    
+    function renderVessels() {
+        aisLayer.clearLayers();
+        vessels.forEach(vessel => {
+            const iconSvg = `
+                <div class="vessel-marker-wrapper" title="${vessel.name}">
+                    <div class="vessel-pulse" style="background:${vessel.color}33"></div>
+                    <div style="transform: rotate(${vessel.heading}deg); width:24px; height:24px; display:flex; align-items:center; justify-content:center;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L19 21L12 17L5 21L12 2Z" fill="${vessel.color}" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+
+            const customIcon = L.divIcon({
+                html: iconSvg,
+                className: 'custom-vessel-div-icon',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+
+            const marker = L.marker([vessel.lat, vessel.lng], { icon: customIcon }).addTo(aisLayer);
+            
+            marker.bindPopup(`
+                <div class="p-2 text-xs">
+                    <div class="flex justify-between items-start mb-1">
+                        <div class="font-bold text-sm text-cyan-400">${vessel.name}</div>
+                        <div class="text-[9px] font-mono px-1 py-0.5 rounded ${vessel.status === 'SIMULATED' ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30'}">${vessel.status === 'SIMULATED' ? 'SIMULATED' : 'LIVE'}</div>
+                    </div>
+                    <div class="text-slate-300">Type: <span class="text-white font-semibold">${vessel.type}</span></div>
+                    <div class="text-slate-300">Speed: <span class="text-white font-semibold">${vessel.speed} kn</span></div>
+                    <div class="text-slate-300 mb-2">Heading: <span class="text-white font-semibold">${vessel.heading}°</span></div>
+                    <button onclick="window.selectVesselById('${vessel.id}')" class="w-full py-1 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded text-[11px] transition-colors">Select Vessel</button>
+                </div>
+            `);
+
+            marker.on('click', () => {
+                selectVessel(vessel);
+            });
+        });
+        
+        // Fit map bounds to vessels if any exist
+        if (vessels.length > 0) {
+            const group = new L.featureGroup(vessels.map(v => L.marker([v.lat, v.lng])));
+            map.fitBounds(group.getBounds(), { padding: [50, 50], maxZoom: 10 });
+        }
+    }
+    
+    // Initial load
+    loadVessels();
+    
+    // Function to populate right detail panel
+    function selectVessel(vessel) {
+        document.getElementById('panel-vessel-name').innerText = vessel.name;
+        document.getElementById('panel-vessel-mmsi').innerText = vessel.mmsi;
+        document.getElementById('panel-vessel-type').innerText = vessel.type;
+        document.getElementById('panel-vessel-speed').innerText = vessel.speed;
+        document.getElementById('panel-vessel-heading').innerText = vessel.heading;
+        document.getElementById('panel-vessel-draft').innerText = vessel.draft;
+        document.getElementById('panel-vessel-status').innerText = vessel.status;
+        document.getElementById('panel-vessel-origin').innerText = vessel.origin;
+        document.getElementById('panel-vessel-dep').innerText = vessel.dep;
+        document.getElementById('panel-vessel-dest').innerText = vessel.dest;
+        document.getElementById('panel-vessel-eta').innerText = vessel.eta;
+
+        const tbody = document.getElementById('panel-vessel-telemetry');
+        tbody.innerHTML = vessel.telemetry.map(row => `
+            <tr class="hover:bg-surface-bright dark:hover:bg-slate-900 transition-colors">
+              <td class="py-2 px-3">${row.time}</td>
+              <td class="py-2 px-3 text-ink dark:text-slate-200 font-mono">${row.coords}</td>
+            </tr>
+        `).join('');
+
+        const isSimulated = vessel.status === 'SIMULATED';
+        document.getElementById('panel-vessel-live-dot').className = isSimulated 
+            ? 'w-2 h-2 rounded-full bg-amber-500' 
+            : 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+        document.getElementById('panel-vessel-live-text').innerText = isSimulated ? 'SIMULATED AIS' : 'LIVE AIS';
+
+        const panel = document.getElementById('vessel-detail-panel');
+        if (panel) {
+            panel.classList.remove('hidden');
+        }
+
+        map.panTo([vessel.lat, vessel.lng], { animate: true, duration: 0.8 });
+    }
+
+    window.selectVesselById = function(id) {
+        const vessel = vessels.find(v => v.id === id);
+        if (vessel) selectVessel(vessel);
+    };
+
+    // 4. Fetch and Render Ports
+    async function loadPorts() {
+        try {
+            const apiPorts = await window.OrcaAPI.getPorts();
+            ports = apiPorts;
+            portsLayer.clearLayers();
+            ports.forEach(port => {
+                const marker = L.circleMarker([port.lat, port.lon], {
+                    radius: 6, color: '#f8fafc', weight: 2, fillColor: '#00dfd8', fillOpacity: 1
+                }).addTo(portsLayer);
+
+                marker.bindPopup(`
+                    <div class="p-2 text-xs">
+                        <div class="font-bold text-sm text-cyan-400 mb-1">${port.name}</div>
+                        <div class="text-slate-300">Locode: <span class="text-white font-semibold">${port.locode || 'N/A'}</span></div>
+                        <div class="text-slate-300 mb-2">Coords: <span class="font-mono text-[10px] text-white">${port.lat.toFixed(4)}, ${port.lon.toFixed(4)}</span></div>
+                        <div class="flex gap-2">
+                            <button onclick="window.setRouteOrigin(${port.lat}, ${port.lon}, '${port.name}')" class="flex-1 py-1 bg-surface-container-low hover:bg-slate-700 text-white font-bold rounded text-[10px] transition-colors border border-outline-variant">Set Origin</button>
+                            <button onclick="window.setRouteDest(${port.lat}, ${port.lon}, '${port.name}')" class="flex-1 py-1 bg-surface-container-low hover:bg-slate-700 text-white font-bold rounded text-[10px] transition-colors border border-outline-variant">Set Dest</button>
+                        </div>
+                    </div>
+                `);
+            });
+        } catch (e) {
+            console.error('Failed to load ports', e);
+        }
+    }
+    loadPorts();
+
+    let routeOriginMarker = null;
+    let routeDestMarker = null;
+
+    window.setRouteOrigin = function(lat, lon, name) {
+        routeOrigin = { lat, lon, name };
+        document.getElementById('route-origin-input').value = name || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        if (routeOriginMarker) map.removeLayer(routeOriginMarker);
+        routeOriginMarker = L.circleMarker([lat, lon], { radius: 6, color: '#10b981', fillColor: '#10b981', fillOpacity: 1 }).addTo(map).bindTooltip("Origin");
+        routesLayer.clearLayers();
+        document.getElementById('route-result-container').classList.add('hidden');
+        document.getElementById('route-result-container').classList.remove('flex');
+        map.closePopup();
+    };
+
+    window.setRouteDest = function(lat, lon, name) {
+        routeDest = { lat, lon, name };
+        document.getElementById('route-dest-input').value = name || `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        if (routeDestMarker) map.removeLayer(routeDestMarker);
+        routeDestMarker = L.circleMarker([lat, lon], { radius: 6, color: '#f43f5e', fillColor: '#f43f5e', fillOpacity: 1 }).addTo(map).bindTooltip("Destination");
+        routesLayer.clearLayers();
+        document.getElementById('route-result-container').classList.add('hidden');
+        document.getElementById('route-result-container').classList.remove('flex');
+        map.closePopup();
+    };
+
+    // Route Planning Logic
+    document.getElementById('btn-clear-origin').addEventListener('click', () => { 
+        routeOrigin = null; 
+        document.getElementById('route-origin-input').value = ''; 
+        if (routeOriginMarker) { map.removeLayer(routeOriginMarker); routeOriginMarker = null; }
+        routesLayer.clearLayers();
+        document.getElementById('route-result-container').classList.add('hidden');
+        document.getElementById('route-result-container').classList.remove('flex');
+    });
+    document.getElementById('btn-clear-dest').addEventListener('click', () => { 
+        routeDest = null; 
+        document.getElementById('route-dest-input').value = ''; 
+        if (routeDestMarker) { map.removeLayer(routeDestMarker); routeDestMarker = null; }
+        routesLayer.clearLayers();
+        document.getElementById('route-result-container').classList.add('hidden');
+        document.getElementById('route-result-container').classList.remove('flex');
+    });
+    document.getElementById('btn-swap-route').addEventListener('click', () => {
+        const temp = routeOrigin;
+        routeOrigin = routeDest;
+        routeDest = temp;
+        
+        if (routeOrigin) {
+            window.setRouteOrigin(routeOrigin.lat, routeOrigin.lon, routeOrigin.name);
+        } else {
+            document.getElementById('btn-clear-origin').click();
+        }
+        
+        if (routeDest) {
+            window.setRouteDest(routeDest.lat, routeDest.lon, routeDest.name);
+        } else {
+            document.getElementById('btn-clear-dest').click();
+        }
+    });
+
+    document.getElementById('btn-calculate-route').addEventListener('click', async () => {
+        if (!routeOrigin || !routeDest) {
+            alert('Please select both Origin and Destination');
+            return;
+        }
+        
+        const btn = document.getElementById('btn-calculate-route');
+        const ogText = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">refresh</span> Calculating...';
+        btn.disabled = true;
+
+        try {
+            const res = await window.OrcaAPI.calculateRoute(routeOrigin.lat, routeOrigin.lon, routeDest.lat, routeDest.lon);
+            routesLayer.clearLayers();
+            
+            const routeCoords = res.route_geometry.coordinates;
+            const polyline = L.polyline(routeCoords, {
+                color: '#3b82f6', weight: 3, dashArray: '8, 8', opacity: 0.85
+            }).addTo(routesLayer);
+            
+            // We already have markers via setRouteOrigin/Dest, so we don't need to add them again here
+            // L.circleMarker(routeCoords[0], { radius: 5, color: '#10b981', fillColor: '#10b981', fillOpacity: 1 }).addTo(routesLayer).bindTooltip("Origin");
+            // L.circleMarker(routeCoords[routeCoords.length-1], { radius: 5, color: '#f43f5e', fillColor: '#f43f5e', fillOpacity: 1 }).addTo(routesLayer).bindTooltip("Destination");
+            
+            map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+
+            document.getElementById('route-result-container').classList.remove('hidden');
+            document.getElementById('route-result-container').classList.add('flex');
+            document.getElementById('route-dist').innerText = `${res.route_geometry.distance_nm} NM`;
+            document.getElementById('route-time').innerText = `${res.route_geometry.duration_hours}h @ 12kn`;
+            document.getElementById('route-type').innerText = res.route_geometry.route_type;
+            
+            const safety = res.route_safety.status;
+            const statusEl = document.getElementById('route-safety-status');
+            if (safety === 'SAFE') {
+                statusEl.className = 'text-xs font-bold px-2 py-1 rounded inline-block text-center w-full bg-emerald-500/20 text-emerald-500 border border-emerald-500/30';
+            } else if (safety === 'WARNING') {
+                statusEl.className = 'text-xs font-bold px-2 py-1 rounded inline-block text-center w-full bg-amber-500/20 text-amber-500 border border-amber-500/30';
+            } else {
+                statusEl.className = 'text-xs font-bold px-2 py-1 rounded inline-block text-center w-full bg-rose-500/20 text-rose-500 border border-rose-500/30';
+            }
+            statusEl.innerText = safety;
+            
+            const hazardsEl = document.getElementById('route-hazards');
+            hazardsEl.innerHTML = res.route_safety.hazards.map(h => `<div class="flex gap-1 items-start"><span class="material-symbols-outlined text-[12px] mt-0.5 text-rose-500">warning</span> <span>${h}</span></div>`).join('');
+            
+        } catch (e) {
+            console.error(e);
+            alert('Route calculation failed.');
+        } finally {
+            btn.innerHTML = ogText;
+            btn.disabled = false;
+        }
+    });
+
+    // Map Click for Origin/Dest selection
+    map.on('click', (e) => {
+        if (!routeOrigin) {
+            window.setRouteOrigin(e.latlng.lat, e.latlng.lng, null);
+        } else if (!routeDest) {
+            window.setRouteDest(e.latlng.lat, e.latlng.lng, null);
+        } else {
+            // Both are set. Reset to new origin and clear destination.
+            document.getElementById('btn-clear-dest').click();
+            window.setRouteOrigin(e.latlng.lat, e.latlng.lng, null);
+        }
+    });
+
+    // 5. Fetch and Render Alerts (Weather/Geofences)
+    async function loadAlerts() {
+        try {
+            const apiAlerts = await window.OrcaAPI.getAlerts();
+            weatherLayer.clearLayers();
+            restrictedLayer.clearLayers();
+            
+            apiAlerts.forEach(alert => {
+                let targetLayer = weatherLayer;
+                let color = '#f5a623';
+                if (alert.title.toLowerCase().includes('restricted') || alert.title.toLowerCase().includes('boundary')) {
+                    targetLayer = restrictedLayer;
+                    color = '#f43f5e';
+                }
+                
+                // create a dummy circle to represent the alert area
+                let lat = 15.0;
+                let lon = 72.0;
+                if (alert.location.toLowerCase().includes('kandla') || alert.location.toLowerCase().includes('kutch')) { lat = 22.8; lon = 70.1; }
+                else if (alert.location.toLowerCase().includes('lakshadweep')) { lat = 11.2; lon = 72.8; }
+                else if (alert.location.toLowerCase().includes('sri lanka')) { lat = 9.4; lon = 79.6; }
+
+                const circle = L.circle([lat, lon], {
+                    radius: 50000, color: color, fillColor: color, fillOpacity: 0.2, weight: 2, dashArray: '6, 6'
+                }).addTo(targetLayer);
+                
+                circle.bindPopup(`
+                    <div class="p-2 text-xs">
+                        <div class="font-bold text-sm mb-1" style="color: ${color}">${alert.title}</div>
+                        <div class="text-slate-300 mb-1">Severity: <span class="font-semibold text-white">${alert.severity}</span></div>
+                        <p class="text-slate-300 mb-2">${alert.hazard}</p>
+                        <div class="bg-surface-container-low p-1.5 rounded text-[10px] text-mute mb-2">
+                            <b>Action:</b> ${alert.recommended_action}
+                        </div>
+                        <div class="font-mono text-[9px] text-mute">Status: ${alert.provenance}</div>
+                        <div class="font-mono text-[9px] text-mute">Time: ${alert.time}</div>
+                        <button onclick="window.location.href='assistant.html?q=' + encodeURIComponent('Analyze the following alert: ${alert.title}. ${alert.hazard}')" class="w-full mt-2 py-1 bg-surface-container-low hover:bg-slate-700 text-white font-bold rounded text-[10px] transition-colors border border-outline-variant">Ask ORCA</button>
+                    </div>
+                `);
+            });
+        } catch (e) {
+            console.error('Failed to load alerts', e);
+        }
+    }
+    loadAlerts();
+
+    // 6. Fetch and Render PFZ
+    async function loadPfz() {
+        try {
+            const apiPfz = await window.OrcaAPI.getPfzData();
+            fishingLayer.clearLayers();
+            
+            apiPfz.forEach(zone => {
+                const circle = L.circle(zone.coords, {
+                    radius: 40000, color: zone.color, fillColor: zone.color, fillOpacity: 0.25, weight: 1.5
+                }).addTo(fishingLayer);
+                
+                circle.bindPopup(`
+                    <div class="p-2 text-xs w-64">
+                        <div class="font-bold text-sm mb-1" style="color: ${zone.color}">${zone.name} (PFZ)</div>
+                        <div class="flex justify-between border-b border-slate-700 pb-1 mb-1">
+                            <span class="text-slate-300">Suitability</span>
+                            <span class="font-bold text-white">${zone.suitability}%</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-700 pb-1 mb-1">
+                            <span class="text-slate-300">SST</span>
+                            <span class="font-mono text-white">${zone.sst.toFixed(1)}°C</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-700 pb-1 mb-1">
+                            <span class="text-slate-300">Chlorophyll</span>
+                            <span class="font-mono text-white">${zone.chlorophyll.toFixed(2)} mg/m³</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-700 pb-1 mb-1">
+                            <span class="text-slate-300">Wind</span>
+                            <span class="font-mono text-white">${zone.wind.speed_kmh} km/h (${zone.wind.risk})</span>
+                        </div>
+                        <div class="font-mono text-[9px] text-mute mt-2">Data Status: ${zone.data_status}</div>
+                        <button onclick="window.location.href='fishing.html'" class="w-full mt-2 py-1 bg-surface-container-low hover:bg-slate-700 text-white font-bold rounded text-[10px] transition-colors border border-outline-variant">Fishing Dashboard</button>
+                    </div>
+                `);
+            });
+        } catch (e) {
+            console.error('Failed to load PFZ', e);
+        }
+    }
+    loadPfz();
+
+    // 8. Map Controls (Zoom In, Zoom Out, Recenter)
+    document.getElementById('btn-zoom-in')?.addEventListener('click', () => map.zoomIn());
+    document.getElementById('btn-zoom-out')?.addEventListener('click', () => map.zoomOut());
+    document.getElementById('btn-recenter')?.addEventListener('click', () => {
+        map.setView(mapCenter, 8, { animate: true });
+    });
+
+    // 9. Active Layer Checkboxes Management
+    const layerMap = {
+        'toggle-layer-ais': aisLayer,
+        'toggle-layer-weather': weatherLayer,
+        'toggle-layer-restricted': restrictedLayer,
+        'toggle-layer-fishing': fishingLayer,
+        'toggle-layer-routes': routesLayer,
+        'toggle-layer-ports': portsLayer
+    };
+
+    function updateActiveLayerBadge() {
+        let count = 0;
+        Object.keys(layerMap).forEach(id => {
+            const checkbox = document.getElementById(id);
+            if (checkbox && checkbox.checked) count++;
+        });
+        const badge = document.getElementById('active-layers-count');
+        if (badge) badge.innerText = `${count} ACTIVE`;
+    }
+
+    Object.keys(layerMap).forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+            checkbox.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    map.addLayer(layerMap[id]);
+                } else {
+                    map.removeLayer(layerMap[id]);
+                }
+                updateActiveLayerBadge();
+            });
+        }
+    });
+
+    // Panel Close Button
+    document.getElementById('panel-close-btn')?.addEventListener('click', () => {
+        const panel = document.getElementById('vessel-detail-panel');
+        if (panel) {
+            panel.classList.toggle('hidden');
+        }
+    });
+});
+</script>
+
+</body></html>

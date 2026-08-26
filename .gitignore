@@ -1,0 +1,15 @@
+# ORCA Project
+node_modules/
+__pycache__/
+*.pyc
+.env
+*.log
+.pytest_cache/
+dist/
+build/
+*.egg-info/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
