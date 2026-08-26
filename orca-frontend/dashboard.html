@@ -261,16 +261,19 @@
         }
 
       </style>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<link rel="shortcut icon" href="favicon.ico"/>
 </head>
 <body class="text-ink antialiased flex flex-col h-screen overflow-hidden">
 
 <!-- Top Header / Navigation Bar -->
 <header class="fixed top-0 left-0 right-0 h-16 z-50 bg-surface/80 dark:bg-black/80 backdrop-blur-md border-b border-hairline dark:border-slate-800 transition-colors duration-200">
   <div class="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
-    <!-- Logo section -->
-    <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
-      <div class="w-8 h-8 bg-ink dark:bg-white rounded-lg flex items-center justify-center text-on-primary dark:text-black">
-        <span class="material-symbols-outlined text-[20px] font-bold">sailing</span>
+        <!-- Logo section -->
+    <div class="flex items-center gap-3 cursor-pointer group" onclick="window.location.href='index.html'">
+      <div class="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center transition-transform group-hover:scale-105 shrink-0">
+        <img src="logo.png" alt="ORCA Marine Logo" class="w-full h-full object-contain dark:hidden">
+        <img src="logo-white.png" alt="ORCA Marine Logo" class="w-full h-full object-contain hidden dark:block">
       </div>
       <div>
         <h1 class="font-headline-md text-sm md:text-base font-bold text-ink dark:text-white leading-tight">ORCA Marine</h1>
