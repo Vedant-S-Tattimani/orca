@@ -376,10 +376,10 @@
 <span class="material-symbols-outlined text-secondary" data-icon="waves">waves</span>
 </div>
 <div class="mt-lg">
-<div class="font-display-xl text-display-xl text-ink">2.4<span class="text-headline-md text-mute ml-xs">m</span></div>
-<div class="flex items-center gap-xs mt-sm text-body text-body-md font-body-md">
-<span class="material-symbols-outlined text-error text-[16px]" data-icon="trending_up">trending_up</span>
-<span>+0.3m from last hour</span>
+<div class="font-display-xl text-display-xl text-ink" id="dash-wave-value">--<span class="text-headline-md text-mute ml-xs">m</span></div>
+<div class="flex items-center gap-xs mt-sm text-body text-body-md font-body-md" id="dash-wave-trend">
+<span class="material-symbols-outlined text-mute text-[16px]">hourglass_empty</span>
+<span>Loading...</span>
 </div>
 </div>
 </div>
@@ -390,10 +390,10 @@
 <span class="material-symbols-outlined text-secondary" data-icon="air">air</span>
 </div>
 <div class="mt-lg">
-<div class="font-display-xl text-display-xl text-ink">18<span class="text-headline-md text-mute ml-xs">kts</span></div>
-<div class="flex items-center gap-xs mt-sm text-body text-body-md font-body-md">
-<span class="material-symbols-outlined text-warning text-[16px]" data-icon="trending_flat">trending_flat</span>
-<span>NW Direction</span>
+<div class="font-display-xl text-display-xl text-ink" id="dash-wind-value">--<span class="text-headline-md text-mute ml-xs">kts</span></div>
+<div class="flex items-center gap-xs mt-sm text-body text-body-md font-body-md" id="dash-wind-trend">
+<span class="material-symbols-outlined text-mute text-[16px]">hourglass_empty</span>
+<span>Loading...</span>
 </div>
 </div>
 </div>
@@ -404,10 +404,10 @@
 <span class="material-symbols-outlined text-secondary" data-icon="thermostat">thermostat</span>
 </div>
 <div class="mt-lg">
-<div class="font-display-xl text-display-xl text-ink">14.2<span class="text-headline-md text-mute ml-xs">°C</span></div>
-<div class="flex items-center gap-xs mt-sm text-body text-body-md font-body-md">
-<span class="material-symbols-outlined text-mute text-[16px]" data-icon="trending_down">trending_down</span>
-<span>Steady cooling</span>
+<div class="font-display-xl text-display-xl text-ink" id="dash-temp-value">--<span class="text-headline-md text-mute ml-xs">°C</span></div>
+<div class="flex items-center gap-xs mt-sm text-body text-body-md font-body-md" id="dash-temp-trend">
+<span class="material-symbols-outlined text-mute text-[16px]">hourglass_empty</span>
+<span>Loading...</span>
 </div>
 </div>
 </div>
@@ -420,68 +420,27 @@
 <svg class="w-48 h-24 transform translate-y-4" viewbox="0 0 100 50">
 <!-- Background Arc -->
 <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="theme('colors.surface-variant')" stroke-linecap="round" stroke-width="8"></path>
-<!-- Active Arc (Warning level) -->
-<path class="gauge-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="theme('colors.warning')" stroke-linecap="round" stroke-width="8"></path>
+<!-- Active Arc -->
+<path id="gauge-arc-live" class="gauge-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="theme('colors.warning')" stroke-linecap="round" stroke-width="8"></path>
 </svg>
 <div class="absolute bottom-4 text-center">
-<div class="font-headline-lg text-headline-lg text-warning">MODERATE</div>
-<div class="font-label-mono text-label-mono text-body mt-xs">INDEX: 6.8 / 10</div>
+<div class="font-headline-lg text-headline-lg" id="dash-risk-label">LOADING</div>
+<div class="font-label-mono text-label-mono text-body mt-xs" id="dash-risk-index">INDEX: -- / 10</div>
 </div>
 </div>
 <div class="mt-auto pt-md border-t border-hairline">
-<p class="font-body-md text-body-md text-body">Conditions are deteriorating offshore. Exercise caution for small vessels.</p>
+<p class="font-body-md text-body-md text-body" id="dash-risk-desc">Analyzing conditions across sectors...</p>
 </div>
 </div>
 <!-- 24h Forecast List (Spans 6 cols) -->
 <div class="card p-lg md:col-span-6">
 <div class="flex justify-between items-center mb-md">
 <h3 class="font-headline-md text-headline-md text-ink">24h Forecast</h3>
-<button class="font-button-app text-button-app text-secondary hover:underline">View Full Chart</button>
+<span class="font-label-mono text-label-mono text-mute" id="dash-forecast-source">Live Data</span>
 </div>
-<div class="space-y-sm">
-<!-- Forecast Item -->
-<div class="flex items-center justify-between py-sm border-b border-surface-variant last:border-0">
-<div class="flex items-center gap-md w-1/3">
-<span class="font-label-mono text-label-mono text-ink">14:00</span>
-<span class="material-symbols-outlined text-body" data-icon="partly_cloudy_day">partly_cloudy_day</span>
-</div>
-<div class="flex-1 grid grid-cols-2 text-right">
-<span class="font-body-md text-body-md text-ink">19kts NW</span>
-<span class="font-body-md text-body-md text-ink">2.5m</span>
-</div>
-</div>
-<!-- Forecast Item -->
-<div class="flex items-center justify-between py-sm border-b border-surface-variant last:border-0">
-<div class="flex items-center gap-md w-1/3">
-<span class="font-label-mono text-label-mono text-ink">18:00</span>
-<span class="material-symbols-outlined text-body" data-icon="cloudy">cloudy</span>
-</div>
-<div class="flex-1 grid grid-cols-2 text-right">
-<span class="font-body-md text-body-md text-ink">22kts NW</span>
-<span class="font-body-md text-body-md text-ink">2.8m</span>
-</div>
-</div>
-<!-- Forecast Item -->
-<div class="flex items-center justify-between py-sm border-b border-surface-variant last:border-0">
-<div class="flex items-center gap-md w-1/3">
-<span class="font-label-mono text-label-mono text-ink">22:00</span>
-<span class="material-symbols-outlined text-body" data-icon="rainy">rainy</span>
-</div>
-<div class="flex-1 grid grid-cols-2 text-right">
-<span class="font-body-md text-body-md text-ink">25kts N</span>
-<span class="font-body-md text-body-md text-ink">3.1m</span>
-</div>
-</div>
-<!-- Forecast Item -->
-<div class="flex items-center justify-between py-sm border-b border-surface-variant last:border-0">
-<div class="flex items-center gap-md w-1/3">
-<span class="font-label-mono text-label-mono text-ink">02:00</span>
-<span class="material-symbols-outlined text-body" data-icon="storm">storm</span>
-</div>
-<div class="flex-1 grid grid-cols-2 text-right">
-<span class="font-body-md text-body-md text-error font-medium">30kts N</span>
-<span class="font-body-md text-body-md text-error font-medium">3.5m</span>
-</div>
+<div class="space-y-sm" id="dash-forecast-list">
+<div class="flex items-center justify-center py-lg text-mute">
+<span class="material-symbols-outlined mr-2">hourglass_empty</span> Loading forecast data...
 </div>
 </div>
 </div>
@@ -489,31 +448,11 @@
 <div class="card p-lg md:col-span-6 bg-surface-bright">
 <div class="flex justify-between items-center mb-md">
 <h3 class="font-headline-md text-headline-md text-ink">Active Directives</h3>
-<span class="bg-error-container text-on-error-container font-label-mono text-label-mono px-xs py-xxs rounded">2 ALERTS</span>
+<span class="bg-error-container text-on-error-container font-label-mono text-label-mono px-xs py-xxs rounded" id="dash-alert-count">-- ALERTS</span>
 </div>
-<div class="space-y-md">
-<!-- Directive Alert -->
-<div class="p-md rounded-lg border border-warning bg-warning/5 flex gap-md items-start">
-<span class="material-symbols-outlined text-warning mt-xxs" data-icon="warning_amber">warning_amber</span>
-<div>
-<h4 class="font-button-app text-button-app text-ink">Gale Warning Issued</h4>
-<p class="font-body-md text-body-md text-body mt-xxs">Sector B offshore expecting gusts up to 45kts starting 22:00. Secure all loose deck equipment.</p>
-</div>
-</div>
-<!-- Directive Maintenance -->
-<div class="p-md rounded-lg border border-outline-variant bg-canvas flex gap-md items-start">
-<span class="material-symbols-outlined text-secondary mt-xxs" data-icon="build">build</span>
-<div>
-<h4 class="font-button-app text-button-app text-ink">Sensor Calibration Required</h4>
-<p class="font-body-md text-body-md text-body mt-xxs">Buoy Alpha-7 reporting irregular swell data. Scheduled maintenance required within 48h.</p>
-</div>
-</div>
-<!-- Directive Info -->
-<div class="p-md rounded-lg border border-outline-variant bg-canvas flex gap-md items-start">
-<span class="material-symbols-outlined text-mute mt-xxs" data-icon="info">info</span>
-<div>
-<h4 class="font-button-app text-button-app text-ink">Route Update Available</h4>
-<p class="font-body-md text-body-md text-body mt-xxs">Optimized routing for Fleet C ready for review based on latest current models.</p>
+<div class="space-y-md" id="dash-directives-list">
+<div class="flex items-center justify-center py-lg text-mute">
+<span class="material-symbols-outlined mr-2">hourglass_empty</span> Loading directives...
 </div>
 </div>
 </div>
@@ -523,17 +462,161 @@
 </div>
 
 <script>
-        // Simple animation trigger for the gauge arc to simulate loading data
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const arc = document.querySelector('.gauge-arc');
-                if(arc) {
-                    // Animate to ~68% fill (warning level)
-                    arc.style.strokeDashoffset = '78.5'; 
+    // Dashboard Live Data Loader
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const pfzData = await window.OrcaAPI.getPfzData();
+            if (pfzData && pfzData.length > 0) {
+                // Calculate aggregate marine conditions
+                let maxWave = 0, maxWindKmh = 0, avgSST = 0, totalSST = 0;
+                let extremeZones = 0, highZones = 0;
+                
+                pfzData.forEach(z => {
+                    if (z.wave_height > maxWave) maxWave = z.wave_height;
+                    if (z.wind && z.wind.speed_kmh > maxWindKmh) maxWindKmh = z.wind.speed_kmh;
+                    totalSST += z.sst || 0;
+                    if (z.wind && z.wind.risk === 'EXTREME') extremeZones++;
+                    else if (z.wind && z.wind.risk === 'HIGH') highZones++;
+                });
+                avgSST = (totalSST / pfzData.length).toFixed(1);
+                const maxWindKts = (maxWindKmh * 0.539957).toFixed(0);
+                
+                // Update Wave Height card
+                const waveEl = document.getElementById('dash-wave-value');
+                if (waveEl) waveEl.innerHTML = `${maxWave.toFixed(1)}<span class="text-headline-md text-mute ml-xs">m</span>`;
+                const waveTrend = document.getElementById('dash-wave-trend');
+                if (waveTrend) {
+                    const wIcon = maxWave > 2.5 ? 'trending_up' : maxWave > 1.5 ? 'trending_flat' : 'trending_down';
+                    const wColor = maxWave > 2.5 ? 'text-error' : maxWave > 1.5 ? 'text-warning' : 'text-emerald-500';
+                    const wText = maxWave > 2.5 ? 'High swell conditions' : maxWave > 1.5 ? 'Moderate swell' : 'Calm conditions';
+                    waveTrend.innerHTML = `<span class="material-symbols-outlined ${wColor} text-[16px]">${wIcon}</span><span>${wText}</span>`;
                 }
-            }, 300);
-        });
-    </script>
+                
+                // Update Wind Speed card
+                const windEl = document.getElementById('dash-wind-value');
+                if (windEl) windEl.innerHTML = `${maxWindKts}<span class="text-headline-md text-mute ml-xs">kts</span>`;
+                const windTrend = document.getElementById('dash-wind-trend');
+                if (windTrend) {
+                    const windKts = parseFloat(maxWindKts);
+                    const windIcon = windKts > 30 ? 'trending_up' : windKts > 15 ? 'trending_flat' : 'trending_down';
+                    const windColor = windKts > 30 ? 'text-error' : windKts > 15 ? 'text-warning' : 'text-emerald-500';
+                    const windText = windKts > 30 ? 'Gale force warning' : windKts > 15 ? 'Moderate breeze' : 'Light winds';
+                    windTrend.innerHTML = `<span class="material-symbols-outlined ${windColor} text-[16px]">${windIcon}</span><span>${windText}</span>`;
+                }
+                
+                // Update Water Temp card
+                const tempEl = document.getElementById('dash-temp-value');
+                if (tempEl) tempEl.innerHTML = `${avgSST}<span class="text-headline-md text-mute ml-xs">°C</span>`;
+                const tempTrend = document.getElementById('dash-temp-trend');
+                if (tempTrend) {
+                    const t = parseFloat(avgSST);
+                    const tIcon = t >= 28 ? 'trending_up' : t >= 24 ? 'trending_flat' : 'trending_down';
+                    const tColor = t >= 28 ? 'text-warning' : t >= 24 ? 'text-emerald-500' : 'text-secondary';
+                    const tText = t >= 28 ? 'Warm waters' : t >= 24 ? 'Optimal fishing range' : 'Cool waters';
+                    tempTrend.innerHTML = `<span class="material-symbols-outlined ${tColor} text-[16px]">${tIcon}</span><span>${tText}</span>`;
+                }
+                
+                // Update Risk Assessment
+                const riskLabel = document.getElementById('dash-risk-label');
+                const riskIndex = document.getElementById('dash-risk-index');
+                const riskDesc = document.getElementById('dash-risk-desc');
+                let riskScore = 3; // base
+                riskScore += extremeZones * 2.5;
+                riskScore += highZones * 1.5;
+                if (maxWave > 3.0) riskScore += 1;
+                riskScore = Math.min(10, Math.max(1, riskScore)).toFixed(1);
+                
+                let riskText, riskColor;
+                if (riskScore >= 7) { riskText = 'HIGH'; riskColor = 'text-error'; }
+                else if (riskScore >= 4) { riskText = 'MODERATE'; riskColor = 'text-warning'; }
+                else { riskText = 'LOW'; riskColor = 'text-emerald-500'; }
+                
+                if (riskLabel) { riskLabel.textContent = riskText; riskLabel.className = `font-headline-lg text-headline-lg ${riskColor}`; }
+                if (riskIndex) riskIndex.textContent = `INDEX: ${riskScore} / 10`;
+                if (riskDesc) {
+                    if (riskScore >= 7) riskDesc.textContent = `${extremeZones + highZones} sectors reporting dangerous wind. Small vessels should seek harbor.`;
+                    else if (riskScore >= 4) riskDesc.textContent = 'Conditions are variable across sectors. Exercise caution for offshore operations.';
+                    else riskDesc.textContent = 'All sectors reporting safe conditions for maritime operations.';
+                }
+                
+                // Animate gauge
+                const arc = document.getElementById('gauge-arc-live');
+                if (arc) {
+                    const pct = parseFloat(riskScore) / 10;
+                    arc.style.strokeDashoffset = String(125.6 * (1 - pct));
+                }
+                
+                // Update 24h Forecast from first zone with forecast data
+                const forecastZone = pfzData.find(z => z.forecast_24h && z.forecast_24h.length > 0);
+                const forecastList = document.getElementById('dash-forecast-list');
+                if (forecastZone && forecastList) {
+                    forecastList.innerHTML = '';
+                    const items = forecastZone.forecast_24h.slice(0, 6);
+                    items.forEach(f => {
+                        const d = new Date(f.time);
+                        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const windKts = (f.wind_speed_kmh * 0.539957).toFixed(0);
+                        const isHigh = f.wind_speed_kmh > 40;
+                        const colorCls = isHigh ? 'text-error font-medium' : 'text-ink';
+                        let icon = 'partly_cloudy_day';
+                        if (f.wind_speed_kmh > 60) icon = 'storm';
+                        else if (f.wind_speed_kmh > 40) icon = 'rainy';
+                        else if (f.wind_speed_kmh > 20) icon = 'cloudy';
+                        
+                        forecastList.innerHTML += `
+                        <div class="flex items-center justify-between py-sm border-b border-surface-variant last:border-0">
+                            <div class="flex items-center gap-md w-1/3">
+                                <span class="font-label-mono text-label-mono text-ink">${timeStr}</span>
+                                <span class="material-symbols-outlined text-body">${icon}</span>
+                            </div>
+                            <div class="flex-1 grid grid-cols-2 text-right">
+                                <span class="font-body-md text-body-md ${colorCls}">${windKts}kts</span>
+                                <span class="font-body-md text-body-md ${colorCls}">${f.temperature_c.toFixed(1)}°C</span>
+                            </div>
+                        </div>`;
+                    });
+                    const srcEl = document.getElementById('dash-forecast-source');
+                    if (srcEl) srcEl.textContent = forecastZone.name;
+                }
+            }
+        } catch (e) {
+            console.error('Dashboard live data error:', e);
+        }
+        
+        // Load live alerts for directives
+        try {
+            const alerts = await window.OrcaAPI.getAlerts();
+            const directivesList = document.getElementById('dash-directives-list');
+            const alertCount = document.getElementById('dash-alert-count');
+            
+            if (alerts && alerts.length > 0 && directivesList) {
+                directivesList.innerHTML = '';
+                if (alertCount) alertCount.textContent = `${alerts.length} ALERTS`;
+                
+                alerts.forEach(alert => {
+                    const isCritical = alert.severity === 'CRITICAL';
+                    const borderCls = isCritical ? 'border-warning bg-warning/5' : 'border-outline-variant bg-canvas';
+                    const iconCls = isCritical ? 'text-warning' : 'text-secondary';
+                    const icon = isCritical ? 'warning_amber' : 'info';
+                    
+                    directivesList.innerHTML += `
+                    <div class="p-md rounded-lg border ${borderCls} flex gap-md items-start">
+                        <span class="material-symbols-outlined ${iconCls} mt-xxs">${icon}</span>
+                        <div>
+                            <h4 class="font-button-app text-button-app text-ink">${alert.title}</h4>
+                            <p class="font-body-md text-body-md text-body mt-xxs">${alert.recommended_action || alert.hazard}</p>
+                        </div>
+                    </div>`;
+                });
+            } else if (directivesList) {
+                directivesList.innerHTML = '<p class="text-body text-center py-md">No active directives</p>';
+                if (alertCount) alertCount.textContent = '0 ALERTS';
+            }
+        } catch (e) {
+            console.error('Dashboard alerts error:', e);
+        }
+    });
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {

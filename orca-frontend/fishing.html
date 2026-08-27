@@ -594,6 +594,35 @@
 </div>
 </div>
 </div>
+<!-- Zone Comparison Table -->
+<div class="bg-surface-container-lowest border border-hairline rounded-[12px] overflow-hidden">
+<div class="p-lg border-b border-hairline flex justify-between items-center bg-surface/50">
+<h3 class="font-body-lg text-body-lg text-ink font-semibold" data-i18n="fish_zone_comparison">Zone Comparison</h3>
+<button class="font-label-mono text-label-mono text-secondary hover:underline" data-i18n="fish_view_analysis">View Full Analysis</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest border-b border-hairline font-label-mono text-label-mono text-mute uppercase">
+<th class="p-md font-medium" data-i18n="fish_th_sector">Sector</th>
+<th class="p-md font-medium" data-i18n="fish_th_score">Score</th>
+<th class="p-md font-medium" data-i18n="fish_th_distance">Distance</th>
+<th class="p-md font-medium" data-i18n="fish_th_sst">SST</th>
+<th class="p-md font-medium" data-i18n="fish_th_wind">Wind</th>
+<th class="p-md font-medium" data-i18n="fish_th_activity">Activity Level</th>
+<th class="p-md font-medium" data-i18n="fish_th_action">Action</th>
+</tr>
+</thead>
+<tbody id="zone-comparison-body" class="font-body-md text-body-md text-ink">
+<!-- Dynamic rows inserted here -->
+<tr class="border-b border-hairline bg-surface/30">
+<td colspan="7" class="p-md text-center text-mute" data-i18n="fish_loading_zones">Loading zones...</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </main>
 
 <script>
@@ -681,6 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 renderMapMarkers();
                 updateSidePanel(customZone);
+                if (typeof renderZoneTable === 'function') renderZoneTable();
             }
         } catch (err) {
             console.error(err);
@@ -688,7 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    async function loadFishingData() {
+    window.loadFishingData = async function() {
         try {
             const response = await window.OrcaAPI.getPfzData();
             pfzZones = response;
@@ -702,6 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const group = new L.featureGroup(pfzZones.map(z => L.marker([z.coords[0], z.coords[1]])));
                 map.fitBounds(group.getBounds().pad(0.1));
             }
+            if (typeof renderZoneTable === 'function') renderZoneTable();
         } catch (error) {
             console.error("Failed to load fishing data:", error);
         }
@@ -745,12 +776,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    window.jumpToSaferZone = function(zoneName) {
+        const saferZone = pfzZones.find(z => z.name === zoneName);
+        if (saferZone) {
+            updateSidePanel(saferZone);
+            map.setView([saferZone.coords[0], saferZone.coords[1]], 8);
+        }
+    };
+
     window.clearCustomPoints = function() {
         pfzZones = pfzZones.filter(z => !z.name.startsWith('Custom Point'));
         renderMapMarkers();
         if (pfzZones.length > 0) {
             updateSidePanel(pfzZones[0]);
         }
+        if (typeof renderZoneTable === 'function') renderZoneTable();
     };
 
     function getHaversineDistance(lat1, lon1, lat2, lon2) {
@@ -1043,6 +1083,84 @@ document.addEventListener('DOMContentLoaded', () => {
             </li>`;
         });
         
+        // Show safer area recommendation when conditions are dangerous
+        const isWindDangerous = zone.wind && (zone.wind.risk === 'HIGH' || zone.wind.risk === 'EXTREME');
+        const isGustDangerous = zone.wind && (zone.wind.gust_risk === 'HIGH' || zone.wind.gust_risk === 'EXTREME');
+        const needsSaferArea = zone.suitability < 70 || isWindDangerous || isGustDangerous;
+        
+        if (needsSaferArea) {
+            // Find safer zones: better suitability AND lower wind
+            const saferZones = pfzZones.filter(z => 
+                z.name !== zone.name && 
+                z.suitability > zone.suitability && 
+                z.wind && z.wind.risk !== 'EXTREME' && z.wind.risk !== 'HIGH'
+            );
+            if (saferZones.length > 0) {
+                // Sort by combined score: prioritize nearby + safe
+                saferZones.sort((a, b) => {
+                    const distA = getHaversineDistance(zone.coords[0], zone.coords[1], a.coords[0], a.coords[1]);
+                    const distB = getHaversineDistance(zone.coords[0], zone.coords[1], b.coords[0], b.coords[1]);
+                    // Combined score: lower distance + higher suitability = better
+                    const scoreA = distA - (a.suitability * 0.5);
+                    const scoreB = distB - (b.suitability * 0.5);
+                    return scoreA - scoreB;
+                });
+                const saferZone = saferZones[0];
+                const distNM = getHaversineDistance(zone.coords[0], zone.coords[1], saferZone.coords[0], saferZone.coords[1]);
+                
+                evidenceList.innerHTML += `
+                <li class="flex items-start gap-xs mt-2 p-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded">
+                    <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-sm mt-0.5">verified_user</span>
+                    <span class="font-body-md text-body-md text-emerald-800 dark:text-emerald-300">
+                        <strong>Safer Area Recommendation:</strong> Consider <a href="#" onclick="window.jumpToSaferZone('${saferZone.name}'); return false;" class="underline hover:text-emerald-600 font-medium">${saferZone.name}</a> (${distNM.toFixed(1)} NM away | Suitability: ${saferZone.suitability}%, Wind: ${saferZone.wind.speed_kmh} km/h)
+                    </span>
+                </li>`;
+            }
+            
+            // Nearest Port Shelter recommendation
+            if (isWindDangerous || isGustDangerous) {
+                const INDIAN_PORTS = [
+                    { name: 'Mumbai Port', lat: 18.94, lon: 72.85 },
+                    { name: 'JNPT Nhava Sheva', lat: 18.95, lon: 72.95 },
+                    { name: 'Goa (Mormugao)', lat: 15.41, lon: 73.80 },
+                    { name: 'New Mangalore Port', lat: 12.92, lon: 74.81 },
+                    { name: 'Cochin Port', lat: 9.97, lon: 76.27 },
+                    { name: 'Tuticorin Port', lat: 8.76, lon: 78.13 },
+                    { name: 'Chennai Port', lat: 13.10, lon: 80.29 },
+                    { name: 'Visakhapatnam Port', lat: 17.69, lon: 83.29 },
+                    { name: 'Paradip Port', lat: 20.27, lon: 86.67 },
+                    { name: 'Kolkata Port', lat: 22.55, lon: 88.33 },
+                    { name: 'Kandla Port', lat: 23.03, lon: 70.22 },
+                    { name: 'Karwar Port', lat: 14.80, lon: 74.13 },
+                    { name: 'Ratnagiri Port', lat: 16.98, lon: 73.30 },
+                    { name: 'Beypore Port', lat: 11.16, lon: 75.80 },
+                    { name: 'Kollam Port', lat: 8.88, lon: 76.59 }
+                ];
+                
+                let nearestPort = null;
+                let nearestPortDist = Infinity;
+                INDIAN_PORTS.forEach(port => {
+                    const d = getHaversineDistance(zone.coords[0], zone.coords[1], port.lat, port.lon);
+                    if (d < nearestPortDist) {
+                        nearestPortDist = d;
+                        nearestPort = port;
+                    }
+                });
+                
+                if (nearestPort) {
+                    const etaHrs = Math.floor(nearestPortDist / 12);
+                    const etaMins = Math.round(((nearestPortDist / 12) - etaHrs) * 60);
+                    evidenceList.innerHTML += `
+                    <li class="flex items-start gap-xs mt-1 p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
+                        <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-sm mt-0.5">anchor</span>
+                        <span class="font-body-md text-body-md text-blue-800 dark:text-blue-300">
+                            <strong>Nearest Port Shelter:</strong> ${nearestPort.name} — ${nearestPortDist.toFixed(1)} NM away (ETA ~${etaHrs}h ${etaMins}m at 12 kts)
+                        </span>
+                    </li>`;
+                }
+            }
+        }
+        
         // 24-Hour Forecast Graph
         const canvas = document.getElementById('weather-forecast-chart');
         if (canvas && zone.forecast_24h && zone.forecast_24h.length > 0) {
@@ -1120,9 +1238,66 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+    window.selectZoneFromTable = function(index) {
+        if (pfzZones[index]) {
+            const zone = pfzZones[index];
+            updateSidePanel(zone);
+            map.panTo([zone.coords[0], zone.coords[1]]);
+        }
+    };
+
+    function renderZoneTable() {
+        const tbody = document.getElementById('zone-comparison-body');
+        tbody.innerHTML = '';
+        
+        pfzZones.forEach((zone, index) => {
+            let activityIcon = 'trending_up';
+            let activityClass = 'text-secondary';
+            let activityText = 'High';
+            
+            if (zone.suitability < 60) {
+                activityIcon = 'trending_down';
+                activityClass = 'text-mute';
+                activityText = 'Low';
+            } else if (zone.suitability < 80) {
+                activityIcon = 'trending_flat';
+                activityClass = 'text-warning';
+                activityText = 'Medium';
+            }
+            
+            const distNM = getHaversineDistance(18.94, 72.85, zone.coords[0], zone.coords[1]);
+            
+            // Wind risk color for table
+            let windClass = 'text-body';
+            let windLabel = zone.wind ? `${zone.wind.speed_kmh} km/h` : '--';
+            if (zone.wind) {
+                if (zone.wind.risk === 'EXTREME') { windClass = 'text-error font-semibold'; windLabel = `⚠ ${zone.wind.speed_kmh} km/h`; }
+                else if (zone.wind.risk === 'HIGH') { windClass = 'text-warning font-semibold'; windLabel = `${zone.wind.speed_kmh} km/h`; }
+                else if (zone.wind.risk === 'MODERATE') { windClass = 'text-warning'; }
+            }
+            
+            tbody.innerHTML += `
+            <tr class="border-b border-hairline hover:bg-surface-container-lowest/50 transition-colors cursor-pointer" onclick="window.selectZoneFromTable(${index})">
+                <td class="p-md flex items-center gap-sm">
+                    <div class="w-2 h-2 rounded-full" style="background-color: ${zone.color}"></div>
+                    <span class="font-medium">${zone.name}</span>
+                </td>
+                <td class="p-md"><span class="bg-surface-container-high px-xs py-xxs rounded text-ink font-label-mono text-label-mono">${zone.suitability}%</span></td>
+                <td class="p-md text-body">${distNM.toFixed(1)} NM</td>
+                <td class="p-md text-body">${zone.sst}°C</td>
+                <td class="p-md ${windClass}">${windLabel}</td>
+                <td class="p-md">
+                    <span class="${activityClass} flex items-center gap-xs text-sm"><span class="material-symbols-outlined text-[16px]">${activityIcon}</span> ${activityText}</span>
+                </td>
+                <td class="p-md">
+                    <button class="text-secondary font-medium hover:underline text-sm transition-colors">Select</button>
+                </td>
+            </tr>`;
+        });
+    }
 
     // Run on load
-    loadFishingData();
+    window.loadFishingData();
 });
 </script>
 

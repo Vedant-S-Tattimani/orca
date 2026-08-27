@@ -357,18 +357,39 @@ async def get_pfz_data(request: PFZRequest):
             # Clamp to 1-99%
             suitability = min(99, max(1, suitability))
             
-            # Get color based on suitability
+            # Build structured wind object from weather data
+            wind_speed_kmh = weather_data.get("wind_speed_kmh", 0.0)
+            wind_gust_kmh = weather_data.get("wind_speed_max_kmh", 0.0)
+            
+            # --- Wind-based suitability penalty ---
+            # Even if SST/chlorophyll are perfect, dangerous wind makes a zone unsuitable
+            if wind_speed_kmh >= WIND_THRESH_EXTREME:
+                suitability = min(suitability, 30)  # Cap at 30% for extreme wind
+            elif wind_speed_kmh >= WIND_THRESH_HIGH:
+                suitability = max(1, suitability - 25)  # Heavy penalty for high wind
+            elif wind_speed_kmh >= WIND_THRESH_MODERATE:
+                suitability = max(1, suitability - 10)  # Moderate penalty
+            
+            # Gust penalty (additional)
+            if wind_gust_kmh >= WIND_THRESH_EXTREME:
+                suitability = min(suitability, 25)
+            elif wind_gust_kmh >= WIND_THRESH_HIGH:
+                suitability = max(1, suitability - 10)
+            
+            # Re-clamp after penalties
+            suitability = min(99, max(1, suitability))
+            
+            # Get color based on suitability (after wind penalties)
             if suitability >= 80:
                 color = '#0057c0'
             elif suitability >= 65:
                 color = '#10b981'
+            elif suitability >= 40:
+                color = '#f5a623'
             else:
-                color = '#8f8f8f'
+                color = '#ee0000'
                 
-            # Build structured wind object from weather data
-            wind_speed_kmh = weather_data.get("wind_speed_kmh", 0.0)
             wind_direction_deg = weather_data.get("wind_direction_deg", 0.0)
-            wind_gust_kmh = weather_data.get("wind_speed_max_kmh", 0.0)
             weather_condition = weather_data.get("weather_condition", "Unknown")
             weather_status = weather_data.get("data_status", "SIMULATED")
             weather_source = weather_data.get("source", "Unknown")
