@@ -561,6 +561,44 @@
       </label>
     </div>
   </div>
+
+  <!-- Color Legend Overlay (Bottom Right) -->
+  <div class="absolute bottom-lg right-md z-10 w-56 bg-surface-container-lowest dark:bg-slate-900/90 rounded-xl border border-hairline dark:border-slate-800 shadow-xl backdrop-blur-md overflow-hidden flex flex-col">
+    <div class="p-sm border-b border-hairline dark:border-slate-800 bg-surface/50 dark:bg-slate-950/50 flex items-center">
+      <h3 class="font-headline-md text-xs font-bold text-ink dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-secondary text-base">palette</span>
+        Map Legend
+      </h3>
+    </div>
+    <div class="p-sm flex flex-col gap-2.5">
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full border border-slate-700/50" style="background-color: #f5a623; opacity: 0.4;"></div>
+        <span class="text-[11px] font-medium text-ink dark:text-slate-200">Weather Hazard</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full border border-slate-700/50" style="background-color: #f43f5e; opacity: 0.4;"></div>
+        <span class="text-[11px] font-medium text-ink dark:text-slate-200">Restricted Zone</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full border border-slate-700/50" style="background-color: #0057c0; opacity: 0.4;"></div>
+        <span class="text-[11px] font-medium text-ink dark:text-slate-200">Optimal Fishing (PFZ)</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full border border-slate-700/50" style="background-color: #10b981; opacity: 0.4;"></div>
+        <span class="text-[11px] font-medium text-ink dark:text-slate-200">Moderate Fishing (PFZ)</span>
+      </div>
+      <div class="w-full h-px bg-hairline dark:bg-slate-800 my-0.5"></div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full border border-emerald-700" style="background-color: #10b981;"></div>
+        <span class="text-[11px] font-medium text-ink dark:text-slate-200">Route Origin</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full border border-rose-700" style="background-color: #f43f5e;"></div>
+        <span class="text-[11px] font-medium text-ink dark:text-slate-200">Route Destination</span>
+      </div>
+    </div>
+  </div>
+
 </div>
 <!-- Right Side Detail Panel (Selected Vessel) -->
 <aside id="vessel-detail-panel" class="hidden w-full md:w-[360px] h-[409px] md:h-full bg-surface-container-lowest border-t md:border-t-0 md:border-l border-hairline flex flex-col z-30 shadow-[-4px_0_16px_rgba(0,0,0,0.02)] transition-transform duration-300 translate-y-0 md:translate-x-0">

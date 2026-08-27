@@ -159,11 +159,11 @@ Output JSON:
 
             # Defaults if completely missing
             if final_lat is None or final_lon is None:
-                final_lat = 8.8879
-                final_lon = 76.5684
+                final_lat = None
+                final_lon = None
 
             location = Location(
-                name=parsed.get("location_name", "Kollam Coast"),
+                name=parsed.get("location_name", "Unknown"),
                 lat=final_lat,
                 lon=final_lon,
                 radius_km=10.0
@@ -252,9 +252,9 @@ Output JSON:
             task = TaskType.GENERAL_INQUIRY
 
         # 2. Location Geocoding
-        location_name = "Kollam Coast"
-        resolved_lat = 8.8879
-        resolved_lon = 76.5684
+        location_name = "Unknown"
+        resolved_lat = 0.0
+        resolved_lon = 0.0
 
         if lat is not None and lon is not None:
             resolved_lat = lat
@@ -276,8 +276,8 @@ Output JSON:
 
         location = Location(
             name=location_name,
-            lat=resolved_lat,
-            lon=resolved_lon,
+            lat=resolved_lat if resolved_lat != 0.0 else None,
+            lon=resolved_lon if resolved_lon != 0.0 else None,
             radius_km=10.0
         )
 

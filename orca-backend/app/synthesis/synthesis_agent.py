@@ -186,9 +186,7 @@ class SynthesisAgent:
         # Wind claim
         if "wind_speed_kmh" in weather_data:
             ws = weather_data["wind_speed_kmh"]
-            evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-                "weather", {"wind_speed_kmh": ws}
-            )[-1:]  # Get the last evidence ID added
+            evidence_ids = self._find_evidence_for_field("weather.wind_speed_kmh")  # Get the last evidence ID added
 
             if ws > 40:
                 risk_level = "high"
@@ -207,9 +205,7 @@ class SynthesisAgent:
         # Rainfall claim
         if "rainfall_mm" in weather_data:
             rf = weather_data["rainfall_mm"]
-            evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-                "weather", {"rainfall_mm": rf}
-            )[-1:]
+            evidence_ids = self._find_evidence_for_field("weather.rainfall_mm")
 
             if rf > 7.5:
                 risk_level = "high"
@@ -228,9 +224,7 @@ class SynthesisAgent:
         # Visibility claim (inverted logic)
         if "visibility_km" in weather_data:
             vis = weather_data["visibility_km"]
-            evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-                "weather", {"visibility_km": vis}
-            )[-1:]
+            evidence_ids = self._find_evidence_for_field("weather.visibility_km")
 
             if vis < 5:
                 risk_level = "high"
@@ -255,9 +249,7 @@ class SynthesisAgent:
         # Wave height claim
         if "wave_height_m" in sea_state_data:
             wh = sea_state_data["wave_height_m"]
-            evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-                "sea_state", {"wave_height_m": wh}
-            )[-1:]
+            evidence_ids = self._find_evidence_for_field("sea_state.wave_height_m")
 
             if wh > 2.5:
                 risk_level = "high"
@@ -276,9 +268,7 @@ class SynthesisAgent:
         # Swell height claim
         if "swell_height_m" in sea_state_data:
             sh = sea_state_data["swell_height_m"]
-            evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-                "sea_state", {"swell_height_m": sh}
-            )[-1:]
+            evidence_ids = self._find_evidence_for_field("sea_state.swell_height_m")
 
             if sh > 2:
                 risk_level = "high"
@@ -303,9 +293,7 @@ class SynthesisAgent:
         # Cyclone claim
         if "cyclone_wind_speed_kmh" in hazard_data:
             cws = hazard_data["cyclone_wind_speed_kmh"]
-            evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-                "hazard", {"cyclone_wind_speed_kmh": cws}
-            )[-1:]
+            evidence_ids = self._find_evidence_for_field("hazard.cyclone_wind_speed_kmh")
 
             if cws > 118:
                 risk_level = "high"
@@ -324,9 +312,7 @@ class SynthesisAgent:
         # Lightning claim
         if "lightning_probability_percent" in hazard_data:
             lp = hazard_data["lightning_probability_percent"]
-            evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-                "hazard", {"lightning_probability_percent": lp}
-            )[-1:]
+            evidence_ids = self._find_evidence_for_field("hazard.lightning_probability_percent")
 
             if lp > 60:
                 risk_level = "high"
@@ -351,9 +337,7 @@ class SynthesisAgent:
         # SST claim
         if "sst_c" in pfz_data:
             sst = pfz_data["sst_c"]
-            evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-                "pfz_satellite", {"sst_c": sst}
-            )[-1:]
+            evidence_ids = self._find_evidence_for_field("pfz_satellite.sst_c")
 
             if sst < 24 or sst > 32:
                 risk_level = "moderate"  # Outside optimal range
@@ -372,9 +356,7 @@ class SynthesisAgent:
         # Chlorophyll-a claim
         if "chlorophyll_a_mgm3" in pfz_data:
             chla = pfz_data["chlorophyll_a_mgm3"]
-            evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-                "pfz_satellite", {"chlorophyll_a_mgm3": chla}
-            )[-1:]
+            evidence_ids = self._find_evidence_for_field("pfz_satellite.chlorophyll_a_mgm3")
 
             if chla < 0.5:
                 risk_level = "moderate"  # Low productivity
@@ -399,9 +381,7 @@ class SynthesisAgent:
         route_type = routing_data.get("route_type", "Unknown Route")
         distance = routing_data.get("distance_nm", 0)
         
-        evidence_ids = self.evidence_tracker.extract_evidence_from_agent_data(
-            "routing_agent", {"distance_nm": distance, "route_type": route_type}
-        )[-1:]
+        evidence_ids = self._find_evidence_for_field("routing_agent.distance_nm")
 
         # Create geometry claim
         claim_geo = self.evidence_tracker.create_claim(

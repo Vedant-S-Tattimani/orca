@@ -110,7 +110,7 @@ class HazardAgent(BaseAgent):
                     if "wind_speed_kmh" in openmeteo_data:
                         wind_speed = openmeteo_data["wind_speed_kmh"]
                         wind_max = openmeteo_data.get("wind_speed_max_kmh", wind_speed)
-                        hazard_data["cyclone_wind_speed_kmh"] = wind_max
+                        # Don't set cyclone_wind_speed_kmh based on daily gusts
                         hazard_data["wind_gusts_kmh"] = wind_max * 1.2
                     
                     if "weather_code" in openmeteo_data:
@@ -125,7 +125,7 @@ class HazardAgent(BaseAgent):
                     if "rainfall_mm" in openmeteo_data:
                         hazard_data["heavy_rain_potential_mmh"] = openmeteo_data["rainfall_mm"]
                         
-                    self.logger.info(f"Fallback: Populated hazard proxy fields from Open-Meteo: wind={hazard_data.get('cyclone_wind_speed_kmh')} km/h, lightning={hazard_data.get('lightning_probability_percent')}%")
+                    self.logger.info(f"Fallback: Populated hazard proxy fields from Open-Meteo: gusts={hazard_data.get('wind_gusts_kmh')} km/h, lightning={hazard_data.get('lightning_probability_percent')}%")
                 except Exception as om_e:
                     self.logger.warning(f"Failed to fetch Open-Meteo fallback hazard data: {om_e}")
 

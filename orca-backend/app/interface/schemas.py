@@ -21,8 +21,8 @@ class TaskType(str, Enum):
 class Location(BaseModel):
     """Geographic location representation"""
     name: Optional[str] = Field("Unknown", description="Human-readable location name")
-    lat: float = Field(..., description="Latitude coordinate")
-    lon: float = Field(..., description="Longitude coordinate")
+    lat: Optional[float] = Field(None, description="Latitude coordinate")
+    lon: Optional[float] = Field(None, description="Longitude coordinate")
     radius_km: Optional[float] = Field(
         default=10.0,
         ge=0.1,
@@ -42,11 +42,11 @@ class Location(BaseModel):
         return data
 
     @property
-    def latitude(self) -> float:
+    def latitude(self) -> Optional[float]:
         return self.lat
 
     @property
-    def longitude(self) -> float:
+    def longitude(self) -> Optional[float]:
         return self.lon
 
 

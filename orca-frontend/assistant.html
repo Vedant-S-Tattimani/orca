@@ -22,7 +22,11 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>ORCA Marine Assistant</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="api.js"></script>
 
 
 
@@ -367,18 +371,7 @@
 <!-- Chat Interface -->
 <section class="flex-1 flex flex-col min-w-0 border-r border-hairline bg-canvas">
 <!-- Chat History -->
-<div class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-xl">
-<!-- Date Separator -->
-<div class="flex justify-center">
-<span class="font-label-mono text-label-mono text-mute bg-surface-container-low px-sm py-xxs rounded">TODAY, 08:42 UTC</span>
-</div>
-<!-- User Message -->
-<div class="flex gap-md max-w-3xl ml-auto justify-end">
-<div class="bg-surface-container-low border border-hairline rounded-lg p-md max-w-[85%]">
-<p class="font-body-md text-body-md text-ink">Assess weather risk for route planning from Dutch Harbor to St. Paul Island over the next 48 hours. Focus on sea state and wind conditions.</p>
-</div>
-<img alt="User" class="w-8 h-8 rounded-full border border-hairline shrink-0" data-alt="Small circular user profile avatar showing a professional seafarer in a bright modern bridge setting with technical gear." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCDHocDLJxg8FZdt5C1bahCr5WPZ__uVVKo1T5abYysjPKgXVBhz3IekebbhsvdJCnWb5PFVX0zIFY0Oh0tk4QGhgbOubQ4NS794WOxV0FwgJ4LsS0omCd1Ux_Gg33S9NWfdKhnJ5HZ8hLekHvvmLNDrbLvWvU60lNiW9YxpgcQ0Z1PHgxJs2bZ3TYDs5A58YS4jD74b0P7yzPQAdh6r-3vdbwrZkqBlMX4dOLs2N98KxgfdxPiNsT1A"/>
-</div>
+<div id="chat-history" class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-xl">
 <!-- Agent Response -->
 <div class="flex gap-md max-w-3xl">
 <div class="w-8 h-8 bg-ink rounded flex items-center justify-center shrink-0">
@@ -386,26 +379,7 @@
 </div>
 <div class="space-y-sm max-w-[85%]">
 <div class="bg-canvas-elevated border border-hairline rounded-lg p-md">
-<p class="font-body-md text-body-md text-ink mb-md">I have analyzed the current forecasts and historical buoy data for the Bering Sea corridor between Dutch Harbor and St. Paul Island.</p>
-<!-- Risk Alert Box -->
-<div class="bg-error-container/20 border border-error/30 rounded-lg p-sm flex gap-sm mb-md">
-<span class="material-symbols-outlined text-error shrink-0" data-icon="warning">warning</span>
-<div>
-<h4 class="font-button-app text-button-app text-error mb-xxs">Elevated Risk Detected</h4>
-<p class="font-body-md text-body-md text-ink text-sm">A low-pressure system is developing west of the Pribilof Islands, expected to bring severe gale-force winds (35-45 knots) and significant wave heights exceeding 6 meters within the next 36 hours.</p>
-</div>
-</div>
-<p class="font-body-md text-body-md text-ink">Key observations:</p>
-<ul class="list-disc list-inside font-body-md text-body-md text-ink space-y-xs ml-xs text-sm">
-<li><span class="font-semibold">Wind:</span> Currently NE 15-20kt, shifting to NW and increasing to 35-45kt by 1800 UTC tomorrow.</li>
-<li><span class="font-semibold">Sea State:</span> Building from 2m to 6m+. Peak waves expected around 0600 UTC on day 2.</li>
-<li><span class="font-semibold">Visibility:</span> Reduced in heavy rain and blowing spray later tomorrow.</li>
-</ul>
-<div class="mt-md pt-md border-t border-hairline flex items-center gap-sm">
-<button class="font-button-app text-button-app text-secondary hover:text-ink transition-colors flex items-center gap-xxs">
-<span class="material-symbols-outlined text-[16px]" data-icon="map">map</span> View on Chart
-                                    </button>
-</div>
+<p class="font-body-md text-body-md text-ink">Hello! I am ORCA, your Marine Ecosystem Reasoning Assistant. How can I help you today?</p>
 </div>
 </div>
 </div>
@@ -420,8 +394,8 @@
 </div>
 <div class="relative flex items-center">
 <input id="chat-input" class="w-full bg-canvas-elevated border border-hairline rounded-lg py-sm pl-sm pr-12 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary font-body-md text-body-md text-ink placeholder:text-mute placeholder:font-label-mono placeholder:text-label-mono" placeholder="Ask ORCA Assistant..." type="text"/>
-<button class="absolute right-sm p-xxs text-secondary hover:text-ink transition-colors rounded">
-<span class="material-symbols-outlined" data-icon="send">send</span>
+<button id="send-btn" type="button" class="absolute right-sm p-xxs text-secondary hover:text-ink transition-colors rounded z-10 cursor-pointer">
+<span class="material-symbols-outlined pointer-events-none" data-icon="send">send</span>
 </button>
 </div>
 </div>
@@ -439,40 +413,7 @@
 <span class="font-label-mono text-[10px] text-mute uppercase">Active</span>
 </div>
 </div>
-<div class="flex-1 overflow-y-auto p-sm space-y-sm bg-canvas">
-<div class="font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs">
-<div class="flex justify-between items-center text-[10px] text-mute">
-<span>SYSTEM_CALL</span>
-<span>08:42:15</span>
-</div>
-<div class="text-ink break-all">&gt; query_noaa_buoys(region="bering_sea", params=["wind", "wave"])</div>
-<div class="flex items-center gap-xs text-[10px] text-secondary mt-xxs">
-<span class="material-symbols-outlined text-[12px]" data-icon="check_circle">check_circle</span>
-                            Success: 12 nodes retrieved
-                        </div>
-</div>
-<div class="font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs">
-<div class="flex justify-between items-center text-[10px] text-mute">
-<span>MODEL_INFERENCE</span>
-<span>08:42:18</span>
-</div>
-<div class="text-ink break-all">&gt; analyze_risk_factors(data=buoy_data, threshold="high")</div>
-<div class="flex items-center gap-xs text-[10px] text-warning mt-xxs">
-<span class="material-symbols-outlined text-[12px]" data-icon="warning">warning</span>
-                            Alert: Sea state exceeds safety margin
-                        </div>
-</div>
-<div class="font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs">
-<div class="flex justify-between items-center text-[10px] text-mute">
-<span>DATA_FETCH</span>
-<span>08:42:22</span>
-</div>
-<div class="text-ink break-all">&gt; fetch_gfs_forecast(lat=54.5, lon=-168.5, hours=48)</div>
-<div class="flex items-center gap-xs text-[10px] text-secondary mt-xxs">
-<span class="material-symbols-outlined text-[12px] animate-spin" data-icon="sync">sync</span>
-                            Processing...
-                        </div>
-</div>
+<div id="activity-feed" class="flex-1 overflow-y-auto p-sm space-y-sm bg-canvas">
 </div>
 </aside>
 </div>
@@ -545,7 +486,33 @@
         }
     </style>
 <script>
+
+<script>
+    window.downloadPDF = function(queryId) {
+        const msgDiv = document.getElementById('msg-' + queryId);
+        if (!msgDiv) return;
+        
+        // Hide buttons before printing to avoid them in PDF
+        const actionButtons = msgDiv.querySelectorAll('.pdf-hide');
+        actionButtons.forEach(btn => btn.style.display = 'none');
+        
+        const opt = {
+            margin:       0.5,
+            filename:     'ORCA_Risk_Report_' + queryId + '.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        
+        html2pdf().set(opt).from(msgDiv).save().then(() => {
+            // Restore buttons
+            actionButtons.forEach(btn => btn.style.display = '');
+        });
+    }
+</script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
+
     // Mobile menu toggle
     const menuBtn = document.getElementById('mobile-menu-btn');
     const navMenu = document.getElementById('mobile-nav-menu');
@@ -585,7 +552,292 @@ document.addEventListener('DOMContentLoaded', () => {
     if (query && inputEl) {
         inputEl.value = query;
         inputEl.focus();
+        setTimeout(() => submitChatMessage(), 500);
     }
+
+    // --- Chat Logic ---
+    const sendBtn = document.getElementById('send-btn');
+    const chatHistory = document.getElementById('chat-history');
+    const activityFeed = document.getElementById('activity-feed');
+    let isPolling = false;
+    let sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
+    
+    function appendUserMessage(text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'flex gap-md max-w-3xl ml-auto justify-end';
+        msgDiv.innerHTML = `
+            <div class="bg-surface-container-low border border-hairline rounded-lg p-md max-w-[85%]">
+                <p class="font-body-md text-body-md text-ink">${text}</p>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center font-bold shrink-0">U</div>
+        `;
+        chatHistory.appendChild(msgDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    function appendAgentLoadingMessage(queryId) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'flex gap-md max-w-3xl';
+        msgDiv.id = 'msg-' + queryId;
+        msgDiv.innerHTML = `
+            <div class="w-8 h-8 bg-ink rounded flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-on-primary text-[18px]">smart_toy</span>
+            </div>
+            <div class="space-y-sm max-w-[85%] w-full">
+                <div class="bg-canvas-elevated border border-hairline rounded-lg p-md">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined animate-spin text-mute text-[18px]">sync</span>
+                        <p class="font-body-md text-body-md text-mute">ORCA is thinking...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        chatHistory.appendChild(msgDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        return msgDiv;
+    }
+    
+    function updateAgentMessage(queryId, riskCard) {
+        const msgDiv = document.getElementById('msg-' + queryId);
+        if (!msgDiv) return;
+        
+        let hasMap = false;
+        let hasChart = false;
+        let mapHTML = '';
+        let chartHTML = '';
+        
+        if (riskCard.evidence && riskCard.evidence.length > 0) {
+            const pfzEvidence = riskCard.evidence.find(e => (e.source || '').toLowerCase().includes('pfz'));
+            const routeEvidence = riskCard.evidence.find(e => (e.source || '').toLowerCase().includes('routing'));
+            const weatherEvidence = riskCard.evidence.find(e => (e.source || '').toLowerCase().includes('weather') || (e.source || '').toLowerCase().includes('imd'));
+
+            if (pfzEvidence || routeEvidence) {
+                hasMap = true;
+                mapHTML = `
+                    <div class="mt-md rounded-lg overflow-hidden border border-hairline relative">
+                        <div class="bg-surface p-xs border-b border-hairline font-label-mono text-label-mono text-mute flex justify-between items-center">
+                            <span><span class="material-symbols-outlined text-[14px] align-text-bottom">map</span> Interactive Marine Context</span>
+                        </div>
+                        <div id="map-${queryId}" class="w-full h-48 bg-surface-variant z-0"></div>
+                    </div>
+                `;
+            }
+
+            if (weatherEvidence) {
+                hasChart = true;
+                chartHTML = `
+                    <div class="mt-md rounded-lg overflow-hidden border border-hairline relative">
+                        <div class="bg-surface p-xs border-b border-hairline font-label-mono text-label-mono text-mute flex justify-between items-center">
+                            <span><span class="material-symbols-outlined text-[14px] align-text-bottom">monitoring</span> Predictive Marine Conditions (24h)</span>
+                        </div>
+                        <div class="w-full h-40 bg-surface-container-lowest p-sm">
+                            <canvas id="chart-${queryId}"></canvas>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        
+        let alertHTML = '';
+        if (riskCard.risk_level === 'high' || riskCard.risk_level === 'extreme') {
+            alertHTML = `
+                <div class="bg-error-container/20 border border-error/30 rounded-lg p-sm flex gap-sm mb-md mt-sm">
+                    <span class="material-symbols-outlined text-error shrink-0">warning</span>
+                    <div>
+                        <h4 class="font-button-app text-button-app text-error mb-xxs">Elevated Risk Detected</h4>
+                        <p class="font-body-md text-body-md text-ink text-sm">Please exercise caution and review the recommendation.</p>
+                    </div>
+                </div>
+            `;
+        } else if (riskCard.risk_level === 'medium') {
+            alertHTML = `
+                <div class="bg-warning/10 border border-warning/30 rounded-lg p-sm flex gap-sm mb-md mt-sm">
+                    <span class="material-symbols-outlined text-warning shrink-0">warning</span>
+                    <div>
+                        <h4 class="font-button-app text-button-app text-warning mb-xxs">Moderate Risk Detected</h4>
+                        <p class="font-body-md text-body-md text-ink text-sm">Review conditions carefully.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        let evidenceHTML = '';
+        if (riskCard.evidence && riskCard.evidence.length > 0) {
+            evidenceHTML = `
+                <p class="font-body-md text-body-md text-ink mt-sm font-semibold">Evidence:</p>
+                <ul class="list-disc list-inside font-body-md text-body-md text-ink space-y-xs ml-xs text-sm mt-xs">
+                    ${riskCard.evidence.map(e => `<li>${e.claim} <span class="text-mute text-xs">(${e.source})</span></li>`).join('')}
+                </ul>
+            `;
+        }
+
+        let actionsHTML = `
+            <div class="mt-md pt-sm border-t border-hairline flex gap-sm pdf-hide">
+                <button onclick="window.downloadPDF('${queryId}')" class="px-sm py-xxs rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-ink font-button-app text-sm flex items-center gap-xs transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">download</span> Export PDF Report
+                </button>
+            </div>
+        `;
+
+        msgDiv.innerHTML = `
+            <div class="w-8 h-8 bg-ink rounded flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-on-primary text-[18px]">smart_toy</span>
+            </div>
+            <div class="space-y-sm max-w-[85%] w-full">
+                <div class="bg-canvas-elevated border border-hairline rounded-lg p-md">
+                    <p class="font-body-md text-body-md text-ink whitespace-pre-wrap">${riskCard.reasoning || riskCard.recommendation || "Error generating response"}</p>
+                    ${alertHTML}
+                    ${evidenceHTML}
+                    ${mapHTML}
+                    ${chartHTML}
+                    ${actionsHTML}
+                </div>
+            </div>
+        `;
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        if (hasMap) {
+            setTimeout(() => {
+                try {
+                    const mapEl = document.getElementById('map-' + queryId);
+                    if (!mapEl) return;
+                    const cMap = L.map('map-' + queryId, { zoomControl: false, attributionControl: false }).setView([15.0, 75.0], 4);
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const tileUrl = isDark 
+                        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+                    L.tileLayer(tileUrl).addTo(cMap);
+                    
+                    const pfzEvidence = riskCard.evidence.find(e => (e.source || '').toLowerCase().includes('pfz'));
+                    const routeEvidence = riskCard.evidence.find(e => (e.source || '').toLowerCase().includes('routing'));
+
+                    if (pfzEvidence) {
+                        L.circle([12.5, 73.2], { radius: 80000, color: '#00dfd8', fillOpacity: 0.3 }).addTo(cMap).bindTooltip("Fishing Zone Match");
+                        L.circle([14.1, 74.5], { radius: 60000, color: '#00dfd8', fillOpacity: 0.2 }).addTo(cMap);
+                    }
+                    if (routeEvidence) {
+                        const latlngs = [[8.9, 76.6], [10.0, 75.0], [13.0, 73.0]];
+                        L.polyline(latlngs, {color: '#007cf0', weight: 3, dashArray: '5, 10'}).addTo(cMap);
+                    }
+                } catch (err) { console.error("Map render err:", err); }
+            }, 100);
+        }
+
+        if (hasChart) {
+            setTimeout(() => {
+                try {
+                    const canvas = document.getElementById('chart-' + queryId);
+                    if (!canvas) return;
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const textColor = isDark ? '#a3a3a3' : '#737373';
+                    const gridColor = isDark ? '#262626' : '#ebebeb';
+                    
+                    new Chart(canvas, {
+                        type: 'line',
+                        data: {
+                            labels: ['Now', '+4h', '+8h', '+12h', '+16h', '+20h', '+24h'],
+                            datasets: [{
+                                label: 'Wind Trend (km/h)',
+                                data: [22, 25, 28, 20, 15, 12, 10],
+                                borderColor: '#00dfd8',
+                                backgroundColor: 'rgba(0, 223, 216, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 2,
+                                pointRadius: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } },
+                                y: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } }
+                            }
+                        }
+                    });
+                } catch (err) { console.error("Chart render err:", err); }
+            }, 100);
+        }
+    }
+    
+    function updateActivityFeed(logs) {
+        if (!logs) return;
+        activityFeed.innerHTML = '';
+        logs.forEach(log => {
+            const time = new Date().toLocaleTimeString('en-US', {hour12:false});
+            const logDiv = document.createElement('div');
+            logDiv.className = "font-label-mono text-label-mono text-body p-sm bg-canvas-elevated border border-hairline rounded flex flex-col gap-xs";
+            logDiv.innerHTML = `
+                <div class="flex justify-between items-center text-[10px] text-mute">
+                    <span>ORCA_SYSTEM</span>
+                    <span>${time}</span>
+                </div>
+                <div class="text-ink break-words">${log}</div>
+            `;
+            activityFeed.appendChild(logDiv);
+        });
+        activityFeed.scrollTop = activityFeed.scrollHeight;
+    }
+
+    async function submitChatMessage() {
+        if (isPolling) return;
+        const text = inputEl.value.trim();
+        if (!text) return;
+        
+        inputEl.value = '';
+        appendUserMessage(text);
+        
+        try {
+            isPolling = true;
+            const response = await window.OrcaAPI.submitQuery(text, null, null, sessionId);
+            const queryId = response.query_id;
+            appendAgentLoadingMessage(queryId);
+            
+            const pollInterval = setInterval(async () => {
+                try {
+                    const result = await window.OrcaAPI.getQueryResult(queryId);
+                    
+                    if (result.dev_logs && result.dev_logs.length > 0) {
+                        updateActivityFeed(result.dev_logs);
+                    }
+                    
+                    if (result.status === 'done' || result.status === 'failed') {
+                        clearInterval(pollInterval);
+                        isPolling = false;
+                        updateAgentMessage(queryId, result);
+                    } else {
+                        const loader = document.querySelector('#msg-' + queryId + ' p');
+                        if (loader && result.reasoning) {
+                            loader.innerText = result.reasoning;
+                        }
+                    }
+                } catch (err) {
+                    console.error("Polling error:", err);
+                    clearInterval(pollInterval);
+                    isPolling = false;
+                    updateAgentMessage(queryId, { reasoning: "Network error fetching results.", status: 'failed', risk_level: 'low' });
+                }
+            }, 2000);
+            
+        } catch (error) {
+            console.error("Submission error:", error);
+            isPolling = false;
+            const errId = 'err-' + Math.random().toString(36).substr(2, 9);
+            appendAgentLoadingMessage(errId);
+            updateAgentMessage(errId, { reasoning: "Failed to connect to backend.", status: 'failed', risk_level: 'low' });
+        }
+    }
+
+    sendBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        submitChatMessage();
+    });
+    inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitChatMessage();
+    });
 });
 </script>
 

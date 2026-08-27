@@ -154,7 +154,8 @@ class EvidenceTracker:
                 "geofence": "Survey of India"
             }
 
-        source = source_mapping.get(agent_name, agent_name.upper())
+        agent_name_str = agent_name.value if hasattr(agent_name, "value") else str(agent_name)
+        source = source_mapping.get(agent_name_str, agent_name_str.upper())
         timestamp = agent_data.get("timestamp", datetime.utcnow().isoformat())
         data_status = agent_data.get("data_status", "SIMULATED")
 
@@ -171,7 +172,7 @@ class EvidenceTracker:
 
                     evidence_id = self.add_evidence(
                         source=source,
-                        field=f"{agent_name}.{field}",
+                        field=f"{agent_name_str}.{field}",
                         timestamp=timestamp,
                         value=value,
                         data_status=data_status,

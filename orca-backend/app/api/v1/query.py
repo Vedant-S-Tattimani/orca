@@ -358,7 +358,7 @@ async def get_pfz_data(request: PFZRequest):
             if suitability >= 80:
                 color = '#0057c0'
             elif suitability >= 65:
-                color = '#f5a623'
+                color = '#10b981'
             else:
                 color = '#8f8f8f'
                 
@@ -486,6 +486,15 @@ async def get_pfz_data(request: PFZRequest):
 
 
 async def process_query_background(query_id: str, structured_query: StructuredQuery, session_id: str = "default", t_nlu: float = None, demo_failure: bool = False):
+    if structured_query and (structured_query.location.lat is None or structured_query.location.lon is None):
+        spatial_tasks = {TaskType.SAFETY_CHECK, TaskType.FISHING_ZONES, TaskType.ROUTE_PLANNING, TaskType.HAZARD_ALERT, TaskType.WEATHER_INFO}
+        if structured_query.task in spatial_tasks:
+            query_results[query_id].status = "done"
+            query_results[query_id].risk_level = "low"
+            query_results[query_id].reasoning = "I need a specific location to check weather and safety conditions. Please provide a coastal area, port, or city name."
+            query_results[query_id].recommendation = "Try asking again with a location, e.g., 'What is the weather like in Kochi?'"
+            return
+
     """
     Background pipeline task to process the query and synthesize the RiskCard
     """
@@ -842,4 +851,18 @@ async def process_query_background_legacy(query_id: str, query_data: Dict[str, A
         agent_status=[],
         status="processing"
     )
+
+    if structured_query and (structured_query.location.lat is None or structured_query.location.lon is None):
+        spatial_tasks = {TaskType.SAFETY_CHECK, TaskType.FISHING_ZONES, TaskType.ROUTE_PLANNING, TaskType.HAZARD_ALERT, TaskType.WEATHER_INFO}
+        if structured_query.task in spatial_tasks:
+            query_results[query_id] = RiskCard(
+                risk_level="low",
+                reasoning="I need a specific location to check weather and safety conditions. Please provide a coastal area, port, or city name.",
+                recommendation="Try asking again with a location, e.g., 'What is the weather like in Kochi?'",
+                evidence=[],
+                agent_status=[],
+                status="done"
+            )
+            return
+
     await process_query_background(query_id, structured_query)
