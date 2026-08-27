@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('orca_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+    })();
+  </script>
+
+  <!-- Google Fonts & Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Login - ORCA Marine Intelligence</title>
+  
+  <!-- MapTiler SDK CSS -->
+  <link href="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.css" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  
+  <!-- Platform Core Scripts -->
+  <script src="api.js"></script>
+  <script src="i18n.js"></script>
+  <script src="tts.js"></script>
+  <script src="stt.js"></script>
+
+  <!-- MapTiler SDK JS -->
+  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.umd.min.js"></script>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error": "#ee0000",
+            "secondary": "#0057c0",
+            "on-primary": "#ffffff",
+            "body": "#4d4d4d",
+            "on-tertiary": "#ffffff",
+            "inverse-surface": "#2f3131",
+            "surface-dim": "#dadada",
+            "on-surface-variant": "#444748",
+            "surface-bright": "#f9f9f9",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-fixed-variant": "#004397",
+            "on-background": "#1a1c1c",
+            "outline-variant": "#c4c7c7",
+            "surface-container": "#eeeeee",
+            "on-tertiary-fixed-variant": "#484645",
+            "surface": "#f9f9f9",
+            "outline": "#747878",
+            "mute": "#8f8f8f",
+            "primary-fixed": "#e5e2e1",
+            "tertiary-fixed-dim": "#cac6c4",
+            "background": "#f9f9f9",
+            "tertiary": "#000000",
+            "primary-container": "#1c1b1b",
+            "surface-container-highest": "#e2e2e2",
+            "error-container": "#ffdad6",
+            "secondary-container": "#006ff0",
+            "on-tertiary-container": "#868382",
+            "inverse-primary": "#c8c6c5",
+            "tertiary-container": "#1c1b1a",
+            "on-primary-container": "#858383",
+            "ink": "#171717",
+            "on-secondary": "#ffffff",
+            "primary-fixed-dim": "#c8c6c5",
+            "hairline": "#ebebeb",
+            "surface-container-low": "#f3f3f3",
+            "surface-tint": "#5f5e5e",
+            "on-tertiary-fixed": "#1c1b1a",
+            "on-primary-fixed": "#1c1b1b",
+            "primary": "#000000",
+            "gradient-cyan": "#00dfd8",
+            "on-secondary-fixed": "#001a43",
+            "secondary-fixed": "#d8e2ff",
+            "tertiary-fixed": "#e6e2df",
+            "gradient-blue": "#007cf0",
+            "on-error-container": "#93000a",
+            "on-error": "#ffffff",
+            "on-surface": "#1a1c1c",
+            "canvas": "#fafafa",
+            "warning": "#f5a623",
+            "surface-variant": "#e2e2e2",
+            "secondary-fixed-dim": "#aec6ff",
+            "on-primary-fixed-variant": "#474746",
+            "surface-container-high": "#e8e8e8",
+            "canvas-elevated": "#ffffff",
+            "gradient-violet": "#7928ca",
+            "inverse-on-surface": "#f0f1f1",
+            "on-secondary-container": "#fefcff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "fontFamily": {
+            "sans": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+            "mono": ["Geist Mono", "monospace"],
+            "label-mono": ["Geist Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+    }
+    body, button, input, select, textarea {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+    code, kbd, samp, pre, .font-mono, .font-label-mono {
+      font-family: 'Geist Mono', monospace !important;
+    }
+    .mesh-gradient {
+      background-color: #fafafa;
+      background-image: 
+        radial-gradient(at 10% 20%, hsla(178,100%,44%,0.15) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, hsla(209,100%,47%,0.15) 0px, transparent 50%),
+        radial-gradient(at 40% 80%, hsla(270,66%,63%,0.15) 0px, transparent 50%);
+    }
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined' !important;
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Pure Dark Mode Styles */
+    html.dark {
+      color-scheme: dark;
+      background-color: #000000 !important;
+    }
+    html.dark body {
+      background-color: #000000 !important;
+      color: #d4d4d4 !important;
+    }
+    html.dark nav, html.dark header, html.dark aside {
+      background-color: #0a0a0a !important;
+      border-color: #262626 !important;
+    }
+    html.dark .bg-surface,
+    html.dark .bg-canvas,
+    html.dark .bg-surface-container-low,
+    html.dark .bg-surface-container-high,
+    html.dark .bg-surface-container-highest,
+    html.dark .bg-surface-container {
+      background-color: #050505 !important;
+    }
+    html.dark .bg-canvas-elevated,
+    html.dark .bg-surface-container-lowest {
+      background-color: #121212 !important;
+    }
+    html.dark .text-ink,
+    html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+      color: #ffffff !important;
+    }
+    html.dark .text-body, html.dark p {
+      color: #a3a3a3 !important;
+    }
+    html.dark .text-mute {
+      color: #737373 !important;
+    }
+    html.dark .border-hairline {
+      border-color: #262626 !important;
+    }
+    html.dark .mesh-gradient {
+      background-color: #000000 !important;
+      background-image: 
+        radial-gradient(at 10% 20%, hsla(178,100%,44%,0.12) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, hsla(209,100%,47%,0.12) 0px, transparent 50%),
+        radial-gradient(at 40% 80%, hsla(270,66%,63%,0.1) 0px, transparent 50%) !important;
+    }
+
+    /* Globe MapTiler Custom Clean styling */
+    #map .maplibregl-control-container,
+    #map .maptiler-ctrl {
+      display: none !important;
+    }
+  </style>
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="shortcut icon" href="favicon.ico"/>
+</head>
+<body class="bg-canvas text-body font-body-md min-h-screen flex flex-col overflow-hidden">
+
+<!-- Top Header / Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 h-16 z-50 bg-surface/80 dark:bg-black/80 backdrop-blur-md border-b border-hairline dark:border-slate-800 transition-colors duration-200">
+  <div class="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+    <!-- Logo section -->
+    <div class="flex items-center gap-3 cursor-pointer group" onclick="window.location.href='index.html'">
+      <div class="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center transition-transform group-hover:scale-105 shrink-0">
+        <img src="logo.png" alt="ORCA Marine Logo" class="w-full h-full object-contain dark:hidden">
+        <img src="logo-white.png" alt="ORCA Marine Logo" class="w-full h-full object-contain hidden dark:block">
+      </div>
+      <div>
+        <h1 class="font-headline-md text-sm md:text-base font-bold text-ink dark:text-white leading-tight">ORCA Marine</h1>
+        <p class="font-label-mono text-[9px] text-mute uppercase tracking-widest leading-none">Intelligence</p>
+      </div>
+    </div>
+
+    <!-- Navigation links -->
+    <nav class="hidden lg:flex items-center gap-1">
+      <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">info</span>
+        <span data-i18n="nav_about">About</span>
+      </a>
+      <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">dashboard</span>
+        <span data-i18n="nav_dashboard">Dashboard</span>
+      </a>
+      <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+        <span data-i18n="nav_assistant">Assistant</span>
+      </a>
+      <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">map</span>
+        <span data-i18n="nav_map">Map</span>
+      </a>
+      <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">sailing</span>
+        <span data-i18n="nav_fishing">Fishing</span>
+      </a>
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <!-- Settings Icon Button -->
+      <a href="settings.html" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center" title="Settings">
+        <span class="material-symbols-outlined">settings</span>
+      </a>
+
+      <!-- Login Option (Active State) -->
+      <a href="login.html" class="px-3 py-1.5 text-xs md:text-sm font-semibold rounded-lg bg-ink text-on-primary dark:bg-white dark:text-black border border-transparent shadow-sm flex items-center gap-1.5 transition-all" title="Login">
+        <span class="material-symbols-outlined text-[18px]">login</span>
+        <span data-i18n="nav_login">Login</span>
+      </a>
+
+      <!-- Theme Toggle inside Navbar -->
+      <button id="theme-toggle-btn-nav" aria-label="Toggle Dark Mode" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg text-amber-500 dark:hidden">light_mode</span>
+        <span class="material-symbols-outlined text-lg text-cyan-400 hidden dark:inline">dark_mode</span>
+      </button>
+
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Menu dropdown -->
+  <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
+    <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">info</span>
+      <span data-i18n="nav_about">About</span>
+    </a>
+    <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span data-i18n="nav_dashboard">Dashboard</span>
+    </a>
+    <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">smart_toy</span>
+      <span data-i18n="nav_assistant">Assistant</span>
+    </a>
+    <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">map</span>
+      <span data-i18n="nav_map">Map</span>
+    </a>
+    <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+      <span class="material-symbols-outlined">sailing</span>
+      <span data-i18n="nav_fishing">Fishing</span>
+    </a>
+    <a href="login.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
+      <span class="material-symbols-outlined">login</span>
+      <span data-i18n="nav_login">Login</span>
+    </a>
+  </div>
+</header>
+
+<!-- Split-Screen Login Main Area -->
+<main class="flex-1 pt-16 grid grid-cols-1 lg:grid-cols-12 h-[calc(100vh-4rem)] overflow-hidden mesh-gradient">
+  
+  <!-- LEFT SIDE: Authentication Form & Branding -->
+  <div class="lg:col-span-5 flex flex-col justify-between p-6 md:p-10 lg:p-12 overflow-y-auto z-10 border-r border-hairline dark:border-slate-800/80 bg-surface/60 dark:bg-black/60 backdrop-blur-xl">
+    
+    <!-- Top Branding Header -->
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 font-label-mono text-xs font-semibold uppercase tracking-wider mb-6">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        ORCA Security Gateway
+      </div>
+
+      <!-- Welcome Title & Description -->
+      <h2 class="font-headline-lg text-2xl md:text-3xl lg:text-4xl font-extrabold text-ink dark:text-white tracking-tight leading-tight" data-i18n="login_welcome_title">
+        Welcome to ORCA
+      </h2>
+      <p class="text-body dark:text-slate-400 text-sm md:text-base mt-3 leading-relaxed" data-i18n="login_welcome_desc">
+        Access real-time marine intelligence, ocean oceanographic telemetry, and AI vessel navigation.
+      </p>
+
+      <!-- Notification alert (for dynamic feedback) -->
+      <div id="login-alert" class="hidden mt-4 p-3 rounded-lg text-xs font-semibold border flex items-center gap-2"></div>
+    </div>
+
+    <!-- Login Form Fields -->
+    <form id="login-form" class="space-y-4 my-6" onsubmit="handleLoginSubmit(event)">
+      <!-- Email Address Input -->
+      <div>
+        <label for="email" class="block font-label-mono text-xs font-semibold text-ink dark:text-slate-300 mb-1.5 uppercase tracking-wider" data-i18n="login_email_label">
+          Email Address
+        </label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3.5 text-mute text-lg pointer-events-none">mail</span>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required 
+            placeholder="captain@vessel.org" 
+            data-i18n-placeholder="login_email_placeholder"
+            class="w-full bg-surface-bright dark:bg-slate-900/90 border border-hairline dark:border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-ink dark:text-white placeholder:text-mute focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500 transition-all shadow-sm"
+          />
+        </div>
+      </div>
+
+      <!-- Password Input -->
+      <div>
+        <div class="flex justify-between items-center mb-1.5">
+          <label for="password" class="font-label-mono text-xs font-semibold text-ink dark:text-slate-300 uppercase tracking-wider" data-i18n="login_password_label">
+            Password
+          </label>
+          <a href="#" onclick="alert('Password reset instructions have been dispatched to your vessel administrator.')" class="text-xs text-cyan-600 dark:text-cyan-400 hover:underline font-semibold" data-i18n="login_forgot_password">
+            Forgot password?
+          </a>
+        </div>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3.5 text-mute text-lg pointer-events-none">lock</span>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            placeholder="••••••••••••" 
+            data-i18n-placeholder="login_password_placeholder"
+            class="w-full bg-surface-bright dark:bg-slate-900/90 border border-hairline dark:border-slate-800 rounded-xl pl-11 pr-11 py-3 text-sm text-ink dark:text-white placeholder:text-mute focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500 transition-all shadow-sm"
+          />
+          <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 text-mute hover:text-ink dark:hover:text-white transition-colors focus:outline-none" title="Toggle password view">
+            <span id="password-toggle-icon" class="material-symbols-outlined text-lg">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Remember Checkbox -->
+      <div class="flex items-center justify-between pt-1">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" id="remember" class="w-4 h-4 rounded border-hairline dark:border-slate-800 text-cyan-500 focus:ring-cyan-500 dark:bg-slate-900">
+          <span class="text-xs text-body dark:text-slate-400 font-medium" data-i18n="login_remember">Remember this vessel</span>
+        </label>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        id="login-btn"
+        class="w-full py-3.5 px-4 mt-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/35 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+      >
+        <span data-i18n="login_submit_btn">Sign In to Platform</span>
+        <span class="material-symbols-outlined text-lg transition-transform group-hover:translate-x-1">arrow_forward</span>
+      </button>
+
+      <!-- Divider -->
+      <div class="relative flex py-2 items-center">
+        <div class="flex-grow border-t border-hairline dark:border-slate-800"></div>
+        <span class="flex-shrink mx-3 text-xs text-mute font-mono uppercase" data-i18n="login_or">or</span>
+        <div class="flex-grow border-t border-hairline dark:border-slate-800"></div>
+      </div>
+
+      <!-- Continue as Guest Option -->
+      <a 
+        href="dashboard.html" 
+        class="w-full py-3 px-4 rounded-xl border border-hairline dark:border-slate-800 bg-surface-container-low dark:bg-slate-900/60 hover:bg-surface-container dark:hover:bg-slate-800 text-ink dark:text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 text-center"
+      >
+        <span class="material-symbols-outlined text-lg text-cyan-500">explore</span>
+        <span data-i18n="login_guest_btn">Continue as Guest</span>
+      </a>
+    </form>
+
+    <!-- Bottom Footer Note -->
+    <div class="pt-4 border-t border-hairline/60 dark:border-slate-800/60 text-xs text-center text-mute flex items-center justify-between">
+      <span>© 2026 ORCA Platform</span>
+      <span class="flex items-center gap-1">
+        <span data-i18n="login_no_account">Don't have an account?</span>
+        <a href="#" onclick="alert('Access request submitted! Our marine operations team will contact your fleet dispatch.')" class="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline" data-i18n="login_request_access">Request Access</a>
+      </span>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDE: Interactive 3D Globe Container -->
+  <div class="lg:col-span-7 relative w-full h-full min-h-[400px] lg:min-h-full bg-black overflow-hidden flex items-center justify-center">
+    
+    <!-- 3D Globe Canvas Element -->
+    <div id="map" class="w-full h-full absolute inset-0"></div>
+
+    <!-- Floating Top-Right Badge -->
+    <div class="absolute top-4 right-4 z-20 pointer-events-none">
+      <div class="px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-cyan-500/30 text-white font-mono text-xs flex items-center gap-2 shadow-xl">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Global Earth Telemetry • Active</span>
+      </div>
+    </div>
+
+    <!-- Floating Bottom-Left Overlay -->
+    <div class="absolute bottom-6 left-6 right-6 lg:right-auto z-20 pointer-events-none">
+      <div class="px-4 py-2.5 rounded-xl bg-black/70 backdrop-blur-md border border-slate-800 text-slate-300 font-mono text-xs flex items-center gap-3 max-w-md shadow-2xl">
+        <span class="material-symbols-outlined text-cyan-400 text-lg shrink-0">public</span>
+        <span>Interactive 3D Globe — Drag to rotate, scroll to zoom. Real-time satellite oceanography layer.</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// Password Visibility Toggle Logic
+function togglePasswordVisibility() {
+  const passwordInput = document.getElementById('password');
+  const icon = document.getElementById('password-toggle-icon');
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    icon.textContent = 'visibility_off';
+  } else {
+    passwordInput.type = 'password';
+    icon.textContent = 'visibility';
+  }
+}
+
+// Simulated Login Form Handling
+function handleLoginSubmit(event) {
+  event.preventDefault();
+  const alertEl = document.getElementById('login-alert');
+  const btn = document.getElementById('login-btn');
+  
+  btn.disabled = true;
+  btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-lg">progress_activity</span> Authenticating...`;
+  
+  setTimeout(() => {
+    alertEl.className = "mt-4 p-3 rounded-lg text-xs font-semibold border flex items-center gap-2 bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
+    alertEl.innerHTML = `<span class="material-symbols-outlined text-base">check_circle</span> Authentication successful! Redirecting to Dashboard...`;
+    alertEl.classList.remove('hidden');
+
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 1200);
+  }, 1000);
+}
+
+// Global Theme Toggle Functionality
+document.addEventListener('DOMContentLoaded', () => {
+  // Mobile menu toggle
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const navMenu = document.getElementById('mobile-nav-menu');
+  if (menuBtn && navMenu) {
+    menuBtn.addEventListener('click', () => {
+      navMenu.classList.toggle('hidden');
+    });
+  }
+
+  // Theme Toggle logic
+  const handleThemeToggle = () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    if (isDark) {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+      localStorage.setItem('orca_theme', 'light');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+      localStorage.setItem('orca_theme', 'dark');
+    }
+  };
+
+  const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
+  if (toggleBtnNav) {
+    toggleBtnNav.addEventListener('click', handleThemeToggle);
+  }
+
+  // Initialize 3D Globe with MapTiler SDK
+  initGlobe();
+});
+
+/* ============================================================================
+ * 3D EARTH GLOBE INITIALIZATION & AUTO-ROTATION LOGIC
+ * Reused & adapted from 3d globe module (MapTiler SDK JS)
+ * ============================================================================ */
+const MAPTILER_API_KEY = 'uPaD3QT5o1HpHQYgYGRX';
+
+let globeMap = null;
+let isUserInteracting = false;
+let isPointerDown = false;
+let inactivityTimer = null;
+let lastAnimationTimestamp = 0;
+let resumeTimestamp = 0;
+
+const INACTIVITY_DELAY_MS = 4000;   // 4s inactivity before rotation resumes
+const SECONDS_PER_REVOLUTION = 200; // 200s per full 360 rotation
+const MAX_ZOOM_FOR_ROTATION = 5.0;
+const RAMP_IN_DURATION_MS = 1200;
+
+function initGlobe() {
+  if (typeof maptilersdk === 'undefined') {
+    console.error('MapTiler SDK not loaded.');
+    showGlobeErrorMessage();
+    return;
+  }
+
+  maptilersdk.config.apiKey = MAPTILER_API_KEY;
+
+  try {
+    globeMap = new maptilersdk.Map({
+      container: 'map',
+      style: maptilersdk.MapStyle.HYBRID,
+      projection: 'globe',
+      center: [15, 20],
+      zoom: 2.2,
+      minZoom: 1,
+      maxZoom: 20,
+      pitch: 0,
+      bearing: 0,
+      terrain: true,
+      navigationControl: false,
+      geolocateControl: false,
+      scaleControl: false
+    });
+
+    globeMap.on('error', (e) => {
+      console.warn('MapTiler API Notice:', e);
+      if (e && e.error && e.error.status === 403) {
+        showGlobeErrorMessage();
+      }
+    });
+
+    globeMap.on('style.load', () => {
+      try {
+        if (typeof globeMap.setSpace === 'function') {
+          globeMap.setSpace({
+            color: '#010204',
+            preset: 'milkyway'
+          });
+        }
+      } catch (err) {
+        console.warn('Space background setup fallback:', err);
+      }
+    });
+
+    globeMap.on('load', () => {
+      setupGlobeInteractionListeners();
+      requestAnimationFrame(animateGlobe);
+    });
+
+    window.addEventListener('resize', () => {
+      if (globeMap) globeMap.resize();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      lastAnimationTimestamp = 0;
+    });
+
+  } catch (error) {
+    console.error('Failed to initialize 3D Globe:', error);
+    showGlobeErrorMessage();
+  }
+}
+
+function animateGlobe(timestamp) {
+  if (lastAnimationTimestamp === 0) {
+    lastAnimationTimestamp = timestamp;
+  }
+  const deltaTime = timestamp - lastAnimationTimestamp;
+  lastAnimationTimestamp = timestamp;
+
+  if (globeMap && !isUserInteracting && !isPointerDown) {
+    const currentZoom = globeMap.getZoom();
+
+    if (currentZoom <= MAX_ZOOM_FOR_ROTATION) {
+      let rampFactor = 1.0;
+      if (resumeTimestamp > 0) {
+        const timeSinceResume = timestamp - resumeTimestamp;
+        rampFactor = Math.min(1.0, timeSinceResume / RAMP_IN_DURATION_MS);
+      }
+
+      const degreesPerMs = (360 / (SECONDS_PER_REVOLUTION * 1000)) * rampFactor;
+      const degreesToRotate = degreesPerMs * deltaTime;
+
+      const center = globeMap.getCenter();
+      center.lng = (center.lng - degreesToRotate + 360) % 360;
+      if (center.lng > 180) center.lng -= 360;
+
+      globeMap.jumpTo({ center });
+    }
+  }
+
+  requestAnimationFrame(animateGlobe);
+}
+
+function setupGlobeInteractionListeners() {
+  const mapElement = document.getElementById('map');
+  if (!mapElement || !globeMap) return;
+
+  function stopAutoRotation() {
+    isUserInteracting = true;
+    resumeTimestamp = 0;
+
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = null;
+    }
+  }
+
+  function scheduleAutoRotationResume() {
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+
+    inactivityTimer = setTimeout(() => {
+      if (!isPointerDown) {
+        isUserInteracting = false;
+        resumeTimestamp = performance.now();
+      }
+    }, INACTIVITY_DELAY_MS);
+  }
+
+  mapElement.addEventListener('pointerdown', () => {
+    isPointerDown = true;
+    stopAutoRotation();
+  }, { passive: true });
+
+  window.addEventListener('pointerup', () => {
+    isPointerDown = false;
+    scheduleAutoRotationResume();
+  }, { passive: true });
+
+  window.addEventListener('pointercancel', () => {
+    isPointerDown = false;
+    scheduleAutoRotationResume();
+  }, { passive: true });
+
+  mapElement.addEventListener('wheel', () => {
+    stopAutoRotation();
+    scheduleAutoRotationResume();
+  }, { passive: true });
+
+  const mapStartEvents = ['dragstart', 'zoomstart', 'rotatestart', 'pitchstart'];
+  mapStartEvents.forEach((evt) => {
+    globeMap.on(evt, () => stopAutoRotation());
+  });
+
+  const mapEndEvents = ['dragend', 'zoomend', 'rotateend', 'pitchend', 'moveend'];
+  mapEndEvents.forEach((evt) => {
+    globeMap.on(evt, () => {
+      if (!isPointerDown) scheduleAutoRotationResume();
+    });
+  });
+}
+
+function showGlobeErrorMessage() {
+  const container = document.getElementById('map');
+  if (container) {
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#e2e8f0; font-family:sans-serif; text-align:center; padding:20px;">
+        <span class="material-symbols-outlined text-red-400 text-4xl mb-2">public_off</span>
+        <h3 style="margin-bottom:8px; color:#f87171; font-weight:bold;">3D Globe Offline</h3>
+        <p style="max-width:350px; color:#94a3b8; font-size:12px; line-height:1.4;">
+          Unable to render MapTiler Earth projection. Please verify network access to MapTiler cloud servers.
+        </p>
+      </div>
+    `;
+  }
+}
+</script>
+
+</body>
+</html>
