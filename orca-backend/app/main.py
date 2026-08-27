@@ -3,7 +3,8 @@ ORCA Backend - Main Application Entry Point
 Marine EcoSystem Reasoning with Collaborative Agents
 """
 
-from fastapi import FastAPI
+import time
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
@@ -17,6 +18,20 @@ app = FastAPI(
     description="Marine EcoSystem Reasoning with Collaborative Agents",
     version="0.1.0"
 )
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    
+    # Log structured information about the request
+    logger.info(
+        f"Method={request.method} Path={request.url.path} "
+        f"Status={response.status_code} Latency={process_time:.4f}s"
+    )
+    return response
 
 # Add CORS middleware
 app.add_middleware(
@@ -35,17 +50,27 @@ app.add_middleware(
 # Include API routers
 from app.api.v1.query import router as query_router
 from app.api.v1.query import api_router as orca_api_router
+from app.api.v1.auth import router as auth_router
+from app.api.v1.health import router as health_router
+from app.api.v1.historical import router as historical_router
+from app.api.v1.reports import router as reports_router
+from app.api.v1.alerts import router as alerts_router
 
-from app.database import db_manager
+from app.db import connect_to_mongo, close_mongo_connection
 from app.services.geospatial_service import GeofenceCache
 
 app.include_router(query_router)
 app.include_router(orca_api_router)
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(health_router, prefix="/api/v1/health", tags=["health"])
+app.include_router(historical_router, prefix="/api/v1/historical", tags=["historical"])
+app.include_router(reports_router, prefix="/api/v1/reports", tags=["reports"])
+app.include_router(alerts_router, prefix="/api/v1/alerts", tags=["alerts"])
 
 @app.on_event("startup")
 async def startup_event():
     logger.info("Initializing database connection...")
-    await db_manager.connect_db()
+    await connect_to_mongo()
     logger.info("Loading geofences into cache...")
     await GeofenceCache.load_from_db()
     
@@ -66,7 +91,7 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     logger.info("Closing database connection...")
-    await db_manager.close_db()
+    await close_mongo_connection()
 
 @app.get("/")
 async def root():

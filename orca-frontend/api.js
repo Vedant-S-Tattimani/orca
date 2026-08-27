@@ -310,3 +310,61 @@ const OrcaAPI = {
 };
 
 window.OrcaAPI = OrcaAPI;
+
+async function fetchHistoricalTrends(location = "Mangalore-Coast", days = 30) {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        throw new Error("No access token found. Please log in.");
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/historical/trends?location=${encodeURIComponent(location)}&days=${days}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+        }
+    });
+
+    if (response.status === 403) {
+        throw new Error("Forbidden: You do not have researcher access.");
+    }
+
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.detail || "Failed to fetch historical trends");
+    }
+
+    return await response.json();
+}
+
+async function fetchSourceHealth() {
+    const response = await fetch(`${API_BASE_URL}/health/sources`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error("Failed to fetch source health");
+    }
+    
+    return await response.json();
+}
+
+// Export the new functions alongside the existing ones if a module bundler is used
+if (typeof window !== 'undefined') {
+    window.fetchHistoricalTrends = fetchHistoricalTrends;
+    window.fetchSourceHealth = fetchSourceHealth;
+}
+
+// Role-based UI visibility
+document.addEventListener('DOMContentLoaded', () => {
+    const role = localStorage.getItem('userRole');
+    if (role === 'researcher' || role === 'admin') {
+        const researcherLink = document.getElementById('nav-researcher-link');
+        if (researcherLink) {
+            researcherLink.classList.remove('hidden');
+        }
+    }
+});

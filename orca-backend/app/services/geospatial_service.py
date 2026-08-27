@@ -7,7 +7,7 @@ import math
 from typing import Dict, Any, List, Tuple, Optional
 from datetime import datetime
 import logging
-from app.database import db_manager
+from app.db import db_manager
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class GeofenceCache:
 
     @classmethod
     async def load_from_db(cls):
-        db = db_manager.get_db()
+        db = db_manager.db
         if db is None:
             logger.warning("No DB connection to load geofences. Boundaries will be empty.")
             return

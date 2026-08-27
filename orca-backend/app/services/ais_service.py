@@ -7,7 +7,7 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 import math
 import logging
-from app.database import db_manager
+from app.db import db_manager
 
 logger = logging.getLogger(__name__)
 

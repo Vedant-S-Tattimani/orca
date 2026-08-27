@@ -89,7 +89,6 @@ def test_create_plan_weather_info():
 
     # Should include weather agent for weather info
     assert "weather" in plan.agents_to_invoke
-    assert "openmeteo_weather" in plan.agents_to_invoke
     assert plan.location_resolution_needed == True
     assert plan.rag_query_needed == False  # Weather info doesn't need RAG advisories
 

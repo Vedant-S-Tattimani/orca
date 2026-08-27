@@ -9,7 +9,7 @@ pydantic-settings==2.1.0
 python-dotenv==1.0.0
 
 # Database and geospatial
-motor==3.3.2
+motor>=3.7.1
 
 # Geospatial indexing
 h3>=4.5.0
@@ -54,3 +54,14 @@ mkdocs-material==9.4.8
 # Optional: For development
 ipykernel==6.25.2
 jupyterlab==4.1.2
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.9
+
+# Subscriptions and Notifications
+twilio==8.1.0
+
+# Reports
+reportlab==4.0.7

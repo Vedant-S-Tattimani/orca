@@ -177,6 +177,27 @@ async def get_vessels():
     return await AISService().get_all_vessels()
 
 
+class AlertPushRequest(BaseModel):
+    title: str
+    severity: str
+    location: str
+    hazard: str
+    recommended_action: str
+    provenance: str = "ORCA Alert System"
+
+@api_router.post("/alerts")
+async def push_alert(request: AlertPushRequest):
+    """POST /api/alerts - Push a new hazard advisory to the database"""
+    from app.services.alert_service import AlertService
+    alert_svc = AlertService()
+    try:
+        doc = await alert_svc.push_alert(request.dict())
+        return {"status": "success", "alert": doc}
+    except Exception as e:
+        logger.error(f"Failed to push alert: {e}")
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/alerts")
 async def get_alerts():
     """GET /api/alerts - Returns active computed alerts across operating sectors"""
@@ -191,19 +212,14 @@ async def get_alerts():
     lak_check = geo_service.check_geofences(11.2, 72.8) # Inside Lakshadweep restricted area
     sl_check = geo_service.check_geofences(9.4, 79.6) # Near Sri Lanka IMBL boundary
     
-    active_alerts = []
+    from app.services.alert_service import AlertService
+    alert_svc = AlertService()
     
-    # Static cyclone alert placeholder (labeled as SIMULATED)
-    active_alerts.append({
-        "id": "alert-cyc-01",
-        "title": "Cyclonic Depression Warning",
-        "severity": "CRITICAL",
-        "location": "Gulf of Kutch / Kandla",
-        "time": datetime.utcnow().isoformat() + "Z",
-        "hazard": "Gale winds up to 45 knots, wave swells > 4.0 meters",
-        "recommended_action": "Vessels under 40ft should seek immediate harbor shelter. Secure moorings.",
-        "provenance": "SIMULATED (IMD Satellite Alert Link)"
-    })
+    try:
+        active_alerts = await alert_svc.get_active_alerts(max_age_hours=48)
+    except Exception as e:
+        logger.error(f"Failed to fetch DB alerts: {e}")
+        active_alerts = []
     
     # Add restricted zone alert from geofence service
     for fence in lak_check:
@@ -505,6 +521,26 @@ async def get_pfz_data(request: PFZRequest):
                 "rejection_reasons": [str(e)]
             })
             
+    all_failed = all(r.get("data_status") == "ERROR" for r in results)
+    
+    from app.services.offline_cache import OfflineCache
+    cache = OfflineCache()
+    import hashlib
+    # create a stable short hash for the sectors
+    sectors_str = "_".join([f"{s.lat},{s.lon}" for s in req_sectors])
+    cache_key = "pfz_data_" + hashlib.md5(sectors_str.encode()).hexdigest()
+    
+    if all_failed:
+        cached_data, cached_at = cache.get(cache_key)
+        if cached_data:
+            for item in cached_data:
+                item["_cached"] = True
+                item["_cached_at"] = cached_at
+            return cached_data
+    else:
+        # Only cache if we got real data
+        cache.set(cache_key, results)
+            
     return results
 
 
@@ -537,6 +573,17 @@ async def get_location_environmental_data(lat: float, lon: float):
             marine_data = marine_res
     except Exception as e:
         logger.error(f"Error fetching environmental data for ({lat}, {lon}): {e}")
+
+    cache_key = f"env_data_{lat}_{lon}"
+    from app.services.offline_cache import OfflineCache
+    cache = OfflineCache()
+
+    if not weather_data and not marine_data:
+        cached_data, cached_at = cache.get(cache_key)
+        if cached_data:
+            cached_data["_cached"] = True
+            cached_data["_cached_at"] = cached_at
+            return cached_data
 
     # Extract real indicator values or None if unavailable
     wind_speed_kmh = weather_data.get("wind_speed_kmh")
@@ -619,6 +666,9 @@ async def get_location_environmental_data(lat: float, lon: float):
         },
         "source": "Open-Meteo Weather & Marine API"
     }
+
+    cache.set(cache_key, result)
+    return result
 
 
 

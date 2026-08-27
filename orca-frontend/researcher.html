@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORCA - Researcher Dashboard</title>
+    <!-- Tailwind CSS (fallback) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            900: '#134e4a',
+                        },
+                        dark: {
+                            bg: '#0f172a',
+                            card: '#1e293b',
+                            border: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-dark-bg selection:bg-brand-500 selection:text-white flex flex-col">
+    <!-- Navbar -->
+    <nav class="glass-card sticky top-0 z-50 border-b border-dark-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center gap-2 group">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg group-hover:shadow-brand-500/50 transition-all">
+                            O
+                        </div>
+                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">ORCA</span>
+                    </a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="user-role-badge" class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-sm font-medium border border-purple-500/30">
+                        <i class="fa-solid fa-flask mr-1"></i> Researcher
+                    </span>
+                    <button onclick="logout()" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa-solid fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <div class="flex justify-between items-end mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Historical Data Trends</h1>
+                <p class="text-gray-400">Analyze long-term marine ecosystem patterns</p>
+            </div>
+            
+            <div class="flex gap-4">
+                <select id="location-select" class="glass-card rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 appearance-none bg-dark-card border border-dark-border">
+                    <option value="Mangalore-Coast">Mangalore Coast</option>
+                    <option value="Kochi-Coast">Kochi Coast</option>
+                    <option value="Mumbai-Coast">Mumbai Coast</option>
+                </select>
+                
+                <select id="days-select" class="glass-card rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-brand-500 appearance-none bg-dark-card border border-dark-border">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+                
+                <button onclick="loadHistoricalData()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition-colors font-medium flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Refresh
+                </button>
+
+                <button onclick="exportReport('csv')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium flex items-center gap-2">
+                    <i class="fa-solid fa-file-csv"></i> Export CSV
+                </button>
+                <button onclick="exportReport('pdf')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors font-medium flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Export PDF
+                </button>
+            </div>
+        </div>
+        
+        <!-- Error State -->
+        <div id="error-container" class="hidden mb-6 p-4 rounded-lg bg-red-900/30 border border-red-500/50 text-red-400 flex items-start gap-3">
+            <i class="fa-solid fa-circle-exclamation mt-1"></i>
+            <div>
+                <h3 class="font-medium">Access Denied</h3>
+                <p id="error-message" class="text-sm opacity-80">You do not have permission to view this page.</p>
+                <a href="dashboard.html" class="inline-block mt-2 text-sm text-red-300 hover:text-white underline">Return to Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div id="charts-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- SST Chart -->
+            <div class="glass-card rounded-xl p-6 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-blue-500/20"></div>
+                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-temperature-full text-blue-400"></i> Sea Surface Temperature
+                </h3>
+                <div class="relative h-64 w-full">
+                    <canvas id="sstChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Chlorophyll Chart -->
+            <div class="glass-card rounded-xl p-6 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-green-500/20"></div>
+                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-leaf text-green-400"></i> Chlorophyll Concentration
+                </h3>
+                <div class="relative h-64 w-full">
+                    <canvas id="chlChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Wind Chart -->
+            <div class="glass-card rounded-xl p-6 relative overflow-hidden group lg:col-span-2">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gray-500/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-gray-500/20"></div>
+                <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-wind text-gray-400"></i> Wind & Wave Dynamics
+                </h3>
+                <div class="relative h-64 w-full">
+                    <canvas id="windChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Health Overview -->
+        <div class="mt-8 glass-card rounded-xl p-6">
+            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-satellite-dish text-brand-400"></i> API Source Health Monitoring
+            </h3>
+            <div id="health-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <!-- Populated by JS -->
+                <div class="animate-pulse flex space-x-4">
+                    <div class="flex-1 space-y-4 py-1">
+                      <div class="h-4 bg-slate-700 rounded w-3/4"></div>
+                      <div class="h-4 bg-slate-700 rounded"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="api.js"></script>
+    <script>
+        // Chart instances
+        let sstChart, chlChart, windChart;
+
+        // Chart.js defaults for dark theme
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(51, 65, 85, 0.5)';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        async function init() {
+            try {
+                // Verify we are logged in
+                const token = localStorage.getItem('accessToken');
+                if (!token) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                await loadHistoricalData();
+                await loadHealthData();
+            } catch (error) {
+                console.error("Initialization failed:", error);
+            }
+        }
+
+        async function loadHistoricalData() {
+            const location = document.getElementById('location-select').value;
+            const days = document.getElementById('days-select').value;
+            
+            try {
+                const response = await fetchHistoricalTrends(location, parseInt(days));
+                const data = response.data;
+                
+                if (!data || data.length === 0) {
+                    showError("No historical data available for this location.");
+                    return;
+                }
+                
+                document.getElementById('error-container').classList.add('hidden');
+                document.getElementById('charts-container').style.display = 'grid';
+                
+                // Parse data
+                const labels = data.map(d => new Date(d.timestamp).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}));
+                const sstData = data.map(d => d.sst);
+                const chlData = data.map(d => d.chlorophyll);
+                const windData = data.map(d => d.wind_speed);
+                const waveData = data.map(d => d.wave_height);
+                
+                updateCharts(labels, sstData, chlData, windData, waveData);
+                
+            } catch (error) {
+                console.error("Error loading historical data:", error);
+                document.getElementById('charts-container').style.display = 'none';
+                const errContainer = document.getElementById('error-container');
+                errContainer.classList.remove('hidden');
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+        
+        async function loadHealthData() {
+            try {
+                const response = await fetchSourceHealth();
+                const grid = document.getElementById('health-grid');
+                grid.innerHTML = '';
+                
+                response.sources.forEach(source => {
+                    const isUp = source.status === 'UP';
+                    const colorClass = isUp ? 'text-green-400 bg-green-400/10 border-green-400/20' : 'text-red-400 bg-red-400/10 border-red-400/20';
+                    const iconClass = isUp ? 'fa-check-circle' : 'fa-times-circle';
+                    
+                    grid.innerHTML += `
+                        <div class="rounded-lg border p-4 ${colorClass} flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid ${iconClass} text-2xl mb-2"></i>
+                            <h4 class="font-medium text-sm text-white mb-1">${source.name}</h4>
+                            <p class="text-xs opacity-80">${source.latency_ms >= 0 ? source.latency_ms + 'ms' : 'Timeout'}</p>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("Failed to load health data", error);
+            }
+        }
+
+        function updateCharts(labels, sst, chl, wind, wave) {
+            // Destroy existing charts if they exist
+            if (sstChart) sstChart.destroy();
+            if (chlChart) chlChart.destroy();
+            if (windChart) windChart.destroy();
+
+            // Create SST Chart
+            const ctxSST = document.getElementById('sstChart').getContext('2d');
+            sstChart = new Chart(ctxSST, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'SST (°C)',
+                        data: sst,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHitRadius: 10
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Create Chl Chart
+            const ctxChl = document.getElementById('chlChart').getContext('2d');
+            chlChart = new Chart(ctxChl, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Chlorophyll (mg/m³)',
+                        data: chl,
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHitRadius: 10
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // Create Wind Chart (Mixed Type)
+            const ctxWind = document.getElementById('windChart').getContext('2d');
+            windChart = new Chart(ctxWind, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Wind Speed (km/h)',
+                            data: wind,
+                            borderColor: '#94a3b8',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Wave Height (m)',
+                            data: wave,
+                            type: 'bar',
+                            backgroundColor: 'rgba(56, 189, 248, 0.5)',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { type: 'linear', display: true, position: 'left', title: {display: true, text: 'Wind Speed'} },
+                        y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: {display: true, text: 'Wave Height'} }
+                    }
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userRole');
+            window.location.href = 'index.html';
+        }
+
+        async function exportReport(format = 'csv') {
+            const location = document.getElementById('locationSelect').value;
+            const days = document.getElementById('timeRange').value;
+            
+            try {
+                // Determine token
+                const token = localStorage.getItem('orcaToken');
+                const headers = {};
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/reports/export?location=${encodeURIComponent(location)}&days=${days}&format=${format}`, {
+                    method: 'GET',
+                    headers: headers
+                });
+                
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || "Failed to export report");
+                }
+                
+                // Trigger file download
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `orca_report_${location.replace(' ', '_').toLowerCase()}.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+            } catch (error) {
+                console.error("Export failed:", error);
+                alert("Failed to export report: " + error.message);
+            }
+        }
+
+        // Event Listeners for filters
+        document.getElementById('location-select').addEventListener('change', loadHistoricalData);
+        document.getElementById('days-select').addEventListener('change', loadHistoricalData);
+
+        // Run init on load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -5,7 +5,7 @@ import sys
 # Add parent dir to path so we can import from app
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.database import db_manager
+from app.db import db_manager
 from app.services.port_service import INDIAN_PORTS
 from app.services.ais_service import SIMULATED_VESSELS
 from app.services.geospatial_service import (

@@ -23,7 +23,7 @@ async def run_tests():
     print("=" * 60)
     
     # Initialize DB connection for testing
-    from app.database import db_manager
+    from app.db import db_manager
     from app.config import settings
     from app.services.geospatial_service import GeofenceCache
     print(f"Connecting to MongoDB at: {settings.MONGODB_URL} ...")

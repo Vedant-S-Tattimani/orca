@@ -4,7 +4,7 @@ Provides a central source of truth for major Indian ports, search, and coordinat
 """
 from typing import Dict, Any, List, Optional
 import logging
-from app.database import db_manager
+from app.db import db_manager
 
 logger = logging.getLogger(__name__)
 

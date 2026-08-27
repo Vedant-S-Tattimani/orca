@@ -366,8 +366,17 @@
   </div>
 </header>
 
-<!-- Main Content Canvas -->
+<!-- Main Content -->
 <main class="flex-1 pt-16 h-screen overflow-y-auto relative">
+<div id="offline-banner" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-warning/90 border border-warning rounded-lg px-md py-xs flex items-center gap-sm text-black shadow-lg">
+    <span class="material-symbols-outlined text-black text-sm">wifi_off</span>
+    <p class="text-sm font-medium" id="offline-banner-text">Offline Mode</p>
+</div>
+<script>
+    window.addEventListener('offline', () => document.getElementById('offline-banner').classList.remove('hidden'));
+    window.addEventListener('online', () => document.getElementById('offline-banner').classList.add('hidden'));
+    if (!navigator.onLine) document.getElementById('offline-banner').classList.remove('hidden');
+</script>
 <div class="p-md md:p-xl lg:p-3xl max-w-7xl mx-auto space-y-xl">
 <!-- Page Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
@@ -722,6 +731,21 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await window.OrcaAPI.getPfzData();
             pfzZones = response;
+            
+            const isCached = pfzZones.some(z => z._cached);
+            if (isCached) {
+                const cachedAt = pfzZones.find(z => z._cached_at)?._cached_at;
+                const banner = document.getElementById('offline-banner');
+                const textEl = document.getElementById('offline-banner-text');
+                if (banner && textEl && cachedAt) {
+                    const mins = Math.max(0, Math.round((Date.now() / 1000 - cachedAt) / 60));
+                    textEl.textContent = `Offline: Cached ${mins}m ago`;
+                    banner.classList.remove('hidden');
+                }
+            } else {
+                const banner = document.getElementById('offline-banner');
+                if (banner) banner.classList.add('hidden');
+            }
             
             pfzZones.sort((a, b) => b.suitability - a.suitability);
             
