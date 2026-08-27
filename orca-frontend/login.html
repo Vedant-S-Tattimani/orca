@@ -367,7 +367,7 @@
             data-i18n-placeholder="login_password_placeholder"
             class="w-full bg-surface-bright dark:bg-slate-900/90 border border-hairline dark:border-slate-800 rounded-xl pl-11 pr-11 py-3 text-sm text-ink dark:text-white placeholder:text-mute focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500 transition-all shadow-sm"
           />
-          <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 text-mute hover:text-ink dark:hover:text-white transition-colors focus:outline-none" title="Toggle password view">
+          <button type="button" onclick="togglePasswordVisibility('password', 'password-toggle-icon')" class="absolute right-3.5 text-mute hover:text-ink dark:hover:text-white transition-colors focus:outline-none" title="Toggle password view">
             <span id="password-toggle-icon" class="material-symbols-outlined text-lg">visibility</span>
           </button>
         </div>
@@ -400,7 +400,111 @@
 
       <!-- Continue as Guest Option -->
       <a 
-        href="dashboard.html" 
+        href="index.html" 
+        class="w-full py-3 px-4 rounded-xl border border-hairline dark:border-slate-800 bg-surface-container-low dark:bg-slate-900/60 hover:bg-surface-container dark:hover:bg-slate-800 text-ink dark:text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 text-center"
+      >
+        <span class="material-symbols-outlined text-lg text-cyan-500">explore</span>
+        <span data-i18n="login_guest_btn">Continue as Guest</span>
+      </a>
+    </form>
+
+    <!-- Signup Form Fields (Hidden by default) -->
+    <form id="signup-form" class="space-y-4 my-6 hidden" onsubmit="handleSignupSubmit(event)">
+      <!-- Full Name Input -->
+      <div>
+        <label for="signup-name" class="block font-label-mono text-xs font-semibold text-ink dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+          Full Name
+        </label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3.5 text-mute text-lg pointer-events-none">person</span>
+          <input 
+            type="text" 
+            id="signup-name" 
+            name="fullName" 
+            required 
+            placeholder="Captain Ahab" 
+            class="w-full bg-surface-bright dark:bg-slate-900/90 border border-hairline dark:border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-ink dark:text-white placeholder:text-mute focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500 transition-all shadow-sm"
+          />
+        </div>
+      </div>
+
+      <!-- Email Address Input -->
+      <div>
+        <label for="signup-email" class="block font-label-mono text-xs font-semibold text-ink dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+          Email Address
+        </label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3.5 text-mute text-lg pointer-events-none">mail</span>
+          <input 
+            type="email" 
+            id="signup-email" 
+            name="email" 
+            required 
+            placeholder="captain@vessel.org" 
+            class="w-full bg-surface-bright dark:bg-slate-900/90 border border-hairline dark:border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-ink dark:text-white placeholder:text-mute focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500 transition-all shadow-sm"
+          />
+        </div>
+      </div>
+
+      <!-- Password Input -->
+      <div>
+        <label for="signup-password" class="block font-label-mono text-xs font-semibold text-ink dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+          Password
+        </label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3.5 text-mute text-lg pointer-events-none">lock</span>
+          <input 
+            type="password" 
+            id="signup-password" 
+            name="password" 
+            required 
+            placeholder="••••••••••••" 
+            class="w-full bg-surface-bright dark:bg-slate-900/90 border border-hairline dark:border-slate-800 rounded-xl pl-11 pr-11 py-3 text-sm text-ink dark:text-white placeholder:text-mute focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500 transition-all shadow-sm"
+          />
+          <button type="button" onclick="togglePasswordVisibility('signup-password', 'signup-password-toggle-icon')" class="absolute right-3.5 text-mute hover:text-ink dark:hover:text-white transition-colors focus:outline-none" title="Toggle password view">
+            <span id="signup-password-toggle-icon" class="material-symbols-outlined text-lg">visibility</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Confirm Password Input -->
+      <div>
+        <label for="signup-confirm-password" class="block font-label-mono text-xs font-semibold text-ink dark:text-slate-300 mb-1.5 uppercase tracking-wider">
+          Confirm Password
+        </label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3.5 text-mute text-lg pointer-events-none">lock_reset</span>
+          <input 
+            type="password" 
+            id="signup-confirm-password" 
+            name="confirmPassword" 
+            required 
+            placeholder="••••••••••••" 
+            class="w-full bg-surface-bright dark:bg-slate-900/90 border border-hairline dark:border-slate-800 rounded-xl pl-11 pr-11 py-3 text-sm text-ink dark:text-white placeholder:text-mute focus:outline-none focus:border-cyan-500 dark:focus:border-cyan-400 focus:ring-1 focus:ring-cyan-500 transition-all shadow-sm"
+          />
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        id="signup-btn"
+        class="w-full py-3.5 px-4 mt-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-semibold text-sm shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+      >
+        <span>Create Account</span>
+        <span class="material-symbols-outlined text-lg transition-transform group-hover:translate-x-1">person_add</span>
+      </button>
+
+      <!-- Divider -->
+      <div class="relative flex py-2 items-center">
+        <div class="flex-grow border-t border-hairline dark:border-slate-800"></div>
+        <span class="flex-shrink mx-3 text-xs text-mute font-mono uppercase" data-i18n="login_or">or</span>
+        <div class="flex-grow border-t border-hairline dark:border-slate-800"></div>
+      </div>
+
+      <!-- Continue as Guest Option -->
+      <a 
+        href="index.html" 
         class="w-full py-3 px-4 rounded-xl border border-hairline dark:border-slate-800 bg-surface-container-low dark:bg-slate-900/60 hover:bg-surface-container dark:hover:bg-slate-800 text-ink dark:text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 text-center"
       >
         <span class="material-symbols-outlined text-lg text-cyan-500">explore</span>
@@ -411,9 +515,9 @@
     <!-- Bottom Footer Note -->
     <div class="pt-4 border-t border-hairline/60 dark:border-slate-800/60 text-xs text-center text-mute flex items-center justify-between">
       <span>© 2026 ORCA Platform</span>
-      <span class="flex items-center gap-1">
-        <span data-i18n="login_no_account">Don't have an account?</span>
-        <a href="#" onclick="alert('Access request submitted! Our marine operations team will contact your fleet dispatch.')" class="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline" data-i18n="login_request_access">Request Access</a>
+      <span class="flex items-center gap-1" id="auth-toggle-container">
+        <span id="auth-toggle-text">Don't have an account?</span>
+        <a href="#" onclick="toggleAuthMode(event)" id="auth-toggle-link" class="text-cyan-600 dark:text-cyan-400 font-semibold hover:underline">Create Account</a>
       </span>
     </div>
   </div>
@@ -444,10 +548,37 @@
 </main>
 
 <script>
+// Form Toggle Logic
+let isSignupMode = false;
+function toggleAuthMode(event) {
+  event.preventDefault();
+  isSignupMode = !isSignupMode;
+  
+  const loginForm = document.getElementById('login-form');
+  const signupForm = document.getElementById('signup-form');
+  const toggleText = document.getElementById('auth-toggle-text');
+  const toggleLink = document.getElementById('auth-toggle-link');
+  const alertEl = document.getElementById('login-alert');
+  
+  alertEl.classList.add('hidden');
+
+  if (isSignupMode) {
+    loginForm.classList.add('hidden');
+    signupForm.classList.remove('hidden');
+    toggleText.textContent = "Already have an account?";
+    toggleLink.textContent = "Sign In";
+  } else {
+    signupForm.classList.add('hidden');
+    loginForm.classList.remove('hidden');
+    toggleText.textContent = "Don't have an account?";
+    toggleLink.textContent = "Create Account";
+  }
+}
+
 // Password Visibility Toggle Logic
-function togglePasswordVisibility() {
-  const passwordInput = document.getElementById('password');
-  const icon = document.getElementById('password-toggle-icon');
+function togglePasswordVisibility(inputId, iconId) {
+  const passwordInput = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
   if (passwordInput.type === 'password') {
     passwordInput.type = 'text';
     icon.textContent = 'visibility_off';
@@ -457,24 +588,76 @@ function togglePasswordVisibility() {
   }
 }
 
-// Simulated Login Form Handling
-function handleLoginSubmit(event) {
+function showAuthAlert(message, type = 'error') {
+  const alertEl = document.getElementById('login-alert');
+  if (type === 'error') {
+    alertEl.className = "mt-4 p-3 rounded-lg text-xs font-semibold border flex items-center gap-2 bg-red-500/10 border-red-500/30 text-red-500";
+    alertEl.innerHTML = `<span class="material-symbols-outlined text-base">error</span> ${message}`;
+  } else {
+    alertEl.className = "mt-4 p-3 rounded-lg text-xs font-semibold border flex items-center gap-2 bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
+    alertEl.innerHTML = `<span class="material-symbols-outlined text-base">check_circle</span> ${message}`;
+  }
+  alertEl.classList.remove('hidden');
+}
+
+// Real Login Form Handling
+async function handleLoginSubmit(event) {
   event.preventDefault();
   const alertEl = document.getElementById('login-alert');
   const btn = document.getElementById('login-btn');
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
   
   btn.disabled = true;
+  const originalHtml = btn.innerHTML;
   btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-lg">progress_activity</span> Authenticating...`;
   
-  setTimeout(() => {
-    alertEl.className = "mt-4 p-3 rounded-lg text-xs font-semibold border flex items-center gap-2 bg-emerald-500/10 border-emerald-500/30 text-emerald-400";
-    alertEl.innerHTML = `<span class="material-symbols-outlined text-base">check_circle</span> Authentication successful! Redirecting to Dashboard...`;
-    alertEl.classList.remove('hidden');
-
+  try {
+    await window.OrcaAPI.login(email, password);
+    showAuthAlert('Authentication successful! Redirecting to Dashboard...', 'success');
     setTimeout(() => {
       window.location.href = 'dashboard.html';
     }, 1200);
-  }, 1000);
+  } catch (error) {
+    showAuthAlert(error.message || 'Invalid email or password');
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+}
+
+// Real Signup Form Handling
+async function handleSignupSubmit(event) {
+  event.preventDefault();
+  const btn = document.getElementById('signup-btn');
+  const name = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+  if (password !== confirmPassword) {
+    showAuthAlert('Passwords do not match');
+    return;
+  }
+
+  btn.disabled = true;
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-lg">progress_activity</span> Creating Account...`;
+  
+  try {
+    // 1. Register the user
+    await window.OrcaAPI.register(email, password, name);
+    showAuthAlert('Account created successfully! Logging in...', 'success');
+    
+    // 2. Automatically log them in
+    await window.OrcaAPI.login(email, password);
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 1200);
+  } catch (error) {
+    showAuthAlert(error.message || 'Error creating account. Email may already exist.');
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
 }
 
 // Global Theme Toggle Functionality

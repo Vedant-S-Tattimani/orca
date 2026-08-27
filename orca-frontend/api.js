@@ -306,6 +306,104 @@ const OrcaAPI = {
             console.error('Error fetching environmental data directly:', err);
             return null;
         }
+    },
+
+    /**
+     * Authenticate user and get JWT
+     */
+    async login(email, password) {
+        const formData = new URLSearchParams();
+        formData.append('username', email);
+        formData.append('password', password);
+
+        try {
+            const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.detail || 'Login failed');
+            }
+            const data = await response.json();
+            localStorage.setItem('accessToken', data.access_token);
+            await this.fetchCurrentUser();
+            return data;
+        } catch (error) {
+            console.error('Error logging in:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Register new user
+     */
+    async register(email, password, fullName) {
+        try {
+            const response = await fetch(`${API_BASE}/api/v1/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, full_name: fullName, role: 'fisherman' })
+            });
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.detail || 'Registration failed');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error registering:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get current user
+     */
+    async fetchCurrentUser() {
+        const token = localStorage.getItem('accessToken');
+        if (!token) return null;
+        try {
+            const response = await fetch(`${API_BASE}/api/v1/auth/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    this.logout(false);
+                }
+                throw new Error('Failed to fetch user');
+            }
+            const user = await response.json();
+            localStorage.setItem('userRole', user.role);
+            localStorage.setItem('userEmail', user.email);
+            localStorage.setItem('userFullName', user.full_name);
+            return user;
+        } catch (error) {
+            console.error('Error fetching current user:', error);
+            return null;
+        }
+    },
+
+    /**
+     * Logout
+     */
+    logout(redirect = true) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userFullName');
+        if (redirect) {
+            window.location.href = 'login.html';
+        }
+    },
+    
+    /**
+     * Page Protection
+     */
+    requireAuth() {
+        if (!localStorage.getItem('accessToken')) {
+            window.location.href = 'login.html';
+        }
     }
 };
 
@@ -317,7 +415,7 @@ async function fetchHistoricalTrends(location = "Mangalore-Coast", days = 30) {
         throw new Error("No access token found. Please log in.");
     }
     
-    const response = await fetch(`${API_BASE_URL}/historical/trends?location=${encodeURIComponent(location)}&days=${days}`, {
+    const response = await fetch(`${API_BASE}/api/v1/historical/trends?location=${encodeURIComponent(location)}&days=${days}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -338,7 +436,7 @@ async function fetchHistoricalTrends(location = "Mangalore-Coast", days = 30) {
 }
 
 async function fetchSourceHealth() {
-    const response = await fetch(`${API_BASE_URL}/health/sources`, {
+    const response = await fetch(`${API_BASE}/api/v1/health/sources`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json'
@@ -358,8 +456,27 @@ if (typeof window !== 'undefined') {
     window.fetchSourceHealth = fetchSourceHealth;
 }
 
-// Role-based UI visibility
+// Role-based UI visibility and Auth state
 document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('accessToken');
+    
+    // Update Navigation based on Auth status
+    const loginLinks = document.querySelectorAll('a[href="login.html"]');
+    if (token) {
+        loginLinks.forEach(link => {
+            link.href = '#';
+            link.innerHTML = `
+                <span class="material-symbols-outlined text-[18px]">logout</span>
+                <span data-i18n="nav_logout">Logout</span>
+            `;
+            link.title = "Logout";
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                OrcaAPI.logout();
+            });
+        });
+    }
+
     const role = localStorage.getItem('userRole');
     if (role === 'researcher' || role === 'admin') {
         const researcherLink = document.getElementById('nav-researcher-link');
