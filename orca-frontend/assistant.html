@@ -27,6 +27,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="api.js"></script>
+<script src="i18n.js"></script>
+<script src="tts.js"></script>
+<script src="stt.js"></script>
 
 
 
@@ -292,27 +295,27 @@
     <nav class="hidden lg:flex items-center gap-1">
       <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">info</span>
-        <span>About</span>
+        <span data-i18n="nav_about">About</span>
       </a>
       <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">dashboard</span>
-        <span>Dashboard</span>
+        <span data-i18n="nav_dashboard">Dashboard</span>
       </a>
       <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-on-primary dark:bg-white dark:text-black shadow-sm">
         <span class="material-symbols-outlined text-[18px]">smart_toy</span>
-        <span>Assistant</span>
+        <span data-i18n="nav_assistant">Assistant</span>
       </a>
       <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">map</span>
-        <span>Map</span>
+        <span data-i18n="nav_map">Map</span>
       </a>
       <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">warning</span>
-        <span>Safety & Alerts</span>
+        <span data-i18n="nav_safety">Safety & Alerts</span>
       </a>
       <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">sailing</span>
-        <span>Fishing</span>
+        <span data-i18n="nav_fishing">Fishing</span>
       </a>
     </nav>
 
@@ -340,27 +343,27 @@
   <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
     <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">info</span>
-      <span>About</span>
+      <span data-i18n="nav_about">About</span>
     </a>
     <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">dashboard</span>
-      <span>Dashboard</span>
+      <span data-i18n="nav_dashboard">Dashboard</span>
     </a>
     <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
       <span class="material-symbols-outlined">smart_toy</span>
-      <span>Assistant</span>
+      <span data-i18n="nav_assistant">Assistant</span>
     </a>
     <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">map</span>
-      <span>Map</span>
+      <span data-i18n="nav_map">Map</span>
     </a>
     <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">warning</span>
-      <span>Safety & Alerts</span>
+      <span data-i18n="nav_safety">Safety & Alerts</span>
     </a>
     <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">sailing</span>
-      <span>Fishing</span>
+      <span data-i18n="nav_fishing">Fishing</span>
     </a>
   </div>
 </header>
@@ -373,13 +376,23 @@
 <!-- Chat History -->
 <div id="chat-history" class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-xl">
 <!-- Agent Response -->
-<div class="flex gap-md max-w-3xl">
+<div class="flex gap-md max-w-3xl" id="msg-greeting">
 <div class="w-8 h-8 bg-ink rounded flex items-center justify-center shrink-0">
 <span class="material-symbols-outlined text-on-primary text-[18px]" data-icon="smart_toy">smart_toy</span>
 </div>
 <div class="space-y-sm max-w-[85%]">
 <div class="bg-canvas-elevated border border-hairline rounded-lg p-md">
-<p class="font-body-md text-body-md text-ink">Hello! I am ORCA, your Marine Ecosystem Reasoning Assistant. How can I help you today?</p>
+<p id="text-msg-greeting" class="font-body-md text-body-md text-ink" data-i18n="greeting_msg">Hello! I am ORCA, your Marine Ecosystem Reasoning Assistant. How can I help you today?</p>
+<div class="mt-md pt-sm border-t border-hairline flex gap-sm pdf-hide items-center">
+  <button id="tts-btn-greeting" onclick="window.toggleTTS('greeting', 'text-msg-greeting')" class="px-sm py-xxs rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-ink font-button-app text-sm flex items-center gap-xs transition-colors cursor-pointer" title="Listen to response">
+    <span class="material-symbols-outlined text-[16px] text-secondary">volume_up</span>
+    <span class="tts-label" data-i18n="listen_response">Listen</span>
+  </button>
+  <button id="tts-stop-greeting" onclick="window.stopTTS()" class="hidden px-sm py-xxs rounded-lg bg-error-container/20 hover:bg-error-container/40 text-error font-button-app text-sm items-center gap-xs transition-colors cursor-pointer" title="Stop speaking">
+    <span class="material-symbols-outlined text-[16px]">stop</span>
+    <span data-i18n="stop_speech">Stop</span>
+  </button>
+</div>
 </div>
 </div>
 </div>
@@ -393,10 +406,15 @@
 <button class="shrink-0 font-label-mono text-label-mono text-body bg-canvas-elevated border border-hairline px-sm py-xxs rounded hover:border-outline-variant hover:text-ink transition-colors">/detailed_forecast</button>
 </div>
 <div class="relative flex items-center">
-<input id="chat-input" class="w-full bg-canvas-elevated border border-hairline rounded-lg py-sm pl-sm pr-12 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary font-body-md text-body-md text-ink placeholder:text-mute placeholder:font-label-mono placeholder:text-label-mono" placeholder="Ask ORCA Assistant..." type="text"/>
-<button id="send-btn" type="button" class="absolute right-sm p-xxs text-secondary hover:text-ink transition-colors rounded z-10 cursor-pointer">
-<span class="material-symbols-outlined pointer-events-none" data-icon="send">send</span>
-</button>
+<input id="chat-input" class="w-full bg-canvas-elevated border border-hairline rounded-lg py-sm pl-sm pr-20 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary font-body-md text-body-md text-ink placeholder:text-mute placeholder:font-label-mono placeholder:text-label-mono" placeholder="Ask ORCA Assistant..." data-i18n-placeholder="ask_assistant_placeholder" type="text"/>
+<div class="absolute right-sm flex items-center gap-xs z-10">
+  <button id="mic-btn" type="button" class="p-xxs text-body hover:text-secondary transition-colors rounded cursor-pointer flex items-center justify-center" title="Speak to ORCA" data-i18n-title="speak_to_orca">
+    <span class="material-symbols-outlined pointer-events-none" data-icon="mic">mic</span>
+  </button>
+  <button id="send-btn" type="button" class="p-xxs text-secondary hover:text-ink transition-colors rounded cursor-pointer flex items-center justify-center">
+    <span class="material-symbols-outlined pointer-events-none" data-icon="send">send</span>
+  </button>
+</div>
 </div>
 </div>
 </section>
@@ -404,7 +422,7 @@
 <aside class="hidden xl:flex w-80 flex-col bg-surface-bright border-l border-hairline shrink-0">
 <div class="p-md border-b border-hairline flex items-center gap-sm bg-canvas">
 <span class="material-symbols-outlined text-body" data-icon="terminal">terminal</span>
-<h3 class="font-button-app text-button-app text-ink">Agent Activity</h3>
+<h3 class="font-button-app text-button-app text-ink" data-i18n="agent_activity">Agent Activity</h3>
 <div class="ml-auto flex items-center gap-xxs">
 <span class="relative flex h-2 w-2">
 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gradient-cyan opacity-75"></span>
@@ -673,7 +691,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let actionsHTML = `
-            <div class="mt-md pt-sm border-t border-hairline flex gap-sm pdf-hide">
+            <div class="mt-md pt-sm border-t border-hairline flex gap-sm pdf-hide items-center">
+                <button id="tts-btn-${queryId}" onclick="window.toggleTTS('${queryId}', 'text-msg-${queryId}')" class="px-sm py-xxs rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-ink font-button-app text-sm flex items-center gap-xs transition-colors cursor-pointer" title="Listen to response">
+                    <span class="material-symbols-outlined text-[16px] text-secondary">volume_up</span>
+                    <span class="tts-label" data-i18n="listen_response">Listen</span>
+                </button>
+                <button id="tts-stop-${queryId}" onclick="window.stopTTS()" class="hidden px-sm py-xxs rounded-lg bg-error-container/20 hover:bg-error-container/40 text-error font-button-app text-sm items-center gap-xs transition-colors cursor-pointer" title="Stop speaking">
+                    <span class="material-symbols-outlined text-[16px]">stop</span>
+                    <span data-i18n="stop_speech">Stop</span>
+                </button>
                 <button onclick="window.downloadPDF('${queryId}')" class="px-sm py-xxs rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-ink font-button-app text-sm flex items-center gap-xs transition-colors">
                     <span class="material-symbols-outlined text-[16px]">download</span> Export PDF Report
                 </button>
@@ -686,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="space-y-sm max-w-[85%] w-full">
                 <div class="bg-canvas-elevated border border-hairline rounded-lg p-md">
-                    <p class="font-body-md text-body-md text-ink whitespace-pre-wrap">${riskCard.reasoning || riskCard.recommendation || "Error generating response"}</p>
+                    <p id="text-msg-${queryId}" class="font-body-md text-body-md text-ink whitespace-pre-wrap">${riskCard.reasoning || riskCard.recommendation || "Error generating response"}</p>
                     ${alertHTML}
                     ${evidenceHTML}
                     ${mapHTML}
@@ -696,6 +722,82 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        // --- Global TTS UI Controller ---
+        window.toggleTTS = function(msgId, textElementId) {
+            if (!window.OrcaTTS) return;
+            const textEl = document.getElementById(textElementId) || document.querySelector(`#msg-${msgId} p`) || document.querySelector(`#${msgId} p`);
+            if (!textEl) return;
+
+            const textToSpeak = textEl.innerText || textEl.textContent;
+            const currentLang = window.Orcai18n ? window.Orcai18n.currentLang : 'en';
+
+            window.OrcaTTS.speak(textToSpeak, msgId, currentLang, (state, activeId) => {
+                window.updateTTSUI(activeId, state);
+            });
+        };
+
+        window.stopTTS = function() {
+            if (window.OrcaTTS) {
+                window.OrcaTTS.stop();
+            }
+        };
+
+        window.updateTTSUI = function(msgId, state) {
+            document.querySelectorAll('[id^="tts-btn-"]').forEach(btn => {
+                const icon = btn.querySelector('.material-symbols-outlined');
+                const label = btn.querySelector('.tts-label');
+                if (icon) {
+                    icon.textContent = 'volume_up';
+                    icon.classList.remove('animate-pulse', 'text-warning');
+                    icon.classList.add('text-secondary');
+                }
+                if (label && window.Orcai18n) {
+                    label.textContent = window.Orcai18n.getTranslation('listen_response', 'Listen');
+                }
+            });
+
+            document.querySelectorAll('[id^="tts-stop-"]').forEach(btn => {
+                btn.classList.add('hidden');
+                btn.classList.remove('flex');
+            });
+
+            if (!msgId || state === 'stopped') return;
+
+            const cleanId = msgId.replace(/^msg-/, '');
+            const playBtn = document.getElementById(`tts-btn-${cleanId}`) || document.getElementById(`tts-btn-${msgId}`);
+            const stopBtn = document.getElementById(`tts-stop-${cleanId}`) || document.getElementById(`tts-stop-${msgId}`);
+
+            if (playBtn) {
+                const icon = playBtn.querySelector('.material-symbols-outlined');
+                const label = playBtn.querySelector('.tts-label');
+
+                if (state === 'playing') {
+                    if (icon) {
+                        icon.textContent = 'pause';
+                        icon.classList.add('animate-pulse', 'text-warning');
+                        icon.classList.remove('text-secondary');
+                    }
+                    if (label && window.Orcai18n) {
+                        label.textContent = window.Orcai18n.getTranslation('pause_speech', 'Pause');
+                    }
+                } else if (state === 'paused') {
+                    if (icon) {
+                        icon.textContent = 'play_arrow';
+                        icon.classList.remove('animate-pulse');
+                        icon.classList.add('text-secondary');
+                    }
+                    if (label && window.Orcai18n) {
+                        label.textContent = window.Orcai18n.getTranslation('resume_speech', 'Resume');
+                    }
+                }
+            }
+
+            if (stopBtn) {
+                stopBtn.classList.remove('hidden');
+                stopBtn.classList.add('flex');
+            }
+        };
 
         if (hasMap) {
             setTimeout(() => {
@@ -838,6 +940,56 @@ document.addEventListener('DOMContentLoaded', () => {
     inputEl.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') submitChatMessage();
     });
+
+    // --- Speech-to-Text (Voice Input) Handler ---
+    const micBtn = document.getElementById('mic-btn');
+    if (micBtn && window.OrcaSTT) {
+        if (!window.OrcaSTT.isSupported()) {
+            micBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            micBtn.title = (window.Orcai18n && window.Orcai18n.getTranslation)
+                ? window.Orcai18n.getTranslation('stt_not_supported', 'Voice input is not supported in this browser.')
+                : 'Voice input is not supported in this browser.';
+        }
+
+        micBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const currentLang = window.Orcai18n ? window.Orcai18n.currentLang : 'en';
+
+            window.OrcaSTT.toggle(
+                currentLang,
+                inputEl,
+                (state) => {
+                    const icon = micBtn.querySelector('.material-symbols-outlined');
+                    if (state === 'listening') {
+                        micBtn.classList.add('text-error');
+                        micBtn.classList.remove('text-body');
+                        if (icon) {
+                            icon.textContent = 'mic';
+                            icon.classList.add('animate-pulse');
+                        }
+                    } else if (state === 'processing') {
+                        micBtn.classList.remove('text-error');
+                        micBtn.classList.add('text-warning');
+                        if (icon) {
+                            icon.textContent = 'sync';
+                            icon.classList.add('animate-spin');
+                            icon.classList.remove('animate-pulse');
+                        }
+                    } else {
+                        micBtn.classList.remove('text-error', 'text-warning');
+                        micBtn.classList.add('text-body');
+                        if (icon) {
+                            icon.textContent = 'mic';
+                            icon.classList.remove('animate-pulse', 'animate-spin');
+                        }
+                    }
+                },
+                (updatedText) => {
+                    // Text updated live inside chat input
+                }
+            );
+        });
+    }
 });
 </script>
 

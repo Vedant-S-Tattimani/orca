@@ -548,13 +548,27 @@ Response MUST be extremely concise (under 100 words) and suitable for general pu
         if query_language and query_language != "en":
             lang_names = {
                 "hi": "Hindi (हिंदी)",
+                "as": "Assamese (অসমীয়া)",
+                "bn": "Bengali (বাংলা)",
+                "brx": "Bodo (बर')",
+                "doi": "Dogri (डोगरी)",
+                "gu": "Gujarati (ગુજરાતી)",
                 "kn": "Kannada (ಕನ್ನಡ)",
+                "ks": "Kashmiri (कॉशुर)",
+                "kok": "Konkani (कोंकणी)",
+                "mai": "Maithili (मैथिली)",
+                "ml": "Malayalam (മലയാളം)",
+                "mni": "Manipuri (मৈতৈলোন্)",
                 "mr": "Marathi (मराठी)",
+                "ne": "Nepali (नेपाली)",
+                "or": "Odia (ଓଡ଼ିଆ)",
+                "pa": "Punjabi (ਪੰਜਾਬੀ)",
+                "sa": "Sanskrit (संस्कृतम्)",
+                "sat": "Santali (ᱥᱟᱱᱛᱟᱲᱤ)",
+                "sd": "Sindhi (सिन्धी)",
                 "ta": "Tamil (தமிழ்)",
                 "te": "Telugu (తెలుగు)",
-                "ml": "Malayalam (മലയാളം)",
-                "gu": "Gujarati (ગુજરાતી)",
-                "bn": "Bengali (বাংলা)"
+                "ur": "Urdu (اردو)"
             }
             lang_name = lang_names.get(query_language, "the same language as the user's query")
             prompt += f"\nCRITICAL: The user's query is in {lang_name}. You MUST translate all your output summaries, explanations, and advice and output them completely in {lang_name}. Do NOT output in English."

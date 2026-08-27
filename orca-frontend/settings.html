@@ -22,6 +22,10 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>ORCA Settings</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="api.js"></script>
+<script src="i18n.js"></script>
+<script src="tts.js"></script>
+<script src="stt.js"></script>
 
 
 
@@ -288,27 +292,27 @@
     <nav class="hidden lg:flex items-center gap-1">
       <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">info</span>
-        <span>About</span>
+        <span data-i18n="nav_about">About</span>
       </a>
       <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">dashboard</span>
-        <span>Dashboard</span>
+        <span data-i18n="nav_dashboard">Dashboard</span>
       </a>
       <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">smart_toy</span>
-        <span>Assistant</span>
+        <span data-i18n="nav_assistant">Assistant</span>
       </a>
       <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">map</span>
-        <span>Map</span>
+        <span data-i18n="nav_map">Map</span>
       </a>
       <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">warning</span>
-        <span>Safety & Alerts</span>
+        <span data-i18n="nav_safety">Safety & Alerts</span>
       </a>
       <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">sailing</span>
-        <span>Fishing</span>
+        <span data-i18n="nav_fishing">Fishing</span>
       </a>
     </nav>
 
@@ -336,27 +340,27 @@
   <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
     <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">info</span>
-      <span>About</span>
+      <span data-i18n="nav_about">About</span>
     </a>
     <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">dashboard</span>
-      <span>Dashboard</span>
+      <span data-i18n="nav_dashboard">Dashboard</span>
     </a>
     <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">smart_toy</span>
-      <span>Assistant</span>
+      <span data-i18n="nav_assistant">Assistant</span>
     </a>
     <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">map</span>
-      <span>Map</span>
+      <span data-i18n="nav_map">Map</span>
     </a>
     <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">warning</span>
-      <span>Safety & Alerts</span>
+      <span data-i18n="nav_safety">Safety & Alerts</span>
     </a>
     <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">sailing</span>
-      <span>Fishing</span>
+      <span data-i18n="nav_fishing">Fishing</span>
     </a>
   </div>
 </header>
@@ -365,8 +369,8 @@
 <main class="flex-1 pt-16 h-full overflow-y-auto bg-canvas relative">
 <div class="max-w-4xl mx-auto p-md md:p-lg xl:p-2xl space-y-xl pb-3xl">
 <div class="mb-lg">
-<h2 class="font-headline-lg text-headline-lg text-ink">Settings</h2>
-<p class="font-body-lg text-body-lg text-body mt-2">Manage your platform preferences and vessel details.</p>
+<h2 class="font-headline-lg text-headline-lg text-ink" data-i18n="settings_title">Settings</h2>
+<p class="font-body-lg text-body-lg text-body mt-2" data-i18n="settings_desc">Manage your platform preferences and vessel details.</p>
 </div>
 <!-- Bento Grid Layout for Settings -->
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
@@ -374,19 +378,19 @@
 <div class="lg:col-span-12 bg-canvas-elevated border border-hairline rounded-[12px] p-lg">
 <div class="flex items-center gap-sm mb-md">
 <span class="material-symbols-outlined text-ink" data-icon="person">person</span>
-<h3 class="font-headline-md text-headline-md text-ink">Account &amp; Profile</h3>
+<h3 class="font-headline-md text-headline-md text-ink" data-i18n="set_account_profile">Account &amp; Profile</h3>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
 <div>
-<label class="block font-label-mono text-label-mono text-body mb-1">Full Name</label>
+<label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="set_full_name">Full Name</label>
 <input class="w-full bg-surface-bright border border-hairline rounded-[6px] px-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors" type="text" value="Captain Ahab"/>
 </div>
 <div>
-<label class="block font-label-mono text-label-mono text-body mb-1">Email Address</label>
+<label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="set_email">Email Address</label>
 <input class="w-full bg-surface-bright border border-hairline rounded-[6px] px-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors" type="email" value="ahab@pequod.co"/>
 </div>
 <div class="md:col-span-2">
-<button class="font-button-app text-button-app text-ink bg-surface-bright border border-hairline hover:bg-surface-variant px-md py-2 rounded-[6px] transition-colors">Update Profile</button>
+<button class="font-button-app text-button-app text-ink bg-surface-bright border border-hairline hover:bg-surface-variant px-md py-2 rounded-[6px] transition-colors" data-i18n="set_update_profile">Update Profile</button>
 </div>
 </div>
 </div>
@@ -394,27 +398,27 @@
 <div class="lg:col-span-8 bg-canvas-elevated border border-hairline rounded-[12px] p-lg">
 <div class="flex items-center gap-sm mb-md">
 <span class="material-symbols-outlined text-ink" data-icon="directions_boat">directions_boat</span>
-<h3 class="font-headline-md text-headline-md text-ink">Vessel Profile</h3>
+<h3 class="font-headline-md text-headline-md text-ink" data-i18n="set_vessel_profile">Vessel Profile</h3>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
 <div class="sm:col-span-2">
-<label class="block font-label-mono text-label-mono text-body mb-1">Vessel Name</label>
+<label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="set_vessel_name">Vessel Name</label>
 <input class="w-full bg-surface-bright border border-hairline rounded-[6px] px-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors" type="text" value="The Pequod"/>
 </div>
 <div>
-<label class="block font-label-mono text-label-mono text-body mb-1">Vessel Type</label>
+<label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="set_vessel_type">Vessel Type</label>
 <select class="w-full bg-surface-bright border border-hairline rounded-[6px] px-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors appearance-none">
-<option>Commercial Fishing</option>
-<option>Recreational</option>
-<option>Transport</option>
+<option data-i18n="set_commercial_fishing">Commercial Fishing</option>
+<option data-i18n="set_recreational">Recreational</option>
+<option data-i18n="set_transport">Transport</option>
 </select>
 </div>
 <div>
-<label class="block font-label-mono text-label-mono text-body mb-1">Length (meters)</label>
+<label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="set_length_m">Length (meters)</label>
 <input class="w-full bg-surface-bright border border-hairline rounded-[6px] px-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors" type="number" value="35"/>
 </div>
 <div>
-<label class="block font-label-mono text-label-mono text-body mb-1">Operating Range (NM)</label>
+<label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="set_operating_range">Operating Range (NM)</label>
 <input class="w-full bg-surface-bright border border-hairline rounded-[6px] px-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors" type="number" value="5000"/>
 </div>
 </div>
@@ -424,11 +428,11 @@
 <div class="bg-canvas-elevated border border-hairline rounded-[12px] p-lg flex-1">
 <div class="flex items-center gap-sm mb-md">
 <span class="material-symbols-outlined text-ink" data-icon="public">public</span>
-<h3 class="font-headline-md text-headline-md text-ink">Localization</h3>
+<h3 class="font-headline-md text-headline-md text-ink" data-i18n="set_localization">Localization</h3>
 </div>
 <div class="space-y-md">
 <div>
-<label class="block font-label-mono text-label-mono text-body mb-1">Language</label>
+<label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="set_language">Language</label>
 <select class="w-full bg-surface-bright border border-hairline rounded-[6px] px-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors appearance-none">
 <option>English</option>
 <option>Hindi</option>
@@ -436,10 +440,10 @@
 </select>
 </div>
 <div>
-<label class="block font-label-mono text-label-mono text-body mb-1">Measurement System</label>
+<label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="set_measurement">Measurement System</label>
 <div class="flex bg-surface-bright border border-hairline rounded-[6px] overflow-hidden">
-<button class="flex-1 py-1 px-2 text-center bg-surface-variant text-ink font-label-mono text-label-mono">Metric</button>
-<button class="flex-1 py-1 px-2 text-center text-body hover:bg-surface-container font-label-mono text-label-mono transition-colors">Imperial</button>
+<button class="flex-1 py-1 px-2 text-center bg-surface-variant text-ink font-label-mono text-label-mono" data-i18n="set_metric">Metric</button>
+<button class="flex-1 py-1 px-2 text-center text-body hover:bg-surface-container font-label-mono text-label-mono transition-colors" data-i18n="set_imperial">Imperial</button>
 </div>
 </div>
 </div>
@@ -449,19 +453,19 @@
 <div class="lg:col-span-6 bg-canvas-elevated border border-hairline rounded-[12px] p-lg">
 <div class="flex items-center gap-sm mb-md">
 <span class="material-symbols-outlined text-ink" data-icon="location_on">location_on</span>
-<h3 class="font-headline-md text-headline-md text-ink">Home Port</h3>
+<h3 class="font-headline-md text-headline-md text-ink" data-i18n="set_home_port">Home Port</h3>
 </div>
 <div>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-3 top-2.5 text-mute" data-icon="search">search</span>
-<input class="w-full bg-surface-bright border border-hairline rounded-[6px] pl-10 pr-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-label-mono placeholder:font-label-mono" placeholder="Search ports..." type="text"/>
+<input class="w-full bg-surface-bright border border-hairline rounded-[6px] pl-10 pr-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors font-label-mono placeholder:font-label-mono" placeholder="Search ports..." type="text" data-i18n-placeholder="set_search_ports"/>
 </div>
 <div class="mt-sm p-sm bg-surface-container-low rounded-[6px] flex items-center justify-between border border-hairline">
 <div>
 <p class="font-body-md text-ink font-medium">Nantucket Harbor</p>
 <p class="font-label-mono text-label-mono text-mute">Massachusetts, USA</p>
 </div>
-<button class="font-label-mono text-label-mono text-secondary hover:underline">Change</button>
+<button class="font-label-mono text-label-mono text-secondary hover:underline" data-i18n="set_change">Change</button>
 </div>
 </div>
 </div>
@@ -469,13 +473,13 @@
 <div class="lg:col-span-6 bg-canvas-elevated border border-hairline rounded-[12px] p-lg">
 <div class="flex items-center gap-sm mb-md">
 <span class="material-symbols-outlined text-ink" data-icon="notifications_active">notifications_active</span>
-<h3 class="font-headline-md text-headline-md text-ink">Alert Preferences</h3>
+<h3 class="font-headline-md text-headline-md text-ink" data-i18n="set_alert_prefs">Alert Preferences</h3>
 </div>
 <div class="space-y-sm">
 <label class="flex items-center justify-between p-sm hover:bg-surface-container-lowest rounded-[6px] cursor-pointer transition-colors border border-transparent hover:border-hairline">
 <div>
-<p class="font-body-md text-ink font-medium">Severe Weather Warnings</p>
-<p class="font-label-mono text-label-mono text-mute">Immediate push notifications for storms.</p>
+<p class="font-body-md text-ink font-medium" data-i18n="set_severe_weather">Severe Weather Warnings</p>
+<p class="font-label-mono text-label-mono text-mute" data-i18n="set_severe_weather_desc">Immediate push notifications for storms.</p>
 </div>
 <div class="relative inline-block w-10 h-6">
 <input checked="" class="peer sr-only" type="checkbox"/>
@@ -485,8 +489,8 @@
 </label>
 <label class="flex items-center justify-between p-sm hover:bg-surface-container-lowest rounded-[6px] cursor-pointer transition-colors border border-transparent hover:border-hairline">
 <div>
-<p class="font-body-md text-ink font-medium">Route Deviations</p>
-<p class="font-label-mono text-label-mono text-mute">Alerts when off planned track.</p>
+<p class="font-body-md text-ink font-medium" data-i18n="set_route_deviations">Route Deviations</p>
+<p class="font-label-mono text-label-mono text-mute" data-i18n="set_route_deviations_desc">Alerts when off planned track.</p>
 </div>
 <div class="relative inline-block w-10 h-6">
 <input checked="" class="peer sr-only" type="checkbox"/>
@@ -496,8 +500,8 @@
 </label>
 <label class="flex items-center justify-between p-sm hover:bg-surface-container-lowest rounded-[6px] cursor-pointer transition-colors border border-transparent hover:border-hairline">
 <div>
-<p class="font-body-md text-ink font-medium">Intelligence Updates</p>
-<p class="font-label-mono text-label-mono text-mute">Daily summaries of marine activity.</p>
+<p class="font-body-md text-ink font-medium" data-i18n="set_intel_updates">Intelligence Updates</p>
+<p class="font-label-mono text-label-mono text-mute" data-i18n="set_intel_updates_desc">Daily summaries of marine activity.</p>
 </div>
 <div class="relative inline-block w-10 h-6">
 <input class="peer sr-only" type="checkbox"/>
@@ -507,9 +511,58 @@
 </label>
 </div>
 </div>
+
+<!-- Text-to-Speech Preferences Card -->
+<div class="lg:col-span-12 bg-canvas-elevated border border-hairline rounded-[12px] p-lg">
+  <div class="flex items-center justify-between mb-md">
+    <div class="flex items-center gap-sm">
+      <span class="material-symbols-outlined text-secondary" data-icon="record_voice_over">record_voice_over</span>
+      <h3 class="font-headline-md text-headline-md text-ink" data-i18n="tts_settings">Text-to-Speech (AI Assistant Voice)</h3>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-md items-center">
+    <!-- Enable Toggle -->
+    <div class="flex items-center justify-between p-sm bg-surface-bright rounded-[6px] border border-hairline">
+      <div>
+        <p class="font-body-md text-ink font-medium" data-i18n="enable_tts">Enable Voice Responses</p>
+        <p class="font-label-mono text-label-mono text-mute" data-i18n="enable_tts_desc">Allow ORCA AI Assistant to speak answers aloud.</p>
+      </div>
+      <div class="relative inline-block w-10 h-6 shrink-0 ml-2">
+        <input id="tts-enable-toggle" type="checkbox" class="peer sr-only" checked />
+        <div class="block w-10 h-6 bg-surface-variant rounded-full peer-checked:bg-secondary transition-colors cursor-pointer"></div>
+        <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-4"></div>
+      </div>
+    </div>
+    
+    <!-- Voice Selector -->
+    <div>
+      <label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="speech_voice">Voice Selection</label>
+      <select id="tts-voice-select" class="w-full bg-surface-bright border border-hairline rounded-[6px] px-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors appearance-none">
+        <option value="">Auto (System Best Match)</option>
+      </select>
+    </div>
+
+    <!-- Speech Speed -->
+    <div>
+      <label class="block font-label-mono text-label-mono text-body mb-1" data-i18n="speech_rate">Speech Speed (Rate)</label>
+      <select id="tts-rate-select" class="w-full bg-surface-bright border border-hairline rounded-[6px] px-sm py-2 font-body-md text-ink focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-colors appearance-none">
+        <option value="0.8">0.8x (Slower)</option>
+        <option value="1.0" selected>1.0x (Normal)</option>
+        <option value="1.2">1.2x (Faster)</option>
+        <option value="1.5">1.5x (Fast)</option>
+      </select>
+    </div>
+  </div>
+  <div class="mt-md flex justify-end">
+    <button id="btn-test-tts" class="font-button-app text-button-app text-secondary bg-surface-bright border border-hairline hover:bg-surface-variant px-md py-2 rounded-[6px] transition-colors flex items-center gap-xs cursor-pointer">
+      <span class="material-symbols-outlined text-[18px]">volume_up</span>
+      <span data-i18n="test_voice">Test Voice Output</span>
+    </button>
+  </div>
+</div>
 </div>
 <div class="flex justify-end pt-lg">
-<button class="font-button-app text-button-app bg-ink text-on-surface-variant text-white px-xl py-2 rounded-[6px] hover:bg-tertiary transition-colors">Save Settings</button>
+<button id="save-settings-btn" class="font-button-app text-button-app bg-ink text-on-surface-variant text-white px-xl py-2 rounded-[6px] hover:bg-tertiary transition-colors cursor-pointer" data-i18n="set_save">Save Settings</button>
 </div>
 </div>
 </main>
@@ -546,6 +599,66 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
     if (toggleBtnNav) {
         toggleBtnNav.addEventListener('click', handleThemeToggle);
+    }
+
+    // --- TTS Settings Integration ---
+    const ttsToggle = document.getElementById('tts-enable-toggle');
+    const ttsVoiceSelect = document.getElementById('tts-voice-select');
+    const ttsRateSelect = document.getElementById('tts-rate-select');
+    const testBtn = document.getElementById('btn-test-tts');
+    const saveBtn = document.getElementById('save-settings-btn');
+
+    if (window.OrcaTTS) {
+        // Load initial state
+        if (ttsToggle) {
+            ttsToggle.checked = window.OrcaTTS.isEnabled();
+        }
+        if (ttsRateSelect) {
+            ttsRateSelect.value = String(window.OrcaTTS.getRate());
+        }
+
+        // Populate voices
+        const populateVoices = () => {
+            if (!ttsVoiceSelect) return;
+            const voices = window.OrcaTTS.getVoices();
+            const savedVoice = window.OrcaTTS.getSavedVoiceURI();
+
+            ttsVoiceSelect.innerHTML = '<option value="">Auto (System Best Match)</option>';
+            voices.forEach(voice => {
+                const opt = document.createElement('option');
+                opt.value = voice.voiceURI;
+                opt.textContent = `${voice.name} (${voice.lang})`;
+                if (voice.voiceURI === savedVoice) {
+                    opt.selected = true;
+                }
+                ttsVoiceSelect.appendChild(opt);
+            });
+        };
+
+        populateVoices();
+        if (typeof window.speechSynthesis !== 'undefined') {
+            window.speechSynthesis.onvoiceschanged = populateVoices;
+        }
+
+        if (testBtn) {
+            testBtn.addEventListener('click', () => {
+                const currentLang = window.Orcai18n ? window.Orcai18n.currentLang : 'en';
+                const sampleText = currentLang === 'hi'
+                    ? 'ORCA वॉयस टेस्ट सफल रहा। टेक्स्ट-टू-स्पीच सक्रिय है।'
+                    : 'ORCA voice response test successful. Text-to-speech engine is active.';
+                window.OrcaTTS.speak(sampleText, 'settings-test', currentLang);
+            });
+        }
+
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                if (ttsToggle) window.OrcaTTS.setPreference('orca_tts_enabled', ttsToggle.checked ? 'true' : 'false');
+                if (ttsVoiceSelect) window.OrcaTTS.setPreference('orca_tts_voice', ttsVoiceSelect.value);
+                if (ttsRateSelect) window.OrcaTTS.setPreference('orca_tts_rate', ttsRateSelect.value);
+                
+                alert(window.Orcai18n ? window.Orcai18n.getTranslation('settings_saved', 'Preferences saved successfully!') : 'Preferences saved successfully!');
+            });
+        }
     }
 });
 </script>

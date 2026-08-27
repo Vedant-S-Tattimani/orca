@@ -26,6 +26,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="api.js"></script>
+<script src="i18n.js"></script>
+<script src="tts.js"></script>
+<script src="stt.js"></script>
 
 
 
@@ -298,27 +301,27 @@
     <nav class="hidden lg:flex items-center gap-1">
       <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">info</span>
-        <span>About</span>
+        <span data-i18n="nav_about">About</span>
       </a>
       <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">dashboard</span>
-        <span>Dashboard</span>
+        <span data-i18n="nav_dashboard">Dashboard</span>
       </a>
       <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">smart_toy</span>
-        <span>Assistant</span>
+        <span data-i18n="nav_assistant">Assistant</span>
       </a>
       <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">map</span>
-        <span>Map</span>
+        <span data-i18n="nav_map">Map</span>
       </a>
       <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">warning</span>
-        <span>Safety & Alerts</span>
+        <span data-i18n="nav_safety">Safety & Alerts</span>
       </a>
       <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-on-primary dark:bg-white dark:text-black shadow-sm">
         <span class="material-symbols-outlined text-[18px]">sailing</span>
-        <span>Fishing</span>
+        <span data-i18n="nav_fishing">Fishing</span>
       </a>
     </nav>
 
@@ -346,27 +349,27 @@
   <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
     <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">info</span>
-      <span>About</span>
+      <span data-i18n="nav_about">About</span>
     </a>
     <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">dashboard</span>
-      <span>Dashboard</span>
+      <span data-i18n="nav_dashboard">Dashboard</span>
     </a>
     <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">smart_toy</span>
-      <span>Assistant</span>
+      <span data-i18n="nav_assistant">Assistant</span>
     </a>
     <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">map</span>
-      <span>Map</span>
+      <span data-i18n="nav_map">Map</span>
     </a>
     <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">warning</span>
-      <span>Safety & Alerts</span>
+      <span data-i18n="nav_safety">Safety & Alerts</span>
     </a>
     <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
       <span class="material-symbols-outlined">sailing</span>
-      <span>Fishing</span>
+      <span data-i18n="nav_fishing">Fishing</span>
     </a>
   </div>
 </header>
@@ -377,15 +380,15 @@
 <!-- Page Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
 <div>
-<h2 class="font-headline-lg text-headline-lg text-ink">Fishing Intelligence</h2>
-<p class="font-body-lg text-body-lg text-body mt-xs">Real-time marine conditions and predictive catch zones.</p>
+<h2 class="font-headline-lg text-headline-lg text-ink" data-i18n="fishing_title">Fishing Intelligence</h2>
+<p class="font-body-lg text-body-lg text-body mt-xs" data-i18n="fishing_desc">Real-time marine conditions and predictive catch zones.</p>
 </div>
 <div class="flex gap-sm">
 <button onclick="window.clearCustomPoints()" class="px-md py-sm rounded-lg border border-hairline bg-surface-container-lowest text-ink font-button-app text-button-app hover:bg-surface-container-low transition-colors flex items-center gap-xs">
-<span class="material-symbols-outlined text-sm">clear_all</span> Clear Custom Points
+<span class="material-symbols-outlined text-sm">clear_all</span> <span data-i18n="fish_clear_points">Clear Custom Points</span>
                     </button>
 <button onclick="window.loadFishingData()" class="px-md py-sm rounded-lg bg-ink text-on-primary font-button-app text-button-app hover:bg-primary-container transition-colors flex items-center gap-xs">
-<span class="material-symbols-outlined text-sm">refresh</span> Update Scan
+<span class="material-symbols-outlined text-sm">refresh</span> <span data-i18n="fish_update_scan">Update Scan</span>
                     </button>
 </div>
 </div>
@@ -396,14 +399,14 @@
 <div class="flex justify-between items-center px-md py-xs mb-sm border-b border-hairline pb-sm">
 <div class="flex gap-md">
 <span class="font-label-mono text-label-mono bg-surface-container-low px-xs py-xxs rounded text-body flex items-center gap-xxs">
-<span class="w-2 h-2 rounded-full bg-secondary"></span> Live SST
+<span class="w-2 h-2 rounded-full bg-secondary"></span> <span data-i18n="fish_live_sst">Live SST</span>
                             </span>
 <span class="font-label-mono text-label-mono bg-surface-container-low px-xs py-xxs rounded text-body flex items-center gap-xxs">
-<span class="w-2 h-2 rounded-full bg-warning"></span> Chlorophyll-a
+<span class="w-2 h-2 rounded-full bg-warning"></span> <span data-i18n="fish_chlorophyll">Chlorophyll-a</span>
                             </span>
 </div>
 <div class="font-label-mono text-label-mono text-mute">
-                            Data Updated: Just Now
+                            <span data-i18n="fish_data_updated">Data Updated</span>: <span id="fish-data-timestamp">Just Now</span>
                         </div>
 </div>
 <!-- Map Container -->
@@ -416,49 +419,49 @@
 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary to-gradient-cyan"></div>
 <div class="flex justify-between items-start mb-md">
 <div>
-<span class="font-label-mono text-label-mono text-secondary mb-xxs block uppercase tracking-wider">Top Recommendation</span>
+<span class="font-label-mono text-label-mono text-secondary mb-xxs block uppercase tracking-wider" data-i18n="fish_top_rec">Top Recommendation</span>
 <h3 id="top-rec-name" class="font-headline-md text-headline-md text-ink">--</h3>
 </div>
 <div class="bg-surface-container-low px-sm py-xs rounded-lg flex flex-col items-end border border-hairline">
 <span id="top-rec-suitability" class="font-headline-md text-headline-md text-ink leading-none">--<span class="text-sm text-mute">%</span></span>
-<span class="font-label-mono text-label-mono text-mute">Suitability</span>
+<span class="font-label-mono text-label-mono text-mute" data-i18n="fish_suitability">Suitability</span>
 </div>
 </div>
 <div class="grid grid-cols-2 gap-sm mb-lg">
 <div class="bg-surface p-sm rounded-lg border border-hairline">
 <div class="flex items-center gap-xs text-mute mb-xs">
 <span class="material-symbols-outlined text-sm">navigation</span>
-<span class="font-label-mono text-label-mono">Distance</span>
+<span class="font-label-mono text-label-mono" data-i18n="fish_distance">Distance</span>
 </div>
 <div id="top-rec-distance" class="font-body-md text-body-md text-ink font-medium">-- NM</div>
 </div>
 <div class="bg-surface p-sm rounded-lg border border-hairline">
 <div class="flex items-center gap-xs text-mute mb-xs">
 <span class="material-symbols-outlined text-sm">schedule</span>
-<span class="font-label-mono text-label-mono">Est. ETA</span>
+<span class="font-label-mono text-label-mono" data-i18n="fish_est_eta">Est. ETA</span>
 </div>
 <div id="top-rec-eta" class="font-body-md text-body-md text-ink font-medium">--</div>
 </div>
 </div>
 <div class="space-y-sm">
-<h4 class="font-label-mono text-label-mono text-ink">Why This Area Is Recommended:</h4>
+<h4 class="font-label-mono text-label-mono text-ink" data-i18n="fish_why_recommended">Why This Area Is Recommended:</h4>
 <ul id="top-rec-evidence" class="space-y-xs">
 <!-- Evidence items dynamically inserted here -->
-<li class="flex items-start gap-xs text-mute"><span class="font-body-md">Loading analysis...</span></li>
+<li class="flex items-start gap-xs text-mute"><span class="font-body-md" data-i18n="fish_loading_analysis">Loading analysis...</span></li>
 </ul>
 </div>
-<button class="mt-md w-full bg-surface-container-lowest border border-outline-variant text-ink font-button-app text-button-app py-sm rounded-[6px] hover:bg-surface-container-low transition-colors">
+<button class="mt-md w-full bg-surface-container-lowest border border-outline-variant text-ink font-button-app text-button-app py-sm rounded-[6px] hover:bg-surface-container-low transition-colors" data-i18n="fish_set_waypoint">
                             Set as Waypoint
                         </button>
 </div>
 <!-- Marine Indicators Brief -->
 <div class="bg-surface-container-lowest border border-hairline rounded-[12px] p-lg flex-shrink-0">
-<h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md">Marine Indicators</h3>
+<h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md" data-i18n="fish_marine_indicators">Marine Indicators</h3>
 <div class="space-y-md">
 <!-- Indicator 1 -->
 <div>
 <div class="flex justify-between items-center mb-xs">
-<span class="font-label-mono text-label-mono text-mute">Sea Surface Temp (SST)</span>
+<span class="font-label-mono text-label-mono text-mute" data-i18n="fish_sst_label">Sea Surface Temp (SST)</span>
 <span id="indicator-sst" class="font-label-mono text-label-mono text-ink">--</span>
 </div>
 <div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden flex">
@@ -468,7 +471,7 @@
 <!-- Indicator 2 -->
 <div>
 <div class="flex justify-between items-center mb-xs">
-<span class="font-label-mono text-label-mono text-mute">Chlorophyll-a</span>
+<span class="font-label-mono text-label-mono text-mute" data-i18n="fish_chla_label">Chlorophyll-a</span>
 <span id="indicator-chla" class="font-label-mono text-label-mono text-ink">--</span>
 </div>
 <div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden flex">
@@ -478,7 +481,7 @@
 <!-- Indicator 3 -->
 <div>
 <div class="flex justify-between items-center mb-xs">
-<span class="font-label-mono text-label-mono text-mute">Wind (Speed / Dir)</span>
+<span class="font-label-mono text-label-mono text-mute" data-i18n="fish_wind_label">Wind (Speed / Dir)</span>
 <span id="indicator-wind" class="font-label-mono text-label-mono text-ink">--</span>
 </div>
 <div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden flex">
@@ -490,7 +493,7 @@
 
 <!-- 24-Hour Forecast Graph -->
 <div class="bg-surface-container-lowest border border-hairline rounded-[12px] p-lg flex-shrink-0">
-<h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md">24-Hour Prediction</h3>
+<h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md" data-i18n="fish_24h_prediction">24-Hour Prediction</h3>
 <div class="w-full h-[250px] relative">
 <canvas id="weather-forecast-chart"></canvas>
 </div>
@@ -501,25 +504,25 @@
 <!-- Zone Comparison Table -->
 <div class="bg-surface-container-lowest border border-hairline rounded-[12px] overflow-hidden">
 <div class="p-lg border-b border-hairline flex justify-between items-center bg-surface/50">
-<h3 class="font-body-lg text-body-lg text-ink font-semibold">Zone Comparison</h3>
-<button class="font-label-mono text-label-mono text-secondary hover:underline">View Full Analysis</button>
+<h3 class="font-body-lg text-body-lg text-ink font-semibold" data-i18n="fish_zone_comparison">Zone Comparison</h3>
+<button class="font-label-mono text-label-mono text-secondary hover:underline" data-i18n="fish_view_analysis">View Full Analysis</button>
 </div>
 <div class="overflow-x-auto">
 <table class="w-full text-left border-collapse">
 <thead>
 <tr class="bg-surface-container-lowest border-b border-hairline font-label-mono text-label-mono text-mute uppercase">
-<th class="p-md font-medium">Sector</th>
-<th class="p-md font-medium">Score</th>
-<th class="p-md font-medium">Distance</th>
-<th class="p-md font-medium">SST</th>
-<th class="p-md font-medium">Activity Level</th>
-<th class="p-md font-medium">Action</th>
+<th class="p-md font-medium" data-i18n="fish_th_sector">Sector</th>
+<th class="p-md font-medium" data-i18n="fish_th_score">Score</th>
+<th class="p-md font-medium" data-i18n="fish_th_distance">Distance</th>
+<th class="p-md font-medium" data-i18n="fish_th_sst">SST</th>
+<th class="p-md font-medium" data-i18n="fish_th_activity">Activity Level</th>
+<th class="p-md font-medium" data-i18n="fish_th_action">Action</th>
 </tr>
 </thead>
 <tbody id="zone-comparison-body" class="font-body-md text-body-md text-ink">
 <!-- Dynamic rows inserted here -->
 <tr class="border-b border-hairline bg-surface/30">
-<td colspan="6" class="p-md text-center text-mute">Loading zones...</td>
+<td colspan="6" class="p-md text-center text-mute" data-i18n="fish_loading_zones">Loading zones...</td>
 </tr>
 </tbody>
 </table>

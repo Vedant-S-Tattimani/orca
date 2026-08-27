@@ -45,6 +45,7 @@ class QueryPostInput(BaseModel):
     lat: Optional[float] = None
     lon: Optional[float] = None
     session_id: Optional[str] = None
+    lang: Optional[str] = None
 
 
 @api_router.post("/query")
@@ -76,6 +77,8 @@ async def submit_api_query(request: Request, input_data: QueryPostInput, backgro
             lon=input_data.lon,
             history=history
         )
+        if input_data.lang:
+            structured_query.language = input_data.lang
         t_nlu = time.time()
         logger.info(f"NLU processing complete in {t_nlu - t0:.2f}s.")
 

@@ -20,7 +20,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>ORCA Dashboard</title>
+<script src="api.js"></script>
+<script src="i18n.js"></script>
+<script src="tts.js"></script>
+<script src="stt.js"></script>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
 
@@ -285,27 +288,27 @@
     <nav class="hidden lg:flex items-center gap-1">
       <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">info</span>
-        <span>About</span>
+        <span data-i18n="nav_about">About</span>
       </a>
       <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-on-primary dark:bg-white dark:text-black shadow-sm">
         <span class="material-symbols-outlined text-[18px]">dashboard</span>
-        <span>Dashboard</span>
+        <span data-i18n="nav_dashboard">Dashboard</span>
       </a>
       <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">smart_toy</span>
-        <span>Assistant</span>
+        <span data-i18n="nav_assistant">Assistant</span>
       </a>
       <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">map</span>
-        <span>Map</span>
+        <span data-i18n="nav_map">Map</span>
       </a>
       <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">warning</span>
-        <span>Safety & Alerts</span>
+        <span data-i18n="nav_safety">Safety & Alerts</span>
       </a>
       <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">sailing</span>
-        <span>Fishing</span>
+        <span data-i18n="nav_fishing">Fishing</span>
       </a>
     </nav>
 
@@ -333,27 +336,27 @@
   <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
     <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">info</span>
-      <span>About</span>
+      <span data-i18n="nav_about">About</span>
     </a>
     <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
       <span class="material-symbols-outlined">dashboard</span>
-      <span>Dashboard</span>
+      <span data-i18n="nav_dashboard">Dashboard</span>
     </a>
     <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">smart_toy</span>
-      <span>Assistant</span>
+      <span data-i18n="nav_assistant">Assistant</span>
     </a>
     <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">map</span>
-      <span>Map</span>
+      <span data-i18n="nav_map">Map</span>
     </a>
     <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">warning</span>
-      <span>Safety & Alerts</span>
+      <span data-i18n="nav_safety">Safety & Alerts</span>
     </a>
     <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">sailing</span>
-      <span>Fishing</span>
+      <span data-i18n="nav_fishing">Fishing</span>
     </a>
   </div>
 </header>
@@ -363,10 +366,10 @@
 <main class="flex-1 overflow-y-auto p-md md:p-xl space-y-xl">
 <div class="flex justify-between items-end mb-lg">
 <div>
-<h2 class="font-headline-lg text-headline-lg text-ink">Dashboard Overview</h2>
-<p class="font-body-md text-body-md text-body mt-xs">Real-time marine conditions and operational directives.</p>
+<h2 class="font-headline-lg text-headline-lg text-ink" data-i18n="dash_title">Dashboard Overview</h2>
+<p class="font-body-md text-body-md text-body mt-xs" data-i18n="dash_subtitle">Real-time marine conditions and operational directives.</p>
 </div>
-<button class="bg-primary text-on-primary font-button-app text-button-app px-md py-xs rounded-lg hover:opacity-90 transition-opacity hidden sm:block">
+<button class="bg-primary text-on-primary font-button-app text-button-app px-md py-xs rounded-lg hover:opacity-90 transition-opacity hidden sm:block" data-i18n="export_report">
                     Export Report
                 </button>
 </div>
@@ -377,7 +380,7 @@
 <!-- Wave Height -->
 <div class="card p-lg feature-card flex flex-col justify-between">
 <div class="flex justify-between items-start">
-<span class="font-label-mono text-label-mono text-body bg-surface-container-low px-xs py-xxs rounded uppercase tracking-wider">Wave Height</span>
+<span class="font-label-mono text-label-mono text-body bg-surface-container-low px-xs py-xxs rounded uppercase tracking-wider" data-i18n="wave_height">Wave Height</span>
 <span class="material-symbols-outlined text-secondary" data-icon="waves">waves</span>
 </div>
 <div class="mt-lg">

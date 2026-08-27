@@ -13,12 +13,13 @@ const OrcaAPI = {
      * Submit a raw query to ORCA
      * POST /api/query
      */
-    async submitQuery(text, lat = null, lon = null, sessionId = 'default') {
+    async submitQuery(text, lat = null, lon = null, sessionId = 'default', lang = null) {
         try {
+            const currentLang = lang || localStorage.getItem('orca_lang') || 'en';
             const response = await fetch(`${API_BASE}/api/query`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, lat, lon, session_id: sessionId })
+                body: JSON.stringify({ text, lat, lon, session_id: sessionId, lang: currentLang })
             });
             if (!response.ok) throw new Error('Query submission failed');
             return await response.json();

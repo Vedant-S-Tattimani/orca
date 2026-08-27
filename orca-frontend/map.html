@@ -23,6 +23,9 @@
 <title>ORCA - Intelligence Map</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="api.js"></script>
+<script src="i18n.js"></script>
+<script src="tts.js"></script>
+<script src="stt.js"></script>
 
 <!-- Leaflet.js for Interactive Map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -347,27 +350,27 @@
     <nav class="hidden lg:flex items-center gap-1">
       <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">info</span>
-        <span>About</span>
+        <span data-i18n="nav_about">About</span>
       </a>
       <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">dashboard</span>
-        <span>Dashboard</span>
+        <span data-i18n="nav_dashboard">Dashboard</span>
       </a>
       <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">smart_toy</span>
-        <span>Assistant</span>
+        <span data-i18n="nav_assistant">Assistant</span>
       </a>
       <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-on-primary dark:bg-white dark:text-black shadow-sm">
         <span class="material-symbols-outlined text-[18px]">map</span>
-        <span>Map</span>
+        <span data-i18n="nav_map">Map</span>
       </a>
       <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">warning</span>
-        <span>Safety & Alerts</span>
+        <span data-i18n="nav_safety">Safety & Alerts</span>
       </a>
       <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">sailing</span>
-        <span>Fishing</span>
+        <span data-i18n="nav_fishing">Fishing</span>
       </a>
     </nav>
 
@@ -395,27 +398,27 @@
   <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
     <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">info</span>
-      <span>About</span>
+      <span data-i18n="nav_about">About</span>
     </a>
     <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">dashboard</span>
-      <span>Dashboard</span>
+      <span data-i18n="nav_dashboard">Dashboard</span>
     </a>
     <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">smart_toy</span>
-      <span>Assistant</span>
+      <span data-i18n="nav_assistant">Assistant</span>
     </a>
     <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
       <span class="material-symbols-outlined">map</span>
-      <span>Map</span>
+      <span data-i18n="nav_map">Map</span>
     </a>
     <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">warning</span>
-      <span>Safety & Alerts</span>
+      <span data-i18n="nav_safety">Safety & Alerts</span>
     </a>
     <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">sailing</span>
-      <span>Fishing</span>
+      <span data-i18n="nav_fishing">Fishing</span>
     </a>
   </div>
 </header>
@@ -432,24 +435,24 @@
     <div class="p-sm border-b border-hairline dark:border-slate-800 bg-surface/50 dark:bg-slate-950/50 flex justify-between items-center">
       <h3 class="font-headline-md text-xs font-bold text-ink dark:text-white uppercase tracking-wider flex items-center gap-1.5">
         <span class="material-symbols-outlined text-secondary text-base">route</span>
-        Route Planning
+        <span data-i18n="map_route_planning">Route Planning</span>
       </h3>
       <span class="font-label-mono text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 font-bold">ORCA ENGINE</span>
     </div>
     <div class="p-sm flex flex-col gap-3">
       <div class="flex flex-col gap-1">
-        <label class="text-[10px] font-label-mono text-mute uppercase tracking-wider">Origin</label>
+        <label class="text-[10px] font-label-mono text-mute uppercase tracking-wider" data-i18n="map_origin">Origin</label>
         <div class="flex gap-2">
-            <input type="text" id="route-origin-input" readonly placeholder="Click map or select port..." class="w-full text-xs bg-canvas dark:bg-slate-950 border border-outline-variant dark:border-slate-700 rounded px-2 py-1.5 text-ink dark:text-white placeholder-mute cursor-pointer">
+            <input type="text" id="route-origin-input" readonly placeholder="Click map or select port..." class="w-full text-xs bg-canvas dark:bg-slate-950 border border-outline-variant dark:border-slate-700 rounded px-2 py-1.5 text-ink dark:text-white placeholder-mute cursor-pointer" data-i18n-placeholder="map_click_map_port">
             <button id="btn-clear-origin" class="w-8 flex items-center justify-center text-mute hover:text-ink dark:hover:text-white bg-surface-container-low dark:bg-slate-800 rounded">
                 <span class="material-symbols-outlined text-sm">close</span>
             </button>
         </div>
       </div>
       <div class="flex flex-col gap-1">
-        <label class="text-[10px] font-label-mono text-mute uppercase tracking-wider">Destination</label>
+        <label class="text-[10px] font-label-mono text-mute uppercase tracking-wider" data-i18n="map_destination">Destination</label>
         <div class="flex gap-2">
-            <input type="text" id="route-dest-input" readonly placeholder="Click map or select port..." class="w-full text-xs bg-canvas dark:bg-slate-950 border border-outline-variant dark:border-slate-700 rounded px-2 py-1.5 text-ink dark:text-white placeholder-mute cursor-pointer">
+            <input type="text" id="route-dest-input" readonly placeholder="Click map or select port..." class="w-full text-xs bg-canvas dark:bg-slate-950 border border-outline-variant dark:border-slate-700 rounded px-2 py-1.5 text-ink dark:text-white placeholder-mute cursor-pointer" data-i18n-placeholder="map_click_map_port">
             <button id="btn-clear-dest" class="w-8 flex items-center justify-center text-mute hover:text-ink dark:hover:text-white bg-surface-container-low dark:bg-slate-800 rounded">
                 <span class="material-symbols-outlined text-sm">close</span>
             </button>
@@ -459,21 +462,21 @@
         <span class="material-symbols-outlined text-sm" style="transform: rotate(90deg)">sync_alt</span>
       </button>
       <button id="btn-calculate-route" class="w-full py-2 bg-secondary text-white rounded text-xs font-semibold hover:bg-secondary/90 transition-colors mt-1 flex justify-center items-center gap-2">
-        <span class="material-symbols-outlined text-sm">directions_boat</span> Calculate Route
+        <span class="material-symbols-outlined text-sm">directions_boat</span> <span data-i18n="map_calculate_route">Calculate Route</span>
       </button>
       
       <div id="route-result-container" class="hidden flex-col gap-2 mt-2 pt-2 border-t border-hairline dark:border-slate-800">
-          <div class="text-[10px] font-label-mono text-mute uppercase tracking-wider mb-1">Route Geometry</div>
+          <div class="text-[10px] font-label-mono text-mute uppercase tracking-wider mb-1" data-i18n="map_route_geometry">Route Geometry</div>
           <div class="flex justify-between items-center text-xs text-ink dark:text-slate-200">
-              <span>Distance:</span> <span id="route-dist" class="font-bold"></span>
+              <span data-i18n="map_distance">Distance:</span> <span id="route-dist" class="font-bold"></span>
           </div>
           <div class="flex justify-between items-center text-xs text-ink dark:text-slate-200">
-              <span>Duration:</span> <span id="route-time" class="font-bold"></span>
+              <span data-i18n="map_duration">Duration:</span> <span id="route-time" class="font-bold"></span>
           </div>
           <div class="flex justify-between items-center text-xs text-ink dark:text-slate-200">
-              <span>Type:</span> <span id="route-type" class="font-medium text-[10px]"></span>
+              <span data-i18n="map_type">Type:</span> <span id="route-type" class="font-medium text-[10px]"></span>
           </div>
-          <div class="text-[10px] font-label-mono text-mute uppercase tracking-wider mt-2 mb-1">Route Safety Assessment</div>
+          <div class="text-[10px] font-label-mono text-mute uppercase tracking-wider mt-2 mb-1" data-i18n="map_route_safety">Route Safety Assessment</div>
           <div id="route-safety-status" class="text-xs font-bold px-2 py-1 rounded inline-block text-center w-full"></div>
           <div id="route-hazards" class="flex flex-col gap-1 text-[11px] mt-1"></div>
       </div>
@@ -501,7 +504,7 @@
     <div class="p-sm border-b border-hairline dark:border-slate-800 bg-surface/50 dark:bg-slate-950/50 flex items-center justify-between">
       <h3 class="font-headline-md text-xs font-bold text-ink dark:text-white uppercase tracking-wider flex items-center gap-1.5">
         <span class="material-symbols-outlined text-secondary text-base">layers</span>
-        Active Layers
+        <span data-i18n="map_active_layers">Active Layers</span>
       </h3>
       <span id="active-layers-count" class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold">5 ACTIVE</span>
     </div>
@@ -510,7 +513,7 @@
       <label class="flex items-center justify-between cursor-pointer group">
         <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-secondary transition-colors">
           <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-          Vessel AIS (Live)
+          <span data-i18n="map_vessel_ais">Vessel AIS (Live)</span>
         </span>
         <input id="toggle-layer-ais" type="checkbox" checked class="rounded border-slate-700 text-cyan-500 focus:ring-cyan-500 bg-slate-950 cursor-pointer"/>
       </label>
@@ -519,7 +522,7 @@
       <label class="flex items-center justify-between cursor-pointer group">
         <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-warning transition-colors">
           <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-          Weather Hazards
+          <span data-i18n="map_weather_hazards">Weather Hazards</span>
         </span>
         <input id="toggle-layer-weather" type="checkbox" checked class="rounded border-slate-700 text-amber-500 focus:ring-amber-500 bg-slate-950 cursor-pointer"/>
       </label>
@@ -528,7 +531,7 @@
       <label class="flex items-center justify-between cursor-pointer group">
         <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-rose-400 transition-colors">
           <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-          Restricted Zones
+          <span data-i18n="map_restricted_zones">Restricted Zones</span>
         </span>
         <input id="toggle-layer-restricted" type="checkbox" checked class="rounded border-slate-700 text-rose-500 focus:ring-rose-500 bg-slate-950 cursor-pointer"/>
       </label>
@@ -537,7 +540,7 @@
       <label class="flex items-center justify-between cursor-pointer group">
         <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-emerald-400 transition-colors">
           <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          Fishing Grounds (SST)
+          <span data-i18n="map_fishing_grounds">Fishing Grounds (SST)</span>
         </span>
         <input id="toggle-layer-fishing" type="checkbox" checked class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-950 cursor-pointer"/>
       </label>
@@ -546,7 +549,7 @@
       <label class="flex items-center justify-between cursor-pointer group">
         <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-blue-400 transition-colors">
           <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-          Vessel Routes
+          <span data-i18n="map_vessel_routes">Vessel Routes</span>
         </span>
         <input id="toggle-layer-routes" type="checkbox" checked class="rounded border-slate-700 text-blue-500 focus:ring-blue-500 bg-slate-950 cursor-pointer"/>
       </label>
@@ -555,7 +558,7 @@
       <label class="flex items-center justify-between cursor-pointer group">
         <span class="flex items-center gap-2 text-xs font-medium text-ink dark:text-slate-200 group-hover:text-[#00dfd8] transition-colors">
           <span class="w-2 h-2 rounded-full bg-[#00dfd8]"></span>
-          Ports
+          <span data-i18n="map_ports">Ports</span>
         </span>
         <input id="toggle-layer-ports" type="checkbox" checked class="rounded border-slate-700 text-[#00dfd8] focus:ring-[#00dfd8] bg-slate-950 cursor-pointer"/>
       </label>
