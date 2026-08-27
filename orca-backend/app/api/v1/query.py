@@ -487,6 +487,119 @@ async def get_pfz_data(request: PFZRequest):
     return results
 
 
+@api_router.get("/environmental-data")
+@api_router.post("/environmental-data")
+async def get_location_environmental_data(lat: float, lon: float):
+    """
+    GET/POST /api/environmental-data
+    Fetch real live weather & marine environmental data for specified (lat, lon) coordinates
+    using Open-Meteo Weather and Marine APIs.
+    """
+    from app.services.openmeteo_weather_client import OpenMeteoWeatherClient
+    from app.services.openmeteo_marine_client import OpenMeteoMarineClient
+
+    weather_client = OpenMeteoWeatherClient()
+    marine_client = OpenMeteoMarineClient()
+
+    weather_data = {}
+    marine_data = {}
+
+    try:
+        weather_task = weather_client.get_weather_forecast(lat, lon, forecast_days=1)
+        marine_task = marine_client.get_marine_forecast(lat, lon, forecast_days=1)
+
+        weather_res, marine_res = await asyncio.gather(weather_task, marine_task, return_exceptions=True)
+
+        if not isinstance(weather_res, Exception) and isinstance(weather_res, dict):
+            weather_data = weather_res
+        if not isinstance(marine_res, Exception) and isinstance(marine_res, dict):
+            marine_data = marine_res
+    except Exception as e:
+        logger.error(f"Error fetching environmental data for ({lat}, {lon}): {e}")
+
+    # Extract real indicator values or None if unavailable
+    wind_speed_kmh = weather_data.get("wind_speed_kmh")
+    wind_direction_deg = weather_data.get("wind_direction_deg")
+    rainfall_mm = weather_data.get("rainfall_mm")
+    weather_code = weather_data.get("weather_code")
+    weather_condition = weather_data.get("weather_condition", "Unknown")
+
+    wave_height_m = marine_data.get("wave_height_m")
+    swell_wave_height_m = marine_data.get("swell_wave_height_m")
+    ocean_current_speed_knots = marine_data.get("ocean_current_speed_knots")
+    ocean_current_direction_deg = marine_data.get("ocean_current_direction_deg")
+    sea_surface_temp_c = marine_data.get("sea_surface_temp_c")
+
+    # Determine Lightning / Storm Risk based on real weather_code and precipitation
+    storm_risk = "Low Risk"
+    if weather_code in [95, 96, 99]:
+        storm_risk = "High Risk (Thunderstorm)"
+    elif weather_code in [80, 81, 82, 63, 65, 67]:
+        storm_risk = "Moderate Risk (Heavy Rain)"
+    elif weather_code in [51, 53, 55, 61]:
+        storm_risk = "Low Risk (Light Rain)"
+    elif weather_code is None:
+        storm_risk = None
+
+    # Calculate Fishing Safety Score deterministically
+    fishing_safety = None
+    if wind_speed_kmh is not None or wave_height_m is not None or weather_code is not None:
+        score = 100
+        if wind_speed_kmh is not None:
+            if wind_speed_kmh > 55: score -= 50
+            elif wind_speed_kmh > 37: score -= 30
+            elif wind_speed_kmh > 22: score -= 15
+
+        eff_wave = wave_height_m if wave_height_m is not None else swell_wave_height_m
+        if eff_wave is not None:
+            if eff_wave > 3.0: score -= 50
+            elif eff_wave > 2.0: score -= 35
+            elif eff_wave > 1.0: score -= 15
+
+        if weather_code in [95, 96, 99]: score -= 45
+        elif weather_code in [80, 81, 82, 63, 65]: score -= 25
+        elif weather_code in [51, 53, 55, 61]: score -= 10
+
+        if ocean_current_speed_knots is not None:
+            if ocean_current_speed_knots > 2.5: score -= 25
+            elif ocean_current_speed_knots > 1.0: score -= 10
+
+        score = max(0, min(100, score))
+        if score >= 80:
+            status = "Safe for Fishing"
+        elif score >= 50:
+            status = "Caution Required"
+        else:
+            status = "Unsafe / High Risk"
+
+        fishing_safety = {
+            "score": score,
+            "status": status
+        }
+
+    return {
+        "latitude": lat,
+        "longitude": lon,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "data": {
+            "wind_speed_kmh": round(wind_speed_kmh, 1) if wind_speed_kmh is not None else None,
+            "wind_speed_knots": round(wind_speed_kmh / 1.852, 1) if wind_speed_kmh is not None else None,
+            "wind_direction_deg": round(wind_direction_deg, 1) if wind_direction_deg is not None else None,
+            "wave_height_m": round(wave_height_m, 2) if wave_height_m is not None else None,
+            "swell_wave_height_m": round(swell_wave_height_m, 2) if swell_wave_height_m is not None else None,
+            "rainfall_mm": round(rainfall_mm, 2) if rainfall_mm is not None else None,
+            "ocean_current_speed_knots": round(ocean_current_speed_knots, 2) if ocean_current_speed_knots is not None else None,
+            "ocean_current_direction_deg": round(ocean_current_direction_deg, 1) if ocean_current_direction_deg is not None else None,
+            "sea_surface_temp_c": round(sea_surface_temp_c, 1) if sea_surface_temp_c is not None else None,
+            "weather_code": weather_code,
+            "weather_condition": weather_condition,
+            "storm_risk": storm_risk,
+            "fishing_safety": fishing_safety
+        },
+        "source": "Open-Meteo Weather & Marine API"
+    }
+
+
 
 async def process_query_background(query_id: str, structured_query: StructuredQuery, session_id: str = "default", t_nlu: float = None, demo_failure: bool = False):
     if structured_query and (structured_query.location.lat is None or structured_query.location.lon is None):
