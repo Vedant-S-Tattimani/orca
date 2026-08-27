@@ -364,10 +364,6 @@
         <span class="material-symbols-outlined text-[18px]">map</span>
         <span data-i18n="nav_map">Map</span>
       </a>
-      <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
-        <span class="material-symbols-outlined text-[18px]">warning</span>
-        <span data-i18n="nav_safety">Safety & Alerts</span>
-      </a>
       <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
         <span class="material-symbols-outlined text-[18px]">sailing</span>
         <span data-i18n="nav_fishing">Fishing</span>
@@ -411,10 +407,6 @@
     <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
       <span class="material-symbols-outlined">map</span>
       <span data-i18n="nav_map">Map</span>
-    </a>
-    <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
-      <span class="material-symbols-outlined">warning</span>
-      <span data-i18n="nav_safety">Safety & Alerts</span>
     </a>
     <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">sailing</span>
@@ -1054,16 +1046,135 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Map Click for Origin/Dest selection
-    map.on('click', (e) => {
+    // Map Click for Origin/Dest selection & Real Environmental Data Popup
+    let locationPopup = L.popup();
+
+    map.on('click', async (e) => {
+        const lat = e.latlng.lat;
+        const lon = e.latlng.lng;
+
         if (!routeOrigin) {
-            window.setRouteOrigin(e.latlng.lat, e.latlng.lng, null);
+            window.setRouteOrigin(lat, lon, null);
         } else if (!routeDest) {
-            window.setRouteDest(e.latlng.lat, e.latlng.lng, null);
+            window.setRouteDest(lat, lon, null);
         } else {
             // Both are set. Reset to new origin and clear destination.
             document.getElementById('btn-clear-dest').click();
-            window.setRouteOrigin(e.latlng.lat, e.latlng.lng, null);
+            window.setRouteOrigin(lat, lon, null);
+        }
+
+        // Show real environmental data popup for exact location clicked
+        locationPopup
+            .setLatLng(e.latlng)
+            .setContent(`
+                <div class="p-2 text-xs w-72 bg-slate-950 text-white rounded border border-slate-800">
+                    <div class="font-bold text-sm text-cyan-400 mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">location_on</span>
+                        Location Environmental Data
+                    </div>
+                    <div class="text-[10px] text-slate-400 border-b border-slate-800 pb-1 mb-2 font-mono">
+                        ${lat.toFixed(4)}°, ${lon.toFixed(4)}°
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-300 py-2">
+                        <span class="material-symbols-outlined text-cyan-400 animate-spin text-[16px]">sync</span>
+                        <span>Fetching real environmental data...</span>
+                    </div>
+                </div>
+            `)
+            .openOn(map);
+
+        try {
+            const envData = await window.OrcaAPI.getLocationEnvironmentalData(lat, lon);
+            if (!envData || !envData.data) {
+                locationPopup.setContent(`
+                    <div class="p-2 text-xs w-72 bg-slate-950 text-white rounded border border-slate-800">
+                        <div class="font-bold text-sm text-cyan-400 mb-1">Selected Location</div>
+                        <div class="text-[10px] text-slate-400 border-b border-slate-800 pb-1 mb-2 font-mono">
+                            ${lat.toFixed(4)}°, ${lon.toFixed(4)}°
+                        </div>
+                        <div class="text-rose-400 py-1 font-semibold">Data unavailable for this location.</div>
+                    </div>
+                `);
+                return;
+            }
+
+            const d = envData.data;
+
+            const windText = d.wind_speed_kmh !== null ? `${d.wind_speed_kmh} km/h (${d.wind_speed_knots} kts)` : 'Data unavailable';
+            const waveText = d.wave_height_m !== null ? `${d.wave_height_m} m` : (d.swell_wave_height_m !== null ? `${d.swell_wave_height_m} m (swell)` : 'Data unavailable');
+            const rainText = d.rainfall_mm !== null ? `${d.rainfall_mm} mm/h` : 'Data unavailable';
+            const currentText = d.ocean_current_speed_knots !== null ? `${d.ocean_current_speed_knots} kts` : 'Data unavailable';
+            const visText = d.visibility_km !== null ? `${d.visibility_km} km` : 'Data unavailable';
+            const stormText = d.storm_risk ? d.storm_risk : 'Data unavailable';
+
+            let safetyHtml = '<span class="text-slate-400">Data unavailable</span>';
+            if (d.fishing_safety) {
+                const score = d.fishing_safety.score;
+                const status = d.fishing_safety.status;
+                let colorClass = 'text-emerald-400';
+                if (score < 50) colorClass = 'text-rose-400';
+                else if (score < 80) colorClass = 'text-amber-400';
+                safetyHtml = `<span class="font-bold ${colorClass}">${score}/100</span> <span class="text-[10px] text-slate-300">(${status})</span>`;
+            }
+
+            locationPopup.setContent(`
+                <div class="p-2 text-xs w-72 bg-slate-950 text-white rounded border border-slate-800">
+                    <div class="font-bold text-sm text-cyan-400 mb-1 flex items-center justify-between">
+                        <span>Selected Location Data</span>
+                        <span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-1 py-0.5 rounded border border-emerald-500/20">LIVE API</span>
+                    </div>
+                    <div class="text-[10px] text-slate-400 border-b border-slate-800 pb-1 mb-2 font-mono">
+                        Lat: ${lat.toFixed(4)}°, Lon: ${lon.toFixed(4)}°
+                    </div>
+
+                    <div class="space-y-1.5 text-[11px]">
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1">
+                            <span class="text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-cyan-400">air</span> Wind Speed</span>
+                            <span class="font-mono text-white font-medium">${windText}</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1">
+                            <span class="text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-cyan-400">waves</span> Wave Swell / Height</span>
+                            <span class="font-mono text-white font-medium">${waveText}</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1">
+                            <span class="text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-cyan-400">rainy</span> Rainfall / Precip.</span>
+                            <span class="font-mono text-white font-medium">${rainText}</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1">
+                            <span class="text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-cyan-400">explore</span> Ocean Current</span>
+                            <span class="font-mono text-white font-medium">${currentText}</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1">
+                            <span class="text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-cyan-400">visibility</span> Visibility</span>
+                            <span class="font-mono text-white font-medium">${visText}</span>
+                        </div>
+                        <div class="flex justify-between border-b border-slate-800/60 pb-1">
+                            <span class="text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-amber-400">thunderstorm</span> Storm Risk</span>
+                            <span class="font-mono text-white font-medium">${stormText}</span>
+                        </div>
+                        <div class="flex justify-between pt-0.5">
+                            <span class="text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-emerald-400">verified</span> Fishing Safety Score</span>
+                            <div>${safetyHtml}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-1 mt-3 pt-2 border-t border-slate-800">
+                        <button onclick="window.setRouteOrigin(${lat}, ${lon}, null)" class="flex-1 py-1 bg-surface-container-low hover:bg-slate-800 text-cyan-400 font-bold rounded text-[10px] transition-colors border border-cyan-500/30">Set Origin</button>
+                        <button onclick="window.setRouteDest(${lat}, ${lon}, null)" class="flex-1 py-1 bg-surface-container-low hover:bg-slate-800 text-cyan-400 font-bold rounded text-[10px] transition-colors border border-cyan-500/30">Set Dest</button>
+                    </div>
+                </div>
+            `);
+        } catch (err) {
+            console.error('Failed to load popup environmental data:', err);
+            locationPopup.setContent(`
+                <div class="p-2 text-xs w-72 bg-slate-950 text-white rounded border border-slate-800">
+                    <div class="font-bold text-sm text-rose-400 mb-1">Error Fetching Data</div>
+                    <div class="text-[10px] text-slate-400 border-b border-slate-800 pb-1 mb-2 font-mono">
+                        ${lat.toFixed(4)}°, ${lon.toFixed(4)}°
+                    </div>
+                    <div class="text-slate-300 py-1">Data unavailable for this location.</div>
+                </div>
+            `);
         }
     });
 

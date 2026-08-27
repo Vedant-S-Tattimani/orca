@@ -315,10 +315,6 @@
         <span class="material-symbols-outlined text-[18px]">map</span>
         <span data-i18n="nav_map">Map</span>
       </a>
-      <a href="safety.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
-        <span class="material-symbols-outlined text-[18px]">warning</span>
-        <span data-i18n="nav_safety">Safety & Alerts</span>
-      </a>
       <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-on-primary dark:bg-white dark:text-black shadow-sm">
         <span class="material-symbols-outlined text-[18px]">sailing</span>
         <span data-i18n="nav_fishing">Fishing</span>
@@ -362,10 +358,6 @@
     <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
       <span class="material-symbols-outlined">map</span>
       <span data-i18n="nav_map">Map</span>
-    </a>
-    <a href="safety.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
-      <span class="material-symbols-outlined">warning</span>
-      <span data-i18n="nav_safety">Safety & Alerts</span>
     </a>
     <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-on-primary dark:bg-white dark:text-black">
       <span class="material-symbols-outlined">sailing</span>
@@ -456,9 +448,9 @@
 </div>
 <!-- Marine Indicators Brief -->
 <div class="bg-surface-container-lowest border border-hairline rounded-[12px] p-lg flex-shrink-0">
-<h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md" data-i18n="fish_marine_indicators">Marine Indicators</h3>
+<h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md" data-i18n="fish_marine_indicators">Real-Time Marine Indicators</h3>
 <div class="space-y-md">
-<!-- Indicator 1 -->
+<!-- SST -->
 <div>
 <div class="flex justify-between items-center mb-xs">
 <span class="font-label-mono text-label-mono text-mute" data-i18n="fish_sst_label">Sea Surface Temp (SST)</span>
@@ -468,7 +460,7 @@
 <div id="bar-sst" class="h-full bg-gradient-blue w-0"></div>
 </div>
 </div>
-<!-- Indicator 2 -->
+<!-- Chlorophyll-a -->
 <div>
 <div class="flex justify-between items-center mb-xs">
 <span class="font-label-mono text-label-mono text-mute" data-i18n="fish_chla_label">Chlorophyll-a</span>
@@ -478,7 +470,7 @@
 <div id="bar-chla" class="h-full bg-gradient-cyan w-0"></div>
 </div>
 </div>
-<!-- Indicator 3 -->
+<!-- Wind -->
 <div>
 <div class="flex justify-between items-center mb-xs">
 <span class="font-label-mono text-label-mono text-mute" data-i18n="fish_wind_label">Wind (Speed / Dir)</span>
@@ -491,6 +483,107 @@
 </div>
 </div>
 
+<!-- Selected Location Safety Panel -->
+<div id="selected-location-safety-panel" class="bg-surface-container-lowest border border-hairline rounded-[16px] p-lg flex-shrink-0 relative overflow-hidden">
+<div class="flex justify-between items-center mb-sm pb-xs border-b border-hairline">
+<div>
+<span class="font-label-mono text-[10px] text-secondary uppercase tracking-wider block font-semibold">Selected Marine Location</span>
+<div id="sel-loc-coords" class="font-mono text-sm font-bold text-ink dark:text-white">Click map to select location</div>
+</div>
+<span class="material-symbols-outlined text-cyan-500 text-xl">location_on</span>
+</div>
+
+<!-- Fishing Safety Score & Status Badge -->
+<div class="bg-surface-container-low p-md rounded-xl border border-hairline mb-md">
+<div class="flex justify-between items-center mb-xs">
+<span class="font-label-mono text-xs text-mute font-medium">Fishing Safety Score</span>
+<span id="sel-loc-badge" class="px-2 py-0.5 rounded text-[11px] font-bold font-mono uppercase bg-slate-700 text-white">--</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span id="sel-loc-score" class="font-display-xl text-3xl font-bold text-ink dark:text-white">--</span>
+<span class="text-mute font-mono text-sm">/ 100</span>
+</div>
+
+<!-- Can I Fish Here? -->
+<div class="mt-sm pt-sm border-t border-hairline/60">
+<div class="font-label-mono text-[10px] text-mute uppercase tracking-wider mb-xxs">Can I Fish Here?</div>
+<div id="sel-loc-can-fish" class="font-bold text-xs flex items-center gap-1.5 text-mute">
+<span class="material-symbols-outlined text-base">help</span>
+<span>Select a location on the map</span>
+</div>
+<p id="sel-loc-explanation" class="text-xs text-body mt-1 leading-snug">Click any point on the map to evaluate live environmental marine safety conditions.</p>
+</div>
+</div>
+
+<!-- Location Environmental Matrix (6 Compact Cards) -->
+<div>
+<h4 class="font-label-mono text-xs text-mute uppercase tracking-wider mb-xs font-semibold">Location Environmental Matrix</h4>
+<div class="grid grid-cols-2 gap-xs">
+
+<!-- Card 1: Wind Speed -->
+<div class="bg-surface p-xs rounded-lg border border-hairline flex flex-col justify-between">
+<div class="flex justify-between items-center text-mute text-[11px]">
+<span class="font-label-mono">Wind Speed</span>
+<span class="material-symbols-outlined text-[14px] text-cyan-500">air</span>
+</div>
+<div id="matrix-wind-val" class="font-mono font-bold text-xs text-ink dark:text-white mt-1">--</div>
+<div id="matrix-wind-risk" class="text-[10px] text-mute mt-0.5">--</div>
+</div>
+
+<!-- Card 2: Wave Swell / Height -->
+<div class="bg-surface p-xs rounded-lg border border-hairline flex flex-col justify-between">
+<div class="flex justify-between items-center text-mute text-[11px]">
+<span class="font-label-mono">Wave Swell</span>
+<span class="material-symbols-outlined text-[14px] text-cyan-500">waves</span>
+</div>
+<div id="matrix-wave-val" class="font-mono font-bold text-xs text-ink dark:text-white mt-1">--</div>
+<div id="matrix-wave-risk" class="text-[10px] text-mute mt-0.5">--</div>
+</div>
+
+<!-- Card 3: Lightning Risk -->
+<div class="bg-surface p-xs rounded-lg border border-hairline flex flex-col justify-between">
+<div class="flex justify-between items-center text-mute text-[11px]">
+<span class="font-label-mono">Lightning Risk</span>
+<span class="material-symbols-outlined text-[14px] text-amber-500">thunderstorm</span>
+</div>
+<div id="matrix-lightning-val" class="font-mono font-bold text-xs text-ink dark:text-white mt-1">--</div>
+<div id="matrix-lightning-risk" class="text-[10px] text-mute mt-0.5">--</div>
+</div>
+
+<!-- Card 4: Rainfall -->
+<div class="bg-surface p-xs rounded-lg border border-hairline flex flex-col justify-between">
+<div class="flex justify-between items-center text-mute text-[11px]">
+<span class="font-label-mono">Rainfall</span>
+<span class="material-symbols-outlined text-[14px] text-blue-400">rainy</span>
+</div>
+<div id="matrix-rain-val" class="font-mono font-bold text-xs text-ink dark:text-white mt-1">--</div>
+<div id="matrix-rain-risk" class="text-[10px] text-mute mt-0.5">--</div>
+</div>
+
+<!-- Card 5: Ocean Current -->
+<div class="bg-surface p-xs rounded-lg border border-hairline flex flex-col justify-between">
+<div class="flex justify-between items-center text-mute text-[11px]">
+<span class="font-label-mono">Ocean Current</span>
+<span class="material-symbols-outlined text-[14px] text-teal-400">explore</span>
+</div>
+<div id="matrix-current-val" class="font-mono font-bold text-xs text-ink dark:text-white mt-1">--</div>
+<div id="matrix-current-risk" class="text-[10px] text-mute mt-0.5">--</div>
+</div>
+
+<!-- Card 6: Visibility -->
+<div class="bg-surface p-xs rounded-lg border border-hairline flex flex-col justify-between">
+<div class="flex justify-between items-center text-mute text-[11px]">
+<span class="font-label-mono">Visibility</span>
+<span class="material-symbols-outlined text-[14px] text-indigo-400">visibility</span>
+</div>
+<div id="matrix-vis-val" class="font-mono font-bold text-xs text-ink dark:text-white mt-1">--</div>
+<div id="matrix-vis-risk" class="text-[10px] text-mute mt-0.5">--</div>
+</div>
+
+</div>
+</div>
+</div>
+
 <!-- 24-Hour Forecast Graph -->
 <div class="bg-surface-container-lowest border border-hairline rounded-[12px] p-lg flex-shrink-0">
 <h3 class="font-body-lg text-body-lg text-ink font-semibold mb-md" data-i18n="fish_24h_prediction">24-Hour Prediction</h3>
@@ -498,34 +591,6 @@
 <canvas id="weather-forecast-chart"></canvas>
 </div>
 </div>
-</div>
-</div>
-</div>
-<!-- Zone Comparison Table -->
-<div class="bg-surface-container-lowest border border-hairline rounded-[12px] overflow-hidden">
-<div class="p-lg border-b border-hairline flex justify-between items-center bg-surface/50">
-<h3 class="font-body-lg text-body-lg text-ink font-semibold" data-i18n="fish_zone_comparison">Zone Comparison</h3>
-<button class="font-label-mono text-label-mono text-secondary hover:underline" data-i18n="fish_view_analysis">View Full Analysis</button>
-</div>
-<div class="overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="bg-surface-container-lowest border-b border-hairline font-label-mono text-label-mono text-mute uppercase">
-<th class="p-md font-medium" data-i18n="fish_th_sector">Sector</th>
-<th class="p-md font-medium" data-i18n="fish_th_score">Score</th>
-<th class="p-md font-medium" data-i18n="fish_th_distance">Distance</th>
-<th class="p-md font-medium" data-i18n="fish_th_sst">SST</th>
-<th class="p-md font-medium" data-i18n="fish_th_activity">Activity Level</th>
-<th class="p-md font-medium" data-i18n="fish_th_action">Action</th>
-</tr>
-</thead>
-<tbody id="zone-comparison-body" class="font-body-md text-body-md text-ink">
-<!-- Dynamic rows inserted here -->
-<tr class="border-b border-hairline bg-surface/30">
-<td colspan="6" class="p-md text-center text-mute" data-i18n="fish_loading_zones">Loading zones...</td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 </div>
@@ -589,6 +654,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const lat = e.latlng.lat;
         const lon = e.latlng.lng;
         
+        // Instantly update the Selected Location Safety Analysis Panel
+        updateSelectedLocationSafetyPanel(lat, lon);
+
         if (customPointMarker) {
             map.removeLayer(customPointMarker);
         }
@@ -612,12 +680,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 renderMapMarkers();
-                renderZoneTable();
                 updateSidePanel(customZone);
             }
         } catch (err) {
             console.error(err);
-            customPointMarker.setTooltipContent("Failed to analyze location.");
+            if (customPointMarker) customPointMarker.setTooltipContent("Failed to analyze location.");
         }
     });
 
@@ -635,12 +702,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const group = new L.featureGroup(pfzZones.map(z => L.marker([z.coords[0], z.coords[1]])));
                 map.fitBounds(group.getBounds().pad(0.1));
             }
-            
-            renderZoneTable();
-            
         } catch (error) {
             console.error("Failed to load fishing data:", error);
-            document.getElementById('zone-comparison-body').innerHTML = `<tr><td colspan="6" class="p-md text-center text-error">Failed to load PFZ data. Make sure backend is running.</td></tr>`;
         }
     }
     
@@ -685,7 +748,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.clearCustomPoints = function() {
         pfzZones = pfzZones.filter(z => !z.name.startsWith('Custom Point'));
         renderMapMarkers();
-        renderZoneTable();
         if (pfzZones.length > 0) {
             updateSidePanel(pfzZones[0]);
         }
@@ -700,6 +762,239 @@ document.addEventListener('DOMContentLoaded', () => {
                   Math.sin(dLon/2) * Math.sin(dLon/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         return R * c;
+    }
+
+    async function updateSelectedLocationSafetyPanel(lat, lon) {
+        const coordsEl = document.getElementById('sel-loc-coords');
+        const scoreEl = document.getElementById('sel-loc-score');
+        const badgeEl = document.getElementById('sel-loc-badge');
+        const canFishEl = document.getElementById('sel-loc-can-fish');
+        const expEl = document.getElementById('sel-loc-explanation');
+
+        const windValEl = document.getElementById('matrix-wind-val');
+        const windRiskEl = document.getElementById('matrix-wind-risk');
+
+        const waveValEl = document.getElementById('matrix-wave-val');
+        const waveRiskEl = document.getElementById('matrix-wave-risk');
+
+        const lightningValEl = document.getElementById('matrix-lightning-val');
+        const lightningRiskEl = document.getElementById('matrix-lightning-risk');
+
+        const rainValEl = document.getElementById('matrix-rain-val');
+        const rainRiskEl = document.getElementById('matrix-rain-risk');
+
+        const currentValEl = document.getElementById('matrix-current-val');
+        const currentRiskEl = document.getElementById('matrix-current-risk');
+
+        const visValEl = document.getElementById('matrix-vis-val');
+        const visRiskEl = document.getElementById('matrix-vis-risk');
+
+        const latNs = lat >= 0 ? `${lat.toFixed(2)}° N` : `${Math.abs(lat).toFixed(2)}° S`;
+        const lonEw = lon >= 0 ? `${lon.toFixed(2)}° E` : `${Math.abs(lon).toFixed(2)}° W`;
+        if (coordsEl) coordsEl.innerText = `${latNs}, ${lonEw}`;
+
+        // Loading state
+        if (scoreEl) scoreEl.innerText = '--';
+        if (badgeEl) {
+            badgeEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold font-mono uppercase bg-slate-700 text-white animate-pulse';
+            badgeEl.innerText = 'LOADING...';
+        }
+        if (canFishEl) {
+            canFishEl.className = 'font-bold text-xs flex items-center gap-1.5 text-mute animate-pulse';
+            canFishEl.innerHTML = '<span class="material-symbols-outlined text-base animate-spin">sync</span> <span>Fetching real data...</span>';
+        }
+        if (expEl) expEl.innerText = 'Connecting to real-time marine meteorological sensors...';
+
+        [windValEl, waveValEl, lightningValEl, rainValEl, currentValEl, visValEl].forEach(el => {
+            if (el) el.innerHTML = '<span class="text-mute text-[10px] animate-pulse">Loading...</span>';
+        });
+        [windRiskEl, waveRiskEl, lightningRiskEl, rainRiskEl, currentRiskEl, visRiskEl].forEach(el => {
+            if (el) el.innerText = '--';
+        });
+
+        try {
+            const env = await window.OrcaAPI.getLocationEnvironmentalData(lat, lon);
+            if (!env || !env.data) {
+                if (badgeEl) {
+                    badgeEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold font-mono uppercase bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                    badgeEl.innerText = 'UNAVAILABLE';
+                }
+                if (expEl) expEl.innerText = 'Environmental sensor data is unavailable for this location.';
+                return;
+            }
+
+            const d = env.data;
+
+            // 1. Wind Speed
+            if (d.wind_speed_knots !== null && d.wind_speed_knots !== undefined) {
+                windValEl.innerText = `${d.wind_speed_knots} kts`;
+                if (d.wind_speed_knots > 30) {
+                    windRiskEl.innerText = 'Dangerous';
+                    windRiskEl.className = 'text-[10px] font-bold text-rose-500';
+                } else if (d.wind_speed_knots > 20) {
+                    windRiskEl.innerText = 'High Wind';
+                    windRiskEl.className = 'text-[10px] font-bold text-amber-500';
+                } else if (d.wind_speed_knots > 12) {
+                    windRiskEl.innerText = 'Moderate';
+                    windRiskEl.className = 'text-[10px] font-bold text-amber-400';
+                } else {
+                    windRiskEl.innerText = 'Clear / Calm';
+                    windRiskEl.className = 'text-[10px] font-bold text-emerald-500';
+                }
+            } else {
+                windValEl.innerText = 'Data unavailable';
+                windRiskEl.innerText = 'Unavailable';
+                windRiskEl.className = 'text-[10px] text-mute';
+            }
+
+            // 2. Wave Swell / Height
+            const effWave = d.wave_height_m !== null ? d.wave_height_m : d.swell_wave_height_m;
+            if (effWave !== null && effWave !== undefined) {
+                waveValEl.innerText = `${effWave} m`;
+                if (effWave > 3.0) {
+                    waveRiskEl.innerText = 'Dangerous';
+                    waveRiskEl.className = 'text-[10px] font-bold text-rose-500';
+                } else if (effWave > 2.0) {
+                    waveRiskEl.innerText = 'High Waves';
+                    waveRiskEl.className = 'text-[10px] font-bold text-amber-500';
+                } else if (effWave > 1.0) {
+                    waveRiskEl.innerText = 'Moderate Swell';
+                    waveRiskEl.className = 'text-[10px] font-bold text-amber-400';
+                } else {
+                    waveRiskEl.innerText = 'Calm Sea';
+                    waveRiskEl.className = 'text-[10px] font-bold text-emerald-500';
+                }
+            } else {
+                waveValEl.innerText = 'Data unavailable';
+                waveRiskEl.innerText = 'Unavailable';
+                waveRiskEl.className = 'text-[10px] text-mute';
+            }
+
+            // 3. Lightning Risk
+            if (d.storm_risk !== null && d.storm_risk !== undefined) {
+                lightningValEl.innerText = d.storm_risk;
+                if (d.storm_risk.includes('High')) {
+                    lightningRiskEl.innerText = 'High Risk';
+                    lightningRiskEl.className = 'text-[10px] font-bold text-rose-500';
+                } else if (d.storm_risk.includes('Moderate')) {
+                    lightningRiskEl.innerText = 'Moderate';
+                    lightningRiskEl.className = 'text-[10px] font-bold text-amber-500';
+                } else {
+                    lightningRiskEl.innerText = 'Clear';
+                    lightningRiskEl.className = 'text-[10px] font-bold text-emerald-500';
+                }
+            } else {
+                lightningValEl.innerText = 'Data unavailable';
+                lightningRiskEl.innerText = 'Unavailable';
+                lightningRiskEl.className = 'text-[10px] text-mute';
+            }
+
+            // 4. Rainfall
+            if (d.rainfall_mm !== null && d.rainfall_mm !== undefined) {
+                rainValEl.innerText = `${d.rainfall_mm} mm/h`;
+                if (d.rainfall_mm >= 2.5) {
+                    rainRiskEl.innerText = 'Heavy Rain';
+                    rainRiskEl.className = 'text-[10px] font-bold text-rose-500';
+                } else if (d.rainfall_mm > 0.0) {
+                    rainRiskEl.innerText = 'Light Rain';
+                    rainRiskEl.className = 'text-[10px] font-bold text-amber-400';
+                } else {
+                    rainRiskEl.innerText = 'None';
+                    rainRiskEl.className = 'text-[10px] font-bold text-emerald-500';
+                }
+            } else {
+                rainValEl.innerText = 'Data unavailable';
+                rainRiskEl.innerText = 'Unavailable';
+                rainRiskEl.className = 'text-[10px] text-mute';
+            }
+
+            // 5. Ocean Current
+            if (d.ocean_current_speed_knots !== null && d.ocean_current_speed_knots !== undefined) {
+                currentValEl.innerText = `${d.ocean_current_speed_knots} kts`;
+                if (d.ocean_current_speed_knots > 2.5) {
+                    currentRiskEl.innerText = 'Strong Current';
+                    currentRiskEl.className = 'text-[10px] font-bold text-rose-500';
+                } else if (d.ocean_current_speed_knots > 1.0) {
+                    currentRiskEl.innerText = 'Moderate';
+                    currentRiskEl.className = 'text-[10px] font-bold text-amber-400';
+                } else {
+                    currentRiskEl.innerText = 'Normal';
+                    currentRiskEl.className = 'text-[10px] font-bold text-emerald-500';
+                }
+            } else {
+                currentValEl.innerText = 'Data unavailable';
+                currentRiskEl.innerText = 'Unavailable';
+                currentRiskEl.className = 'text-[10px] text-mute';
+            }
+
+            // 6. Visibility
+            if (d.visibility_km !== null && d.visibility_km !== undefined) {
+                visValEl.innerText = `${d.visibility_km} km`;
+                if (d.visibility_km < 1.0) {
+                    visRiskEl.innerText = 'Dense Fog';
+                    visRiskEl.className = 'text-[10px] font-bold text-rose-500';
+                } else if (d.visibility_km < 4.0) {
+                    visRiskEl.innerText = 'Low Visibility';
+                    visRiskEl.className = 'text-[10px] font-bold text-amber-500';
+                } else if (d.visibility_km < 10.0) {
+                    visRiskEl.innerText = 'Moderate';
+                    visRiskEl.className = 'text-[10px] font-bold text-amber-400';
+                } else {
+                    visRiskEl.innerText = 'Clear';
+                    visRiskEl.className = 'text-[10px] font-bold text-emerald-500';
+                }
+            } else {
+                visValEl.innerText = 'Data unavailable';
+                visRiskEl.innerText = 'Unavailable';
+                visRiskEl.className = 'text-[10px] text-mute';
+            }
+
+            // Score & Can I Fish Here? Logic
+            if (d.fishing_safety) {
+                const score = d.fishing_safety.score;
+                scoreEl.innerText = score;
+
+                if (score >= 80) {
+                    badgeEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold font-mono uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                    badgeEl.innerText = 'SAFE';
+
+                    canFishEl.className = 'font-bold text-xs flex items-center gap-1.5 text-emerald-400';
+                    canFishEl.innerHTML = '<span class="material-symbols-outlined text-base">check_circle</span> <span>YES — SAFE CONDITIONS</span>';
+                    expEl.innerText = 'Atmospheric wind and sea swell conditions are favorable for safe marine operations.';
+                } else if (score >= 65) {
+                    badgeEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold font-mono uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                    badgeEl.innerText = 'MODERATE RISK';
+
+                    canFishEl.className = 'font-bold text-xs flex items-center gap-1.5 text-amber-400';
+                    canFishEl.innerHTML = '<span class="material-symbols-outlined text-base">warning</span> <span>CAUTION — MODERATE CONDITIONS</span>';
+                    expEl.innerText = 'Moderate winds or swells present. Exercise caution and verify safety equipment before departure.';
+                } else if (score >= 50) {
+                    badgeEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold font-mono uppercase bg-orange-500/20 text-orange-400 border border-orange-500/30';
+                    badgeEl.innerText = 'UNSAFE';
+
+                    canFishEl.className = 'font-bold text-xs flex items-center gap-1.5 text-orange-400';
+                    canFishEl.innerHTML = '<span class="material-symbols-outlined text-base">gavel</span> <span>NO — DANGEROUS CONDITIONS</span>';
+                    expEl.innerText = 'Elevated wind speeds or wave swells pose risk for small craft operations.';
+                } else {
+                    badgeEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold font-mono uppercase bg-rose-500/20 text-rose-400 border border-rose-500/30';
+                    badgeEl.innerText = 'DANGEROUS';
+
+                    canFishEl.className = 'font-bold text-xs flex items-center gap-1.5 text-rose-400';
+                    canFishEl.innerHTML = '<span class="material-symbols-outlined text-base">dangerous</span> <span>NO — DANGEROUS CONDITIONS</span>';
+                    expEl.innerText = 'Severe winds or wave swells detected. Fishing and vessel navigation are strongly discouraged.';
+                }
+            } else {
+                scoreEl.innerText = '--';
+                badgeEl.className = 'px-2 py-0.5 rounded text-[11px] font-bold font-mono uppercase bg-slate-700 text-white';
+                badgeEl.innerText = 'DATA UNAVAILABLE';
+                canFishEl.className = 'font-bold text-xs flex items-center gap-1.5 text-mute';
+                canFishEl.innerHTML = '<span class="material-symbols-outlined text-base">info</span> <span>DATA UNAVAILABLE</span>';
+                expEl.innerText = 'Insufficient real environmental data returned to evaluate safety score.';
+            }
+
+        } catch (e) {
+            console.error('Error updating selected location safety panel:', e);
+        }
     }
 
     function updateSidePanel(zone) {
@@ -718,13 +1013,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (etaEl) etaEl.innerText = `${hours}h ${mins}m`;
         
         document.getElementById('indicator-sst').innerText = `${zone.sst}°C`;
-        document.getElementById('bar-sst').style.width = '70%'; // Placeholder bar fill
+        document.getElementById('bar-sst').style.width = '70%';
         
         document.getElementById('indicator-chla').innerText = `${zone.chlorophyll} mg/m³`;
         document.getElementById('bar-chla').style.width = '60%'; 
         
         document.getElementById('indicator-wind').innerText = `${zone.wind.speed_kmh} km/h @ ${zone.wind.direction_deg}°`;
         document.getElementById('bar-wind').style.width = Math.min(100, (zone.wind.speed_kmh / 60) * 100) + '%'; 
+
+        // Update Selected Location Safety Analysis Panel
+        updateSelectedLocationSafetyPanel(zone.coords[0], zone.coords[1]);
         
         const evidenceList = document.getElementById('top-rec-evidence');
         evidenceList.innerHTML = '';
@@ -821,54 +1119,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-    }
-    
-    window.selectZoneFromTable = function(index) {
-        if (pfzZones[index]) {
-            const zone = pfzZones[index];
-            updateSidePanel(zone);
-            map.panTo([zone.coords[0], zone.coords[1]]);
-        }
-    };
-
-    function renderZoneTable() {
-        const tbody = document.getElementById('zone-comparison-body');
-        tbody.innerHTML = '';
-        
-        pfzZones.forEach((zone, index) => {
-            let activityIcon = 'trending_up';
-            let activityClass = 'text-secondary';
-            let activityText = 'High';
-            
-            if (zone.suitability < 60) {
-                activityIcon = 'trending_down';
-                activityClass = 'text-mute';
-                activityText = 'Low';
-            } else if (zone.suitability < 80) {
-                activityIcon = 'trending_flat';
-                activityClass = 'text-warning';
-                activityText = 'Medium';
-            }
-            
-            const distNM = getHaversineDistance(18.94, 72.85, zone.coords[0], zone.coords[1]);
-            
-            tbody.innerHTML += `
-            <tr class="border-b border-hairline hover:bg-surface-container-lowest/50 transition-colors cursor-pointer" onclick="window.selectZoneFromTable(${index})">
-                <td class="p-md flex items-center gap-sm">
-                    <div class="w-2 h-2 rounded-full" style="background-color: ${zone.color}"></div>
-                    <span class="font-medium">${zone.name}</span>
-                </td>
-                <td class="p-md"><span class="bg-surface-container-high px-xs py-xxs rounded text-ink font-label-mono text-label-mono">${zone.suitability}%</span></td>
-                <td class="p-md text-body">${distNM.toFixed(1)} NM</td>
-                <td class="p-md text-body">${zone.sst}°C</td>
-                <td class="p-md">
-                    <span class="${activityClass} flex items-center gap-xs text-sm"><span class="material-symbols-outlined text-[16px]">${activityIcon}</span> ${activityText}</span>
-                </td>
-                <td class="p-md">
-                    <button class="text-secondary font-medium hover:underline text-sm transition-colors">Select</button>
-                </td>
-            </tr>`;
-        });
     }
 
     // Run on load
