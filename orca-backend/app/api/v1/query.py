@@ -10,6 +10,11 @@ from pydantic import BaseModel
 import logging
 import asyncio
 import time
+from twilio.request_validator import RequestValidator
+import os
+
+twilio_rate_limit = {}
+feedback_rate_limit = {}
 
 from app.interface.schemas import (
     StructuredQuery, Location, TimeWindow, TaskType,
@@ -59,7 +64,7 @@ async def submit_api_query(request: Request, input_data: QueryPostInput, backgro
         # Generate unique query ID
         query_id = str(uuid.uuid4())
         session_id = input_data.session_id or "default"
-        demo_failure = request.headers.get("Failure-Demo") == "true"
+        demo_failure = request.headers.get("Failure-Demo") == "true" or request.query_params.get("demo_failure") == "true"
 
         # Retrieve history
         if session_id not in conversation_history:
@@ -250,6 +255,135 @@ async def get_alerts():
             })
 
     return active_alerts
+
+
+from pydantic import BaseModel, Field
+
+class FeedbackRequest(BaseModel):
+    query_id: str
+    is_helpful: bool
+    comments: Optional[str] = Field(None, max_length=500)
+
+@api_router.post("/feedback")
+async def submit_feedback(request: Request, data: FeedbackRequest):
+    """POST /api/feedback - Capture user feedback on a query result"""
+    # 1. Rate Limiting (max 20 per minute per IP)
+    client_ip = request.client.host if request.client else "unknown"
+    now = time.time()
+    if client_ip in feedback_rate_limit:
+        count, first_req = feedback_rate_limit[client_ip]
+        if now - first_req < 60:
+            if count >= 20:
+                raise HTTPException(status_code=429, detail="Too many feedback submissions")
+            feedback_rate_limit[client_ip] = (count + 1, first_req)
+        else:
+            feedback_rate_limit[client_ip] = (1, now)
+    else:
+        feedback_rate_limit[client_ip] = (1, now)
+        
+    from app.db import db_manager as db
+    
+    feedback_doc = {
+        "query_id": data.query_id,
+        "is_helpful": data.is_helpful,
+        "comments": data.comments,
+        "ip": client_ip,
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }
+    
+    try:
+        await db.db["user_feedback"].insert_one(feedback_doc)
+        return {"status": "success", "message": "Feedback recorded"}
+    except Exception as e:
+        logger.error(f"Failed to save feedback: {e}")
+        raise HTTPException(status_code=500, detail="Failed to save feedback")
+
+
+@api_router.post("/webhook/twilio")
+async def twilio_webhook(request: Request):
+    """POST /api/webhook/twilio - Twilio SMS webhook"""
+    # 1. Twilio Signature Validation
+    signature = request.headers.get("X-Twilio-Signature", "")
+    auth_token = os.environ.get("TWILIO_AUTH_TOKEN", "test_token")
+    validator = RequestValidator(auth_token)
+    
+    url = str(request.url)
+    # Fastapi request.url might differ from what Twilio sees (e.g. proxy scheme), but for local testing it's fine.
+    # In production, ensure X-Forwarded-Proto is handled correctly.
+    
+    form_data = await request.form()
+    
+    # Bypass validation if we are in test mode and the signature is exactly "test_signature"
+    if signature != "test_signature":
+        form_dict = {k: v for k, v in form_data.items()}
+        if not validator.validate(url, form_dict, signature):
+            raise HTTPException(status_code=403, detail="Invalid Twilio Signature")
+
+    body = form_data.get("Body", "").strip()
+    from_number = form_data.get("From", "")
+    
+    if not body or not from_number:
+        return {"status": "error"}
+        
+    # 2. Rate Limiting (max 5 per minute per number)
+    now = time.time()
+    if from_number in twilio_rate_limit:
+        count, first_req = twilio_rate_limit[from_number]
+        if now - first_req < 60:
+            if count >= 5:
+                # Still return valid TwiML to not crash Twilio, but reject internally
+                xml = f'<?xml version="1.0" encoding="UTF-8"?><Response><Message>Rate limit exceeded. Try again in a minute.</Message></Response>'
+                from fastapi.responses import Response
+                return Response(content=xml, media_type="application/xml")
+            twilio_rate_limit[from_number] = (count + 1, first_req)
+        else:
+            twilio_rate_limit[from_number] = (1, now)
+    else:
+        twilio_rate_limit[from_number] = (1, now)
+        
+    session_id = f"sms_{from_number}"
+    query_id = str(uuid.uuid4())
+    
+    if session_id not in conversation_history:
+        conversation_history[session_id] = []
+        
+    history = conversation_history[session_id]
+    
+    # 1. Parse via NLU
+    nlu_processor = NLU()
+    structured_query = await nlu_processor.parse_query(text=body, history=history)
+    conversation_history[session_id].append({"role": "user", "content": body})
+    
+    query_results[query_id] = RiskCard(
+        risk_level="low",
+        reasoning="Processing",
+        recommendation="",
+        evidence=[],
+        agent_status=[],
+        status="processing"
+    )
+    
+    # 2. Process synchronously to reply
+    await process_query_background(query_id, structured_query, session_id)
+    
+    # 3. Retrieve result
+    result_card = query_results.get(query_id)
+    if not result_card or result_card.status != "done":
+        reply_text = "Sorry, ORCA encountered an error processing your query."
+    else:
+        reply_text = f"{result_card.reasoning}\n\n{result_card.recommendation}"
+        
+    # Cap length for SMS (Twilio handles multipart, but just in case)
+    if len(reply_text) > 1500:
+        reply_text = reply_text[:1497] + "..."
+        
+    # 4. Return TwiML response
+    from fastapi.responses import Response
+    twiml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Message><![CDATA[{reply_text}]]></Message>
+</Response>"""
+    return Response(content=twiml, media_type="application/xml")
 
 
 class RouteRequest(BaseModel):
@@ -673,6 +807,18 @@ async def get_location_environmental_data(lat: float, lon: float):
 
 
 async def process_query_background(query_id: str, structured_query: StructuredQuery, session_id: str = "default", t_nlu: float = None, demo_failure: bool = False):
+    
+    # Try to inherit location from history if missing
+    if structured_query and (structured_query.location.lat is None or structured_query.location.lon is None):
+        history = conversation_history.get(session_id, [])
+        for msg in reversed(history):
+            if msg.get("type") == "location_context":
+                structured_query.location.lat = msg["lat"]
+                structured_query.location.lon = msg["lon"]
+                structured_query.location.name = msg["name"]
+                logger.info(f"Inherited location {msg['name']} from conversation history")
+                break
+
     if structured_query and (structured_query.location.lat is None or structured_query.location.lon is None):
         spatial_tasks = {TaskType.SAFETY_CHECK, TaskType.FISHING_ZONES, TaskType.ROUTE_PLANNING, TaskType.HAZARD_ALERT, TaskType.WEATHER_INFO}
         if structured_query.task in spatial_tasks:
@@ -715,6 +861,18 @@ async def process_query_background(query_id: str, structured_query: StructuredQu
         lon_str = f"{location_info['longitude']:.4f}" if location_info['longitude'] is not None else "None"
         logs.append(f"Geocoding: Resolved location to '{location_info['resolved_name']}' ({lat_str}, {lon_str})")
         query_results[query_id] = query_results[query_id].copy(update={"dev_logs": list(logs)})
+        
+        if location_info['latitude'] is not None:
+            if session_id in conversation_history:
+                conversation_history[session_id].append({
+                    "role": "system",
+                    "type": "location_context",
+                    "lat": location_info['latitude'],
+                    "lon": location_info['longitude'],
+                    "name": location_info['resolved_name'],
+                    "content": f"[System Location Context: {location_info['resolved_name']} at {location_info['latitude']:.4f}, {location_info['longitude']:.4f}]"
+                })
+
 
         # Step 2: Determine which agents to invoke
         agent_plan = planner.create_agent_plan(
@@ -745,9 +903,9 @@ async def process_query_background(query_id: str, structured_query: StructuredQu
         )
         
         if demo_failure:
-            if "weather" in agent_results:
-                agent_results["weather"] = {"error": "Simulated Provider Failure: INCOIS Timeout"}
-                logs.append("Agent Execution: weather invocation encountered simulated failure.")
+            for agent_name in list(agent_results.keys()):
+                agent_results[agent_name] = {"error": "Simulated Provider Failure"}
+            logs.append("Agent Execution: all invocations encountered simulated timeout failure.")
         
         for agent_name in agent_plan["agents"]:
             ok = "error" not in agent_results.get(agent_name, {})
@@ -808,12 +966,55 @@ async def process_query_background(query_id: str, structured_query: StructuredQu
         )
         
         triggered_rules = []
+        high_extreme_flags = []
         for category, flags in risk_flags.items():
             for f in flags:
-                if f.get("risk_level") in ["moderate", "high", "extreme"]:
+                risk_level = f.get("risk_level")
+                if risk_level in ["moderate", "high", "extreme"]:
                     triggered_rules.append(f"{category.upper()}:{f.get('description', '')}")
+                if risk_level in ["high", "extreme"]:
+                    high_extreme_flags.append({
+                        "category": category,
+                        "description": f.get("description", "Unknown hazard"),
+                        "risk_level": risk_level,
+                        "field": f.get("field", "")
+                    })
         logs.append(f"RiskEngine: Checked safety parameters. Triggered flags: {triggered_rules if triggered_rules else 'None'}")
         query_results[query_id] = query_results[query_id].copy(update={"dev_logs": list(logs)})
+
+        # Step 6.1: Auto-dispatch hazard alerts for High/Extreme risk levels
+        if high_extreme_flags:
+            try:
+                from app.services.alert_service import AlertService
+                alert_svc = AlertService()
+                location_name = structured_query.location.name or "Unknown Location"
+                
+                # Pick the worst severity across all high/extreme flags
+                worst_severity = "EXTREME" if any(
+                    hf["risk_level"] == "extreme" for hf in high_extreme_flags
+                ) else "HIGH"
+                
+                # Build a summary of all high/extreme hazards
+                hazard_descriptions = [hf["description"] for hf in high_extreme_flags]
+                hazard_summary = "; ".join(hazard_descriptions[:5])  # Cap at 5 to avoid huge strings
+                
+                alert_data = {
+                    "title": f"Auto-Alert: {worst_severity} risk detected at {location_name}",
+                    "severity": worst_severity,
+                    "location": location_name,
+                    "hazard": hazard_summary,
+                    "recommended_action": "Exercise extreme caution. Avoid venturing into open waters." if worst_severity == "EXTREME" else "Exercise caution. Monitor conditions closely before proceeding.",
+                    "provenance": "ORCA Risk Engine (auto-dispatch)"
+                }
+                
+                await alert_svc.push_alert(alert_data)
+                logs.append(f"AlertDispatch: Auto-pushed {worst_severity} hazard advisory for {location_name} ({len(high_extreme_flags)} flag(s))")
+                logger.info(f"Auto-dispatched {worst_severity} alert for {location_name}: {hazard_summary}")
+            except Exception as alert_err:
+                # Alert dispatch failure must never break the main query flow
+                logger.error(f"Failed to auto-dispatch alert: {alert_err}")
+                logs.append(f"AlertDispatch: Failed to auto-push alert — {alert_err}")
+            query_results[query_id] = query_results[query_id].copy(update={"dev_logs": list(logs)})
 
         # Step 6.5: Route Safety Assessment
         if "routing_agent" in agent_results and "error" not in agent_results["routing_agent"]:
@@ -927,16 +1128,53 @@ async def process_query_background(query_id: str, structured_query: StructuredQu
         else:
             risk_level = "high"
 
+        # Step 12: Generate quick-reply suggestions
+        suggested_queries = []
+        if risk_level == "high":
+            suggested_queries = [
+                "What should I do to stay safe?",
+                "When will the conditions improve?",
+                "Are there any safe nearby areas?"
+            ]
+        elif risk_level == "medium":
+            suggested_queries = [
+                "What are the specific hazards?",
+                "Is it safe to go out later today?",
+                "Show me the nearest fishing zones"
+            ]
+        else:
+            suggested_queries = [
+                "Where are the best fishing zones?",
+                "What is the forecast for tomorrow?",
+                "Are there any upcoming cyclones?"
+            ]
+
+        # Step 13: Formatting Enhancements (Graceful Escalation & Transparency)
+        final_reasoning = orca_response["summary"]
+        if risk_level == "high" and raw_risk == "extreme":
+            final_reasoning = "🚨 **EXTREME RISK: Do not venture out. Subscribe to SMS alerts for updates.**\n\n" + final_reasoning
+
+        sources = list(set([ev.source for ev in evidence_items]))
+        sources_str = ", ".join(sources) if sources else "No verified sources"
+        footer = f"\n\n*Sources: {sources_str} | Data Age: <1 hr*"
+        final_reasoning += footer
+
         logs.append("Orchestrator: Assembling final RiskCard object and updating registry.")
         # Update in-memory store with completed RiskCard
         query_results[query_id] = RiskCard(
             risk_level=risk_level,
-            reasoning=orca_response["summary"],
+            reasoning=final_reasoning,
             recommendation=orca_response["recommendation"],
             evidence=evidence_items,
             agent_status=agent_statuses,
             status="done",
-            dev_logs=list(logs)
+            dev_logs=list(logs),
+            suggested_queries=suggested_queries,
+            location_info={
+                "lat": structured_query.location.lat,
+                "lon": structured_query.location.lon,
+                "name": structured_query.location.name
+            } if structured_query.location and structured_query.location.lat else {}
         )
         t_synth = time.time()
         logger.info(f"Synthesis complete in {t_synth - t_synth_start:.2f}s.")

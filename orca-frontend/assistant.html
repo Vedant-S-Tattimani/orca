@@ -507,8 +507,6 @@
         }
     </style>
 <script>
-
-<script>
     window.downloadPDF = function(queryId) {
         const msgDiv = document.getElementById('msg-' + queryId);
         if (!msgDiv) return;
@@ -709,6 +707,24 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
 
+        let feedbackHTML = `
+            <div class="mt-xs pt-xs border-t border-hairline flex gap-sm pdf-hide items-center">
+                <span class="text-xs text-mute">Was this helpful?</span>
+                <button onclick="submitFeedback('${queryId}', true)" class="p-1 rounded hover:bg-surface-container-high text-mute hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[16px]">thumb_up</span></button>
+                <button onclick="submitFeedback('${queryId}', false)" class="p-1 rounded hover:bg-surface-container-high text-mute hover:text-error transition-colors"><span class="material-symbols-outlined text-[16px]">thumb_down</span></button>
+                <span id="feedback-msg-${queryId}" class="text-xs text-secondary hidden">Thanks for your feedback!</span>
+            </div>
+        `;
+
+        let suggestionsHTML = '';
+        if (riskCard.suggested_queries && riskCard.suggested_queries.length > 0) {
+            suggestionsHTML = `
+                <div class="mt-sm flex gap-sm flex-wrap pdf-hide">
+                    ${riskCard.suggested_queries.map(q => `<button onclick="document.getElementById('chat-input').value='${q}'; document.getElementById('send-btn').click();" class="text-xs font-label-mono bg-canvas-elevated border border-hairline px-2 py-1 rounded hover:border-secondary hover:text-secondary transition-colors">${q}</button>`).join('')}
+                </div>
+            `;
+        }
+
         msgDiv.innerHTML = `
             <div class="w-8 h-8 bg-ink rounded flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-on-primary text-[18px]">smart_toy</span>
@@ -721,12 +737,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${mapHTML}
                     ${chartHTML}
                     ${actionsHTML}
+                    ${feedbackHTML}
+                    ${suggestionsHTML}
                 </div>
             </div>
         `;
         chatHistory.scrollTop = chatHistory.scrollHeight;
 
         // --- Global TTS UI Controller ---
+        window.submitFeedback = async function(qId, isHelpful) {
+            try {
+                await fetch('/api/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query_id: qId, is_helpful: isHelpful })
+                });
+                const msgEl = document.getElementById('feedback-msg-' + qId);
+                if (msgEl) {
+                    msgEl.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Feedback error", err);
+            }
+        };
+
         window.toggleTTS = function(msgId, textElementId) {
             if (!window.OrcaTTS) return;
             const textEl = document.getElementById(textElementId) || document.querySelector(`#msg-${msgId} p`) || document.querySelector(`#${msgId} p`);
@@ -807,22 +841,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const mapEl = document.getElementById('map-' + queryId);
                     if (!mapEl) return;
-                    const cMap = L.map('map-' + queryId, { zoomControl: false, attributionControl: false }).setView([15.0, 75.0], 4);
+                    
+                    let mapLat = 15.0;
+                    let mapLon = 75.0;
+                    if (riskCard.location_info && riskCard.location_info.lat) {
+                        mapLat = riskCard.location_info.lat;
+                        mapLon = riskCard.location_info.lon;
+                    }
+                    
+                    const cMap = L.map('map-' + queryId, { zoomControl: false, attributionControl: false }).setView([mapLat, mapLon], 6);
                     const isDark = document.documentElement.classList.contains('dark');
                     const tileUrl = isDark 
                         ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
                         : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
                     L.tileLayer(tileUrl).addTo(cMap);
                     
+                    if (riskCard.location_info && riskCard.location_info.lat) {
+                         const locName = riskCard.location_info.name || "Target Location";
+                         // Add a marker for the queried location
+                         L.marker([mapLat, mapLon]).addTo(cMap).bindTooltip(locName, {permanent: false, direction: 'top'});
+                    }
+                    
                     const pfzEvidence = riskCard.evidence.find(e => (e.source || '').toLowerCase().includes('pfz'));
                     const routeEvidence = riskCard.evidence.find(e => (e.source || '').toLowerCase().includes('routing'));
 
                     if (pfzEvidence) {
-                        L.circle([12.5, 73.2], { radius: 80000, color: '#00dfd8', fillOpacity: 0.3 }).addTo(cMap).bindTooltip("Fishing Zone Match");
-                        L.circle([14.1, 74.5], { radius: 60000, color: '#00dfd8', fillOpacity: 0.2 }).addTo(cMap);
+                        L.circle([mapLat - 0.2, mapLon - 0.2], { radius: 80000, color: '#00dfd8', fillOpacity: 0.3 }).addTo(cMap).bindTooltip("Fishing Zone Match");
+                        L.circle([mapLat - 0.5, mapLon - 0.4], { radius: 60000, color: '#00dfd8', fillOpacity: 0.2 }).addTo(cMap);
                     }
                     if (routeEvidence) {
-                        const latlngs = [[8.9, 76.6], [10.0, 75.0], [13.0, 73.0]];
+                        const latlngs = [[mapLat - 2, mapLon - 2], [mapLat - 1, mapLon - 1], [mapLat, mapLon]];
                         L.polyline(latlngs, {color: '#007cf0', weight: 3, dashArray: '5, 10'}).addTo(cMap);
                     }
                 } catch (err) { console.error("Map render err:", err); }

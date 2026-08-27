@@ -235,13 +235,15 @@ class Planner:
         agent_names = []
         import asyncio
         for agent_name, agent_instance in agents.items():
-            task = asyncio.create_task(agent_instance.process(
+            process_coro = agent_instance.process(
                 latitude=latitude,
                 longitude=longitude,
                 start_time=start_time,
                 end_time=end_time,
                 radius_km=radius_km
-            ))
+            )
+            # Wrap with a 10 second timeout
+            task = asyncio.create_task(asyncio.wait_for(process_coro, timeout=10.0))
             agent_tasks.append(task)
             agent_names.append(agent_name)
 

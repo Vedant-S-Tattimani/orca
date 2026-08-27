@@ -62,7 +62,7 @@ class NLU:
         
         # If local parsing found a specific task and location, or if coordinates were provided
         has_specific_task = local_parsed.task != TaskType.GENERAL_INQUIRY
-        has_specific_loc = (lat is not None and lon is not None) or local_parsed.location.name != "Kollam Coast"
+        has_specific_loc = (lat is not None and lon is not None) or local_parsed.location.name != "Unknown"
         
         if has_specific_task and has_specific_loc:
             logger.info("Local NLU parsing successful, bypassing LLM for latency.")
@@ -71,7 +71,7 @@ class NLU:
 
         # Fallback to LLM if local parsing is too vague
         try:
-            structured_data = await self._parse_with_llm(text, lat, lon)
+            structured_data = await self._parse_with_llm(text, lat, lon, history)
             if structured_data:
                 return structured_data
         except Exception as e:
@@ -79,7 +79,7 @@ class NLU:
 
         return local_parsed
 
-    async def _parse_with_llm(self, text: str, lat: Optional[float] = None, lon: Optional[float] = None) -> Optional[StructuredQuery]:
+    async def _parse_with_llm(self, text: str, lat: Optional[float] = None, lon: Optional[float] = None, history: Optional[List[Dict[str, str]]] = None) -> Optional[StructuredQuery]:
         """
         Use LLM to perform named entity recognition, intent classification, and time parsing.
         """
@@ -117,6 +117,8 @@ Current Time: {datetime.utcnow().isoformat()}Z
    - "general_inquiry": default fallback.
 2. For location coordinates: If latitude/longitude are not provided in user metadata, try to geocode the location if it is a major Indian port/coast. (e.g. Mumbai [18.9438, 72.8588], Karwar [14.8016, 74.13], Chennai [13.0906, 80.2989], Kollam [8.8879, 76.5684], Kochi [9.9637, 76.2711], Vizhinjam [8.3812, 76.9905]).
 3. Identify language: Detect if the input is written in Hindi (hi), Kannada (kn), Marathi (mr), Tamil (ta), Telugu (te), Malayalam (ml), English (en), etc.
+
+Conversation History Context: {json.dumps(history) if history else 'None'}
 
 Query: "{text}"
 User Latitude Metadata: {lat if lat is not None else 'null'}

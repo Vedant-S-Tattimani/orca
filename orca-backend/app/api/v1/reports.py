@@ -159,4 +159,4 @@ def generate_pdf_report(location, advisories, readings):
     headers = {
         "Content-Disposition": f"attachment; filename={filename}"
     }
-    return StreamingResponse(buffer, media_type="application/pdf", headers=headers)
+    return StreamingResponse(iter([buffer.getvalue()]), media_type="application/pdf", headers=headers)

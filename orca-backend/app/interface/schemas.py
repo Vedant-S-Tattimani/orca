@@ -107,3 +107,5 @@ class RiskCard(BaseModel):
     agent_status: List[AgentStatus] = Field(default_factory=list, description="Responding agent states")
     status: str = Field("done", description="Parsing status: 'processing', 'done', or 'failed'")
     dev_logs: List[str] = Field(default_factory=list, description="Internal agent execution and developer logs")
+    suggested_queries: List[str] = Field(default_factory=list, description="Follow-up quick reply suggestions")
+    location_info: dict = Field(default_factory=dict, description="Location coordinates and metadata")

@@ -6,6 +6,7 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 import logging
 import json
+import re
 
 from .evidence_tracker import EvidenceTracker, Claim
 from .llm_client import LLMClient
@@ -481,6 +482,9 @@ class SynthesisAgent:
         Generate a natural language response using the LLM
         This is where the LLM's narrowly scoped job happens: turn computed risks + evidence into readable language
         """
+        if len(self.evidence_tracker.get_all_evidence()) == 0:
+            return self._generate_fallback_response(claims, risk_flags, query_language)
+            
         # Prepare context for the LLM
         context = {
             "original_query": original_query,
@@ -488,16 +492,68 @@ class SynthesisAgent:
             "risk_summary": self._summarize_risks(risk_flags),
             "agent_status": self._summarize_agent_status(merged_agent_data),
             "evidence_count": len(self.evidence_tracker.get_all_evidence()),
-            "query_language": query_language
+            "query_language": "en" # Force initial generation in English
         }
 
         # Create prompt for the LLM
-        prompt = self._create_synthesis_prompt(context, query_language, history)
+        prompt = self._create_synthesis_prompt(context, "en", history)
 
         # Get response from LLM
         try:
             response = await self.llm_client.generate_response(prompt)
-            self.logger.debug(f"LLM response generated: {response[:100]}...")
+            self.logger.debug(f"LLM english response generated: {response[:100]}...")
+            
+            # Step 2: Translate if necessary, ensuring numeric values are preserved
+            if query_language and query_language != "en":
+                # Extract numbers with optional decimals and units (e.g. 10.5 km/h, 5 m, 20°C)
+                # Regex looks for numbers followed optionally by spaces and word characters/symbols commonly used for units
+                pattern = r'(\d+(?:\.\d+)?\s*(?:km/h|mm/h|m/s|m|°C|knots|%))'
+                matches = re.findall(pattern, response)
+                
+                template = response
+                for i, match in enumerate(matches):
+                    template = template.replace(match, f"{{{{VAL_{i}}}}}")
+                
+                # Risk keywords handling
+                risk_keywords = ["EXTREME RISK", "HIGH RISK", "MODERATE RISK", "LOW RISK", "EXTREME", "HIGH", "MODERATE", "LOW"]
+                keyword_matches = []
+                for kw in risk_keywords:
+                    if kw in template:
+                        keyword_matches.append(kw)
+                        template = template.replace(kw, f"{{{{RISK_{len(keyword_matches)-1}}}}}")
+                        
+                lang_names = {
+                    "hi": "Hindi (हिंदी)", "kn": "Kannada (ಕನ್ನಡ)", "ml": "Malayalam (മലയാളം)",
+                    "ta": "Tamil (தமிழ்)", "te": "Telugu (తెలుగు)", "mr": "Marathi (मराठी)"
+                }
+                lang_name = lang_names.get(query_language, "the same language as the user's query")
+                
+                translation_prompt = f"""
+Translate the following English template into {lang_name}.
+CRITICAL: Keep the placeholders {{{{VAL_X}}}} and {{{{RISK_X}}}} EXACTLY as they are in the translated text. Do not modify or translate them.
+
+Template:
+{template}
+"""
+                translated_template = await self.llm_client.generate_response(translation_prompt)
+                
+                # Restore the extracted values
+                final_response = translated_template
+                for i, match in enumerate(matches):
+                    final_response = final_response.replace(f"{{{{VAL_{i}}}}}", match)
+                
+                # For risk keywords, we can do a simple lookup, or if missing, just use English
+                risk_translations = {
+                    "hi": {"EXTREME RISK": "अत्यधिक जोखिम", "HIGH RISK": "उच्च जोखिम", "MODERATE RISK": "मध्यम जोखिम", "LOW RISK": "कम जोखिम", "EXTREME": "अत्यधिक", "HIGH": "उच्च", "MODERATE": "मध्यम", "LOW": "कम"},
+                    "ta": {"EXTREME RISK": "மிக அதிக ஆபத்து", "HIGH RISK": "அதிக ஆபத்து", "MODERATE RISK": "மிதமான ஆபத்து", "LOW RISK": "குறைந்த ஆபத்து", "EXTREME": "மிக அதிக", "HIGH": "அதிக", "MODERATE": "மிதமான", "LOW": "குறைந்த"}
+                }
+                lang_dict = risk_translations.get(query_language, {})
+                
+                for i, kw in enumerate(keyword_matches):
+                    final_response = final_response.replace(f"{{{{RISK_{i}}}}}", lang_dict.get(kw, kw))
+                    
+                response = final_response
+                
             return response
         except Exception as e:
             self.logger.error(f"Error generating LLM response: {e}")
@@ -511,7 +567,7 @@ class SynthesisAgent:
         if history and len(history) > 1:
             history_str = "\nCONVERSATION HISTORY:\n"
             for msg in history[-5:-1]: # Last few turns, excluding the current query
-                history_str += f"{msg['role'].upper()}: {msg['content']}\n"
+                history_str += f"{msg['role'].upper()}: {msg.get('content', '')}\n"
         
         prompt = f"""
 You are ORCA's synthesis agent. Your job is to turn already-computed risk assessments and evidence into a clear, natural language response.
@@ -541,7 +597,7 @@ Based ONLY on the information above, produce a clear, helpful response that:
 2. Explains the reasoning in simple terms
 3. Mentions key evidence sources without getting too technical
 4. Provides a clear recommendation if appropriate
-5. Notes any data limitations or uncertainties
+5. Notes any data limitations or uncertainties. If any agents failed or data is unavailable (as indicated in AGENT STATUS or CLAIMS), you MUST explicitly mention that partial results are returned and note what is missing.
 
 Response MUST be extremely concise (under 100 words) and suitable for general public consumption.
 """
@@ -662,6 +718,17 @@ Response MUST be extremely concise (under 100 words) and suitable for general pu
         }
 
         lang_trans = translations.get(query_language, translations["en"])
+
+        if len(self.evidence_tracker.get_all_evidence()) == 0:
+            return {
+                "hi": "हम अभी कोई डेटा प्राप्त नहीं कर सके — कृपया थोड़ी देर बाद पुनः प्रयास करें।",
+                "kn": "ನಾವು ಈಗ ಯಾವುದೇ ಡೇಟಾವನ್ನು ಹಿಂಪಡೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಪುನಃ ಪ್ರಯತ್ನಿಸಿ.",
+                "ml": "ഞങ്ങൾക്ക് ഇപ്പോൾ ഡാറ്റയൊന്നും ലഭിച്ചില്ല — ദയവായി കുറച്ച് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.",
+                "ta": "தற்போது எந்தத் தரவையும் எங்களால் பெற முடியவில்லை — தயவுசெய்து சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.",
+                "te": "మేము ప్రస్తుతం ఏ డేటాను పొందలేకపోయాము — దయచేసి కాసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.",
+                "mr": "आम्हाला आत्ता कोणताही डेटा मिळू शकला नाही — कृपया थोड्या वेळानंतर पुन्हा प्रयत्न करा.",
+                "en": "We couldn't retrieve any data right now — please try again shortly."
+            }.get(query_language, "We couldn't retrieve any data right now — please try again shortly.")
 
         # Simple template-based response
         high_risk_claims = [c for c in claims if c.risk_level in ["high", "extreme"]]

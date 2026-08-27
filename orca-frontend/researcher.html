@@ -346,18 +346,21 @@
         }
 
         async function exportReport(format = 'csv') {
-            const location = document.getElementById('locationSelect').value;
-            const days = document.getElementById('timeRange').value;
+            const location = document.getElementById('location-select').value;
+            const days = document.getElementById('days-select').value;
             
             try {
                 // Determine token
-                const token = localStorage.getItem('orcaToken');
+                const token = localStorage.getItem('accessToken');
                 const headers = {};
                 if (token) {
                     headers['Authorization'] = `Bearer ${token}`;
                 }
                 
-                const response = await fetch(`${API_BASE_URL}/reports/export?location=${encodeURIComponent(location)}&days=${days}&format=${format}`, {
+                // Assuming API_BASE is defined in api.js or fallback to localhost
+                const apiBase = (typeof API_BASE !== 'undefined') ? API_BASE : 'http://localhost:8000';
+                
+                const response = await fetch(`${apiBase}/api/v1/reports/export?location=${encodeURIComponent(location)}&days=${days}&format=${format}`, {
                     method: 'GET',
                     headers: headers
                 });
