@@ -1,0 +1,61 @@
+/* Reset & Fullscreen Layout */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #010204;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Globe Map Container */
+#map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at center, #060b14 0%, #010204 100%);
+  cursor: grab;
+}
+
+#map:active {
+  cursor: grabbing;
+}
+
+/* Subtle MapTiler Dark Theme Attribution Styling */
+.maplibregl-ctrl-bottom-right,
+.maplibregl-ctrl-bottom-left,
+.maptiler-ctrl-bottom-right,
+.maptiler-ctrl-bottom-left {
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.maplibregl-ctrl-bottom-right:hover,
+.maplibregl-ctrl-bottom-left:hover,
+.maptiler-ctrl-bottom-right:hover,
+.maptiler-ctrl-bottom-left:hover {
+  opacity: 1;
+}
+
+.maplibregl-ctrl-attrib-inner a,
+.maptiler-ctrl-attrib a {
+  color: #8899ac !important;
+  text-decoration: none;
+}
+
+.maplibregl-ctrl-attrib,
+.maptiler-ctrl-attrib {
+  background-color: rgba(2, 4, 8, 0.6) !important;
+  color: #667788 !important;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+}

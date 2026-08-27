@@ -39,7 +39,23 @@ const TRANSLATIONS = {
         nav_safety: 'Safety & Alerts',
         nav_fishing: 'Fishing',
         nav_settings: 'Settings',
+        nav_login: 'Login',
         brand_sub: 'Intelligence',
+        
+        // Login Page
+        login_welcome_title: 'Welcome to ORCA',
+        login_welcome_desc: 'Access real-time marine intelligence, ocean oceanographic telemetry, and AI vessel navigation.',
+        login_email_label: 'Email Address',
+        login_email_placeholder: 'captain@vessel.org',
+        login_password_label: 'Password',
+        login_password_placeholder: '••••••••••••',
+        login_remember: 'Remember this vessel',
+        login_forgot_password: 'Forgot password?',
+        login_submit_btn: 'Sign In to Platform',
+        login_or: 'or',
+        login_guest_btn: 'Continue as Guest',
+        login_no_account: "Don't have an account?",
+        login_request_access: 'Request Access',
         
         // Common
         export_report: 'Export Report',
