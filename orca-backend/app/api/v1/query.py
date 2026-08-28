@@ -819,6 +819,67 @@ async def process_query_background(query_id: str, structured_query: StructuredQu
                 logger.info(f"Inherited location {msg['name']} from conversation history")
                 break
 
+    # Handle GENERAL_INQUIRY without a location as a conversational response
+    # instead of running the full marine agent pipeline
+    if structured_query and structured_query.task == TaskType.GENERAL_INQUIRY and \
+       (structured_query.location.lat is None or structured_query.location.lon is None):
+        logger.info(f"Handling GENERAL_INQUIRY as conversational response for query: '{structured_query.original_query}'")
+        
+        conversational_reply = None
+        try:
+            from app.synthesis.llm_client import LLMClient
+            llm = LLMClient()
+            if await llm.is_available():
+                history = conversation_history.get(session_id, [])
+                history_str = ""
+                if history:
+                    history_str = "\nConversation history:\n"
+                    for msg in history[-5:]:
+                        history_str += f"{msg.get('role', 'user').upper()}: {msg.get('content', '')}\n"
+                
+                prompt = f"""You are ORCA, an AI-powered marine intelligence assistant that helps fishermen, coastal authorities, and maritime stakeholders with safety advisories, weather, fishing zones, route planning, and hazard alerts across the Indian Ocean region.
+
+The user has sent a casual/conversational message. Respond naturally and helpfully. Be warm and friendly. Keep your response under 60 words. If appropriate, suggest what you can help with (e.g., weather checks, fishing zone data, route safety, hazard alerts).
+{history_str}
+User message: "{structured_query.original_query}"
+
+Respond naturally:"""
+                conversational_reply = await llm.generate_response(prompt)
+        except Exception as e:
+            logger.warning(f"LLM conversational reply failed: {e}")
+        
+        if not conversational_reply:
+            conversational_reply = (
+                "Hi! I'm ORCA, your marine intelligence assistant. "
+                "I can help you with weather forecasts, fishing zone recommendations, "
+                "route safety checks, and hazard alerts across the Indian Ocean. "
+                "Try asking something like 'Is it safe to fish near Kochi tomorrow?' "
+                "or 'Show me fishing zones near Mumbai'."
+            )
+        
+        query_results[query_id] = RiskCard(
+            risk_level="low",
+            reasoning=conversational_reply,
+            recommendation="",
+            evidence=[],
+            agent_status=[],
+            status="done",
+            dev_logs=["NLU: Classified as conversational/general inquiry — no agent pipeline needed."],
+            suggested_queries=[
+                "Is it safe to fish near Kochi?",
+                "What is the weather like in Mumbai?",
+                "Show me fishing zones near Chennai"
+            ]
+        )
+        
+        # Save assistant response to history
+        if session_id in conversation_history:
+            conversation_history[session_id].append({
+                "role": "assistant",
+                "content": conversational_reply
+            })
+        return
+
     if structured_query and (structured_query.location.lat is None or structured_query.location.lon is None):
         spatial_tasks = {TaskType.SAFETY_CHECK, TaskType.FISHING_ZONES, TaskType.ROUTE_PLANNING, TaskType.HAZARD_ALERT, TaskType.WEATHER_INFO}
         if structured_query.task in spatial_tasks:

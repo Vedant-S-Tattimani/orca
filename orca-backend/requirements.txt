@@ -15,11 +15,11 @@ motor>=3.7.1
 
 # Geospatial indexing
 h3>=4.5.0
-shapely==2.0.4
+# shapely==2.0.4
 
 # RAG and vector store
 sentence-transformers==2.2.2
-faiss-cpu==1.8.0
+faiss-cpu>=1.12.0
 numpy==1.26.2
 
 # HTTP clients for external APIs
