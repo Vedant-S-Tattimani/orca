@@ -24,8 +24,13 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>Login - ORCA Marine Intelligence</title>
   
-  <!-- MapTiler SDK CSS -->
+  <!-- MapTiler SDK CSS & MapLibre GL CSS -->
   <link href="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.css" rel="stylesheet" />
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+
+  <!-- MapTiler SDK JS & MapLibre GL JS -->
+  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.umd.min.js"></script>
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -35,9 +40,6 @@
   <script src="i18n.js"></script>
   <script src="tts.js"></script>
   <script src="stt.js"></script>
-
-  <!-- MapTiler SDK JS -->
-  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.umd.min.js"></script>
 
   <script id="tailwind-config">
     tailwind.config = {
@@ -696,9 +698,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* ============================================================================
  * 3D EARTH GLOBE INITIALIZATION & AUTO-ROTATION LOGIC
- * Reused & adapted from 3d globe module (MapTiler SDK JS)
+ * Supports MapTiler SDK & MapLibre GL 3D Globe with Deep Location Zooming
  * ============================================================================ */
-const MAPTILER_API_KEY = 'uPaD3QT5o1HpHQYgYGRX';
+let MAPTILER_API_KEY = '0YSu8AQQixtJloXET7Ro';
 
 let globeMap = null;
 let isUserInteracting = false;
@@ -707,55 +709,109 @@ let inactivityTimer = null;
 let lastAnimationTimestamp = 0;
 let resumeTimestamp = 0;
 
-const INACTIVITY_DELAY_MS = 4000;   // 4s inactivity before rotation resumes
-const SECONDS_PER_REVOLUTION = 200; // 200s per full 360 rotation
+const INACTIVITY_DELAY_MS = 4000;
+const SECONDS_PER_REVOLUTION = 200;
 const MAX_ZOOM_FOR_ROTATION = 5.0;
 const RAMP_IN_DURATION_MS = 1200;
 
+// High-resolution Satellite + Vector Labels style (Zoomable up to zoom 20, 100% free)
+const fallbackStyle = {
+  version: 8,
+  sources: {
+    'esri-satellite': {
+      type: 'raster',
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+      tileSize: 256,
+      maxzoom: 20
+    },
+    'carto-labels': {
+      type: 'raster',
+      tiles: ['https://basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png'],
+      tileSize: 256,
+      maxzoom: 20
+    }
+  },
+  layers: [
+    { id: 'esri-satellite-layer', type: 'raster', source: 'esri-satellite', minzoom: 0, maxzoom: 20 },
+    { id: 'carto-labels-layer', type: 'raster', source: 'carto-labels', minzoom: 0, maxzoom: 20 }
+  ]
+};
+
 function initGlobe() {
-  if (typeof maptilersdk === 'undefined') {
-    console.error('MapTiler SDK not loaded.');
+  const container = document.getElementById('map');
+  if (!container) return;
+
+  let useMapTiler = typeof maptilersdk !== 'undefined' && MAPTILER_API_KEY && MAPTILER_API_KEY.trim() !== '';
+
+  if (useMapTiler) {
+    try {
+      maptilersdk.config.apiKey = MAPTILER_API_KEY;
+      globeMap = new maptilersdk.Map({
+        container: 'map',
+        style: maptilersdk.MapStyle.HYBRID,
+        projection: 'globe',
+        center: [55, 15], // Positioned slightly to the right side
+        zoom: 1.8,
+        minZoom: 1,
+        maxZoom: 20,
+        pitch: 0,
+        bearing: 0,
+        terrain: true,
+        navigationControl: false,
+        geolocateControl: false,
+        scaleControl: false
+      });
+
+      let hasErrored = false;
+      globeMap.on('error', (e) => {
+        if (!hasErrored && e && e.error && (e.error.status === 403 || e.error.status === 401)) {
+          hasErrored = true;
+          console.warn('MapTiler key unauthorized (403). Falling back to free MapLibre 3D Globe...');
+          try { globeMap.remove(); } catch(err){}
+          initMapLibreGlobe();
+        }
+      });
+
+      globeMap.on('style.load', () => {
+        try {
+          if (typeof globeMap.setSpace === 'function') {
+            globeMap.setSpace({ color: '#010204', preset: 'milkyway' });
+          }
+        } catch (err) {}
+      });
+
+      globeMap.on('load', () => {
+        setupGlobeInteractionListeners();
+        requestAnimationFrame(animateGlobe);
+      });
+      return;
+    } catch (e) {
+      console.warn('MapTiler init failed, falling back to MapLibre:', e);
+    }
+  }
+
+  initMapLibreGlobe();
+}
+
+function initMapLibreGlobe() {
+  if (typeof maplibregl === 'undefined') {
+    console.error('MapLibre GL JS not loaded.');
     showGlobeErrorMessage();
     return;
   }
 
-  maptilersdk.config.apiKey = MAPTILER_API_KEY;
-
   try {
-    globeMap = new maptilersdk.Map({
+    globeMap = new maplibregl.Map({
       container: 'map',
-      style: maptilersdk.MapStyle.HYBRID,
+      style: fallbackStyle,
       projection: 'globe',
-      center: [15, 20],
-      zoom: 2.2,
+      center: [55, 15], // Positioned slightly to the right side
+      zoom: 1.8,
       minZoom: 1,
       maxZoom: 20,
       pitch: 0,
       bearing: 0,
-      terrain: true,
-      navigationControl: false,
-      geolocateControl: false,
-      scaleControl: false
-    });
-
-    globeMap.on('error', (e) => {
-      console.warn('MapTiler API Notice:', e);
-      if (e && e.error && e.error.status === 403) {
-        showGlobeErrorMessage();
-      }
-    });
-
-    globeMap.on('style.load', () => {
-      try {
-        if (typeof globeMap.setSpace === 'function') {
-          globeMap.setSpace({
-            color: '#010204',
-            preset: 'milkyway'
-          });
-        }
-      } catch (err) {
-        console.warn('Space background setup fallback:', err);
-      }
+      attributionControl: false
     });
 
     globeMap.on('load', () => {
@@ -766,12 +822,7 @@ function initGlobe() {
     window.addEventListener('resize', () => {
       if (globeMap) globeMap.resize();
     });
-
-    document.addEventListener('visibilitychange', () => {
-      lastAnimationTimestamp = 0;
-    });
-
-  } catch (error) {
+  } catch (err) {
     console.error('Failed to initialize 3D Globe:', error);
     showGlobeErrorMessage();
   }
@@ -786,7 +837,6 @@ function animateGlobe(timestamp) {
 
   if (globeMap && !isUserInteracting && !isPointerDown) {
     const currentZoom = globeMap.getZoom();
-
     if (currentZoom <= MAX_ZOOM_FOR_ROTATION) {
       let rampFactor = 1.0;
       if (resumeTimestamp > 0) {
@@ -815,7 +865,6 @@ function setupGlobeInteractionListeners() {
   function stopAutoRotation() {
     isUserInteracting = true;
     resumeTimestamp = 0;
-
     if (inactivityTimer) {
       clearTimeout(inactivityTimer);
       inactivityTimer = null;
@@ -824,7 +873,6 @@ function setupGlobeInteractionListeners() {
 
   function scheduleAutoRotationResume() {
     if (inactivityTimer) clearTimeout(inactivityTimer);
-
     inactivityTimer = setTimeout(() => {
       if (!isPointerDown) {
         isUserInteracting = false;
@@ -839,11 +887,6 @@ function setupGlobeInteractionListeners() {
   }, { passive: true });
 
   window.addEventListener('pointerup', () => {
-    isPointerDown = false;
-    scheduleAutoRotationResume();
-  }, { passive: true });
-
-  window.addEventListener('pointercancel', () => {
     isPointerDown = false;
     scheduleAutoRotationResume();
   }, { passive: true });
@@ -874,7 +917,7 @@ function showGlobeErrorMessage() {
         <span class="material-symbols-outlined text-red-400 text-4xl mb-2">public_off</span>
         <h3 style="margin-bottom:8px; color:#f87171; font-weight:bold;">3D Globe Offline</h3>
         <p style="max-width:350px; color:#94a3b8; font-size:12px; line-height:1.4;">
-          Unable to render MapTiler Earth projection. Please verify network access to MapTiler cloud servers.
+          Unable to render 3D Earth projection. Please verify network connection.
         </p>
       </div>
     `;
