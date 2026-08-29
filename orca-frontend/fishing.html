@@ -398,10 +398,32 @@
 <div class="flex gap-sm">
 <button onclick="window.clearCustomPoints()" class="px-md py-sm rounded-lg border border-hairline bg-surface-container-lowest text-ink font-button-app text-button-app hover:bg-surface-container-low transition-colors flex items-center gap-xs">
 <span class="material-symbols-outlined text-sm">clear_all</span> <span data-i18n="fish_clear_points">Clear Custom Points</span>
-                    </button>
-<button onclick="window.loadFishingData()" class="px-md py-sm rounded-lg bg-ink text-on-primary font-button-app text-button-app hover:bg-primary-container transition-colors flex items-center gap-xs">
-<span class="material-symbols-outlined text-sm">refresh</span> <span data-i18n="fish_update_scan">Update Scan</span>
-                    </button>
+</button>
+</div>
+</div>
+
+<!-- Dynamic Simple Summary Section -->
+<div id="simple-summary-card" class="bg-surface-container-lowest border border-hairline rounded-[16px] p-lg relative overflow-hidden shadow-sm transition-all duration-200">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gradient-cyan via-secondary to-gradient-blue"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md mb-sm pb-sm border-b border-hairline/80">
+<div class="flex items-center gap-sm">
+<div class="w-9 h-9 rounded-xl bg-secondary/10 text-secondary dark:bg-cyan-500/10 dark:text-cyan-400 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-xl">auto_awesome</span>
+</div>
+<div>
+<h3 class="font-headline-md text-lg font-bold text-ink dark:text-white leading-tight">Simple Summary</h3>
+<p id="summary-location-subtitle" class="font-label-mono text-xs text-mute mt-0.5">Analysing current conditions...</p>
+</div>
+</div>
+<!-- Status Badge -->
+<div id="summary-status-badge" class="px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider bg-slate-700 text-white flex items-center gap-1.5 shrink-0 self-start md:self-auto animate-pulse">
+<span class="material-symbols-outlined text-sm animate-spin">sync</span>
+<span>Analysing...</span>
+</div>
+</div>
+<!-- Summary Paragraph Text -->
+<div id="summary-text-content" class="text-body dark:text-slate-300 text-sm md:text-base leading-relaxed">
+<p class="text-mute italic animate-pulse">Analysing current marine and weather conditions...</p>
 </div>
 </div>
 <!-- Bento Grid Layout -->
@@ -698,6 +720,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let customPointMarker = null;
     window.weatherChartInstance = null;
 
+    let currentSelectedZone = null;
+    let currentSelectedEnv = null;
+
     // Click anywhere on map to fetch data
     map.on('click', async (e) => {
         const lat = e.latlng.lat;
@@ -837,6 +862,153 @@ document.addEventListener('DOMContentLoaded', () => {
                   Math.sin(dLon/2) * Math.sin(dLon/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         return R * c;
+    }
+
+    function updateSimpleSummary(zone, envData) {
+        if (zone !== undefined && zone !== null) currentSelectedZone = zone;
+        if (envData !== undefined) currentSelectedEnv = envData;
+
+        const badgeEl = document.getElementById('summary-status-badge');
+        const textEl = document.getElementById('summary-text-content');
+        const subtitleEl = document.getElementById('summary-location-subtitle');
+
+        if (!badgeEl || !textEl) return;
+
+        const activeZone = currentSelectedZone;
+        const activeEnv = currentSelectedEnv ? (currentSelectedEnv.data || currentSelectedEnv) : null;
+
+        if (!activeZone && !activeEnv) {
+            if (subtitleEl) subtitleEl.innerText = 'Analysing current conditions...';
+            badgeEl.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider bg-slate-700 text-white flex items-center gap-1.5 animate-pulse';
+            badgeEl.innerHTML = '<span class="material-symbols-outlined text-sm animate-spin">sync</span> <span>Analysing...</span>';
+            textEl.innerHTML = '<p class="text-mute italic animate-pulse">Analysing current marine and weather conditions...</p>';
+            return;
+        }
+
+        // Location Subtitle
+        let locName = activeZone ? activeZone.name : 'Selected Marine Location';
+        if (activeZone && activeZone.coords) {
+            const lat = activeZone.coords[0];
+            const lon = activeZone.coords[1];
+            const latNs = lat >= 0 ? `${lat.toFixed(2)}° N` : `${Math.abs(lat).toFixed(2)}° S`;
+            const lonEw = lon >= 0 ? `${lon.toFixed(2)}° E` : `${Math.abs(lon).toFixed(2)}° W`;
+            locName += ` (${latNs}, ${lonEw})`;
+        }
+        if (subtitleEl) subtitleEl.innerText = `Current Location: ${locName}`;
+
+        // Extract Indicators
+        const suitability = activeZone ? activeZone.suitability : null;
+        const safetyScore = (activeEnv && activeEnv.fishing_safety) ? activeEnv.fishing_safety.score : (suitability || 70);
+
+        let windKmh = null;
+        if (activeZone && activeZone.wind && activeZone.wind.speed_kmh !== undefined) {
+            windKmh = activeZone.wind.speed_kmh;
+        } else if (activeEnv && activeEnv.wind_speed_knots !== undefined && activeEnv.wind_speed_knots !== null) {
+            windKmh = Math.round(activeEnv.wind_speed_knots * 1.852);
+        }
+
+        let waveM = null;
+        if (activeEnv) {
+            waveM = activeEnv.wave_height_m !== null && activeEnv.wave_height_m !== undefined ? activeEnv.wave_height_m : activeEnv.swell_wave_height_m;
+        }
+
+        const stormRisk = activeEnv ? activeEnv.storm_risk : null;
+        const rainMm = activeEnv ? activeEnv.rainfall_mm : null;
+        const currentKts = activeEnv ? activeEnv.ocean_current_speed_knots : null;
+        const visKm = activeEnv ? activeEnv.visibility_km : null;
+        const chla = activeZone ? activeZone.chlorophyll : null;
+
+        // Status Category Determination
+        let category = 'good';
+        const isHighStorm = stormRisk && stormRisk.includes('High');
+        const isModStorm = stormRisk && stormRisk.includes('Moderate');
+
+        if (safetyScore < 50 || (windKmh !== null && windKmh >= 40) || (waveM !== null && waveM >= 2.5) || isHighStorm || (suitability !== null && suitability < 40)) {
+            category = 'danger';
+        } else if (safetyScore < 65 || (windKmh !== null && windKmh >= 28) || (waveM !== null && waveM >= 1.8) || isModStorm || (rainMm !== null && rainMm >= 2.5) || (suitability !== null && suitability < 60)) {
+            category = 'risky';
+        } else if (safetyScore < 80 || (windKmh !== null && windKmh >= 18) || (waveM !== null && waveM >= 1.0) || (suitability !== null && suitability < 75)) {
+            category = 'moderate';
+        } else {
+            category = 'good';
+        }
+
+        // Status Badges
+        if (category === 'good') {
+            badgeEl.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5';
+            badgeEl.innerHTML = '<span class="material-symbols-outlined text-base text-emerald-500">check_circle</span> <span>Good for Fishing</span>';
+        } else if (category === 'moderate') {
+            badgeEl.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1.5';
+            badgeEl.innerHTML = '<span class="material-symbols-outlined text-base text-amber-500">warning</span> <span>Fishing is Possible — Stay Alert</span>';
+        } else if (category === 'risky') {
+            badgeEl.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 flex items-center gap-1.5';
+            badgeEl.innerHTML = '<span class="material-symbols-outlined text-base text-orange-500">gavel</span> <span>Risky Conditions</span>';
+        } else {
+            badgeEl.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase tracking-wider bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex items-center gap-1.5';
+            badgeEl.innerHTML = '<span class="material-symbols-outlined text-base text-rose-500">dangerous</span> <span>Not Recommended Right Now</span>';
+        }
+
+        // Build Clear Sentences
+        let sentences = [];
+
+        // Sentence 1: General Overview
+        if (category === 'good') {
+            sentences.push('Conditions are good for fishing right now. Winds and waves are calm, and there are no major weather risks detected in this area.');
+        } else if (category === 'moderate') {
+            sentences.push('Fishing conditions are moderate today. Sea and weather conditions are manageable, but it is important to stay alert and keep monitoring local forecasts.');
+        } else if (category === 'risky') {
+            sentences.push('Marine conditions are currently risky for fishing. Increased wind speeds or wave swells make boat navigation uncomfortable and require extra caution.');
+        } else {
+            sentences.push('Fishing is not recommended right now. Strong winds and rough sea conditions may make boat travel unsafe for small and medium vessels.');
+        }
+
+        // Sentence 2: Wind & Sea Feel
+        if (waveM !== null && waveM >= 2.0) {
+            sentences.push(`Wave swells are high (${waveM}m), creating rough and choppy water conditions.`);
+        } else if (waveM !== null && waveM >= 1.2) {
+            sentences.push(`Waves are slightly elevated (${waveM}m), causing mild movement on the water.`);
+        } else if (windKmh !== null && windKmh >= 28) {
+            sentences.push(`Wind speeds are elevated at around ${windKmh} km/h, generating surface chop.`);
+        } else if (windKmh !== null && windKmh >= 18) {
+            sentences.push(`A steady breeze of around ${windKmh} km/h is blowing across the water.`);
+        } else {
+            sentences.push('Light winds and calm ocean swells make for comfortable and smooth vessel handling.');
+        }
+
+        // Sentence 3: Fish Activity & Productivity
+        if (chla !== null && chla >= 0.5) {
+            sentences.push('Rich biological productivity and nutrient levels in this area show strong potential for fish activity.');
+        } else if (suitability !== null && suitability >= 70) {
+            sentences.push('Oceanographic parameters show favorable conditions for fish feeding and aggregation.');
+        } else if (suitability !== null && suitability < 50) {
+            sentences.push('Fish activity may be lower in this zone today, so catch rates could require extra patience.');
+        } else {
+            sentences.push('Fish activity is moderate across this sector.');
+        }
+
+        // Sentence 4: Specific Risks / Hazards (if any)
+        if (isHighStorm) {
+            sentences.push('High lightning storm risk detected; avoid open waters and return if weather deteriorates.');
+        } else if (rainMm !== null && rainMm > 1.0) {
+            sentences.push('Active rainfall is present in the area, reducing sea visibility.');
+        } else if (visKm !== null && visKm < 4.0) {
+            sentences.push('Reduced atmospheric visibility is present near the surface.');
+        } else if (currentKts !== null && currentKts > 2.0) {
+            sentences.push('Strong ocean currents are active in this zone.');
+        }
+
+        // Sentence 5: Actionable Advice
+        if (category === 'good') {
+            sentences.push('It is generally safe to head out, but always carry standard marine safety gear and follow normal precautions.');
+        } else if (category === 'moderate') {
+            sentences.push('If you decide to go out fishing, maintain your safety equipment ready and check weather updates regularly.');
+        } else if (category === 'risky') {
+            sentences.push('If venturing out, stay close to safe harbours and avoid exposed offshore areas.');
+        } else {
+            sentences.push('Please consider waiting for calmer weather or remaining near a safe harbour until conditions improve.');
+        }
+
+        textEl.innerHTML = `<p class="leading-relaxed font-medium">${sentences.join(' ')}</p>`;
     }
 
     async function updateSelectedLocationSafetyPanel(lat, lon) {
@@ -1067,12 +1239,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 expEl.innerText = 'Insufficient real environmental data returned to evaluate safety score.';
             }
 
+            // Update Simple Summary with latest environmental metrics
+            updateSimpleSummary(null, env);
+
         } catch (e) {
             console.error('Error updating selected location safety panel:', e);
         }
     }
 
     function updateSidePanel(zone) {
+        updateSimpleSummary(zone, undefined);
         document.getElementById('top-rec-name').innerText = zone.name;
         document.getElementById('top-rec-suitability').innerHTML = `${zone.suitability}<span class="text-sm text-mute">%</span>`;
         
