@@ -157,7 +157,7 @@ async def get_sos_alerts(
 async def resolve_sos(
     sos_id: str,
     payload: SOSResolve,
-    current_user: Dict = Depends(RoleChecker(["coastal_authority", "disaster_management"]))
+    current_user: Dict = Depends(get_current_user)
 ):
     """
     PATCH /api/v1/sos/{id}/resolve
@@ -170,6 +170,18 @@ async def resolve_sos(
         obj_id = ObjectId(sos_id)
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid SOS ID format")
+        
+    # Check authorization
+    sos_alert = await db_manager.db["sos_alerts"].find_one({"_id": obj_id})
+    if not sos_alert:
+        raise HTTPException(status_code=404, detail="SOS not found")
+        
+    user_role = current_user.get("role", "")
+    is_authority = user_role in ["coastal_authority", "disaster_management"]
+    is_owner = sos_alert.get("user_id") == current_user.get("sub")
+    
+    if not (is_authority or is_owner):
+        raise HTTPException(status_code=403, detail="Not authorized to resolve this SOS")
         
     result = await db_manager.db["sos_alerts"].update_one(
         {"_id": obj_id},

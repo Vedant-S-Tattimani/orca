@@ -1,4 +1,4 @@
-const CACHE_NAME = 'orca-marine-v1';
+const CACHE_NAME = 'orca-marine-v5';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -75,16 +75,19 @@ self.addEventListener('fetch', (event) => {
       throw err;
     }));
   } else {
-    // Cache first for static assets, fallback to network
+    // Stale-While-Revalidate for static assets
     event.respondWith(
-      caches.match(event.request).then((response) => {
-        return response || fetch(event.request).then(networkResponse => {
+      caches.match(event.request).then((cachedResponse) => {
+        const fetchPromise = fetch(event.request).then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
                 const responseToCache = networkResponse.clone();
                 caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
             }
             return networkResponse;
+        }).catch(() => {
+            // Ignore network errors, return cached response if available
         });
+        return cachedResponse || fetchPromise;
       })
     );
   }

@@ -732,34 +732,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Mobile menu toggle
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const navMenu = document.getElementById('mobile-nav-menu');
-    if (menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('hidden');
-        });
-    }
-
-    // 2. Theme Toggle logic
-    const handleThemeToggle = () => {
-        const isDark = document.documentElement.classList.contains('dark');
-        if (isDark) {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.classList.add('light');
-            localStorage.setItem('orca_theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            document.documentElement.classList.remove('light');
-            localStorage.setItem('orca_theme', 'dark');
-        }
-    };
-
-    const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
-    if (toggleBtnNav) {
-        toggleBtnNav.addEventListener('click', handleThemeToggle);
-    }
-
-    // 3. Initialize Leaflet Map
+// 3. Initialize Leaflet Map
     const mapCenter = [18.0, 77.0]; // Indian Maritime Region
     const map = L.map('leaflet-map', {
         center: mapCenter,

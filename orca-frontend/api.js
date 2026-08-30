@@ -404,6 +404,133 @@ const OrcaAPI = {
         if (!localStorage.getItem('accessToken')) {
             window.location.href = 'login.html';
         }
+    },
+
+    /**
+     * Trigger SOS
+     * POST /api/v1/sos
+     */
+    async triggerSOS(lat, lon) {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            
+            const response = await fetch(`${API_BASE}/api/v1/sos`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ lat, lon })
+            });
+            if (!response.ok) throw new Error('Failed to trigger SOS');
+            return await response.json();
+        } catch (error) {
+            console.error('Error triggering SOS:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Cancel SOS
+     * PATCH /api/v1/sos/{incident_id}/resolve
+     */
+    async cancelSOS(incidentId) {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            
+            const response = await fetch(`${API_BASE}/api/v1/sos/${incidentId}/resolve`, {
+                method: 'PATCH',
+                headers,
+                body: JSON.stringify({ resolution_note: "Cancelled by user" })
+            });
+            if (!response.ok) throw new Error('Failed to cancel SOS');
+            return await response.json();
+        } catch (error) {
+            console.error('Error canceling SOS:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get Trip Details
+     * GET /api/v1/trips/{trip_id}
+     */
+    async getTrip(tripId) {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const headers = { 'Accept': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            
+            const response = await fetch(`${API_BASE}/api/v1/trips/${tripId}`, {
+                method: 'GET',
+                headers
+            });
+            if (!response.ok) throw new Error('Failed to get trip details');
+            return await response.json();
+        } catch (error) {
+            console.error('Error getting trip:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Log Trip Action
+     * POST /api/v1/trips/{trip_id}/log
+     */
+    async logTripAction(tripId, lat, lon, activityType, notes) {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            
+            const response = await fetch(`${API_BASE}/api/v1/trips/${tripId}/log`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ lat, lon, activity_type: activityType, notes })
+            });
+            if (!response.ok) throw new Error('Failed to log trip action');
+            return await response.json();
+        } catch (error) {
+            console.error('Error logging trip action:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get Last Known Advisory
+     * GET /api/v1/advisory/last_known
+     */
+    async getLastKnownAdvisory() {
+        try {
+            const response = await fetch(`${API_BASE}/api/v1/advisory/last_known`, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) throw new Error('Failed to fetch last known advisory');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching last known advisory:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get Regional Alerts
+     * GET /api/v1/alerts/regional
+     */
+    async getRegionalAlerts(region) {
+        try {
+            const response = await fetch(`${API_BASE}/api/v1/alerts/regional?region=${encodeURIComponent(region)}`, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!response.ok) throw new Error('Failed to fetch regional alerts');
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching regional alerts:', error);
+            throw error;
+        }
     }
 };
 

@@ -5,7 +5,7 @@ Handles POST requests for marine ecosystem queries and GET requests for results 
 from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
 from typing import Dict, Any, List, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel
 import logging
 import asyncio
@@ -215,7 +215,7 @@ async def get_last_known_advisory(current_user: Dict = Depends(get_current_user)
         
     doc = docs[0]
     
-    from datetime import datetime, timezone
+
     
     # Check staleness based on age (e.g. older than 3 hours is considered stale)
     created_at = doc.get("created_at")
@@ -530,7 +530,7 @@ async def get_pfz_data(request: PFZRequest):
     weather_agent = OpenMeteoWeatherAgent()
     
     start_time = datetime.utcnow()
-    from datetime import timedelta
+
     end_time = start_time + timedelta(hours=24)
     
     # Wind thresholds from thresholds.yaml (km/h)
@@ -1381,7 +1381,7 @@ Respond naturally:"""
                 docs = await cursor.to_list(length=1)
                 if docs:
                     doc = docs[0]
-                    from datetime import datetime, timezone
+
                     created_at = doc.get("created_at")
                     age_hours = 0
                     if created_at:

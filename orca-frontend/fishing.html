@@ -34,7 +34,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="api.js"></script>
+<script src="api.js?v=2"></script>
 <script>OrcaAPI.requireAuth();</script>
 <script src="i18n.js"></script>
 <script src="tts.js"></script>
@@ -678,39 +678,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Mobile menu toggle
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const navMenu = document.getElementById('mobile-nav-menu');
-    if (menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('hidden');
-        });
-    }
-
-    // Theme Toggle logic
-    const handleThemeToggle = () => {
-        const isDark = document.documentElement.classList.contains('dark');
-        if (isDark) {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.classList.add('light');
-            localStorage.setItem('orca_theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            document.documentElement.classList.remove('light');
-            localStorage.setItem('orca_theme', 'dark');
-        }
-    };
-
-    const toggleBtn = document.getElementById('theme-toggle-btn');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', handleThemeToggle);
-    }
-    const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
-    if (toggleBtnNav) {
-        toggleBtnNav.addEventListener('click', handleThemeToggle);
-    }
-    
-    // --- Fishing Intelligence Dynamic Map ---
+// --- Fishing Intelligence Dynamic Map ---
     const map = L.map('fishing-map').setView([15.0, 75.0], 5);
     
     // Check if dark mode is active to set the right basemap
@@ -1542,4 +1510,107 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script src="theme-extensions.js"></script>
+
+<!-- === PHASE 3 INTEGRATION COMPONENTS === -->
+<!-- Floating Action Buttons -->
+<div class="fixed bottom-6 right-6 flex flex-col gap-4 z-[100]">
+    <button id="fab-alerts-btn" class="w-14 h-14 bg-surface-container-high text-warning border-hairline rounded-full shadow-lg flex items-center justify-center hover:bg-surface-variant transition-colors" title="Regional Alerts">
+        <span class="material-symbols-outlined">warning</span>
+    </button>
+    <button id="fab-trip-btn" class="w-14 h-14 bg-primary-container text-on-primary-container rounded-full shadow-lg flex items-center justify-center hover:bg-primary transition-colors" title="Trip Log">
+        <span class="material-symbols-outlined">sailing</span>
+    </button>
+    <button id="fab-sos-btn" class="w-16 h-16 bg-error text-on-error border-2 border-error-container rounded-full shadow-[0_0_20px_rgba(255,180,171,0.4)] flex items-center justify-center cursor-pointer active:scale-95 transition-transform touch-none" title="SOS Emergency">
+        <span class="font-headline-md font-bold tracking-tighter">SOS</span>
+    </button>
+</div>
+
+<!-- 1. SOS Active Modal -->
+<div id="modal-sos" class="hidden fixed inset-0 z-[200] bg-black/90 flex-col justify-center items-center p-4 backdrop-blur-sm">
+    <div class="bg-error text-on-error rounded-lg p-p-sm flex items-center justify-center animate-pulse-fast border border-error-container shadow-lg mb-8">
+        <span class="material-symbols-outlined mr-2 font-headline-md">warning</span>
+        <span class="font-headline-md text-headline-md font-bold uppercase tracking-widest">SOS ACTIVE</span>
+        <span class="material-symbols-outlined ml-2 font-headline-md">warning</span>
+    </div>
+    <div class="bg-surface-container-lowest border border-error rounded-xl p-p-lg flex flex-col gap-p-md shadow-2xl relative overflow-hidden max-w-md w-full">
+        <div class="absolute inset-0 bg-error opacity-10 animate-pulse pointer-events-none"></div>
+        <div class="flex flex-col items-center text-center z-10">
+            <p class="font-label-mono text-label-mono text-error mb-2 uppercase tracking-widest">Current Coordinates</p>
+            <div class="font-headline-lg-mobile md:text-headline-lg text-on-surface bg-surface-container p-p-md rounded-lg border border-outline-variant w-full">44.3126° N, 68.2158° W</div>
+        </div>
+        <div class="flex flex-col flex-1 bg-surface-container p-p-sm rounded-lg border border-outline-variant mt-4 z-10">
+            <span class="font-label-mono text-label-mono text-on-surface-variant mb-1 uppercase">Status</span>
+            <span class="font-body-regular text-body-regular text-error font-bold flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">cell_tower</span> SIGNAL SENT</span>
+        </div>
+        <button id="sos-cancel-btn" class="w-full mt-6 bg-surface-variant text-on-surface border border-outline hover:bg-surface-container-high transition-colors py-4 rounded-xl font-button-app text-button-app flex items-center justify-center gap-2 z-10 touch-none">
+            <span class="material-symbols-outlined">cancel</span> CANCEL SOS
+        </button>
+        <p class="font-text-mute text-text-mute text-on-surface-variant text-center mt-2 z-10 text-xs">Hold for 3 seconds to cancel</p>
+    </div>
+</div>
+
+<!-- 2. Trip Logging Panel (Slide over) -->
+<div id="panel-trip" class="hidden fixed inset-y-0 right-0 z-[150] w-full max-w-md bg-surface border-l border-outline-variant shadow-2xl flex-col">
+    <header class="flex items-center justify-between p-4 border-b border-outline-variant">
+        <h2 class="font-headline-md font-bold text-primary">TRIP LOG</h2>
+        <button id="trip-close-btn" class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-full"><span class="material-symbols-outlined">close</span></button>
+    </header>
+    <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+        <section class="bg-surface-container-lowest border-hairline rounded-[16px] p-4 flex flex-col gap-2">
+            <div class="flex items-center gap-2 text-primary mb-2"><span class="material-symbols-outlined">sailing</span> <span class="font-label-mono font-bold">LIVE TRACKING</span></div>
+            <div class="font-label-mono text-on-surface-variant">DEPARTURE: <span class="text-on-surface">Portland Harbor, ME</span></div>
+            <div id="trip-heading" class="font-label-mono text-on-surface-variant">HEADING: <span class="text-on-surface">--°</span></div>
+        </section>
+        <section class="flex flex-col gap-4">
+            <h3 class="font-label-mono uppercase">Log Entry</h3>
+            <div class="flex flex-col gap-1">
+                <label class="font-label-mono text-on-surface-variant text-xs">ACTIVITY TYPE</label>
+                <select id="activity-type" class="w-full bg-surface-container border-hairline rounded-lg p-3 text-on-surface min-h-[48px]">
+                    <option value="catch_record">Catch Record</option>
+                    <option value="trawl_deployment">Trawl Deployment</option>
+                    <option value="hauling_gear">Hauling Gear</option>
+                </select>
+            </div>
+            <div class="flex flex-col gap-1">
+                <label class="font-label-mono text-on-surface-variant text-xs">NOTES</label>
+                <textarea id="log-notes" class="w-full min-h-[100px] bg-surface-container border-hairline rounded-lg p-3 text-on-surface resize-none" placeholder="Enter operational details..."></textarea>
+            </div>
+            <button id="trip-save-log" class="w-full bg-primary text-surface-container-lowest hover:bg-primary-fixed py-3 rounded-lg font-bold mt-2">Save Entry</button>
+        </section>
+    </div>
+</div>
+
+<!-- 3. Regional Alerts Panel -->
+<div id="panel-alerts" class="hidden fixed inset-y-0 right-0 z-[150] w-full max-w-sm bg-surface border-l border-outline-variant shadow-2xl flex-col">
+    <header class="flex items-center justify-between p-4 border-b border-outline-variant">
+        <h2 class="font-headline-md font-bold text-on-surface uppercase">Sector 7G Alerts</h2>
+        <button id="alerts-close-btn" class="p-2 text-on-surface-variant hover:bg-surface-variant rounded-full"><span class="material-symbols-outlined">close</span></button>
+    </header>
+    <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+        <article class="bg-surface-container-lowest border border-error rounded-[16px] p-4 flex flex-col gap-2">
+            <div class="flex items-center gap-2 text-error font-label-mono"><span class="material-symbols-outlined">warning</span> [CRITICAL]</div>
+            <h2 class="font-bold text-on-surface">GALE WARNING: 45kt gusts expected</h2>
+        </article>
+        <article class="bg-surface-container-lowest border border-outline-variant rounded-[16px] p-4 flex flex-col gap-2">
+            <div class="flex items-center gap-2 text-tertiary font-label-mono"><span class="material-symbols-outlined">tsunami</span> [HAZARD]</div>
+            <h2 class="text-on-surface">Driftnet debris reported at 44.2N, 68.5W</h2>
+        </article>
+    </div>
+</div>
+
+<!-- 4. Last Known Advisory Card (Injected into side panel) -->
+<div id="advisory-stale-card" class="hidden fixed top-20 right-6 z-[90] w-80 bg-surface-container-lowest border border-warning rounded-[16px] p-4 shadow-xl">
+    <header class="flex justify-between items-start mb-2">
+        <h2 class="font-label-mono text-warning font-bold">STALE DATA</h2>
+        <span class="material-symbols-outlined text-warning">warning</span>
+    </header>
+    <p class="text-sm text-on-surface-variant mb-2">Last Updated: 2 hours ago</p>
+    <div class="text-sm text-on-surface">
+        <div>Wave Height: 4.5ft @ 8s</div>
+        <div>Wind Speed: 18 kts NNE</div>
+    </div>
+</div>
+
+<script src="integration.js?v=2"></script>
+</body>
 </html>

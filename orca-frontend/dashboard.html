@@ -592,33 +592,6 @@ window.toggleGlobeMode = function() {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Initialize Nav & Mobile Menu
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const navMenu = document.getElementById('mobile-nav-menu');
-    if (menuBtn && navMenu) {
-        menuBtn.addEventListener('click', () => { navMenu.classList.toggle('hidden'); });
-    }
-
-    const handleThemeToggle = () => {
-        const isDark = document.documentElement.classList.contains('dark');
-        if (isDark) {
-            document.documentElement.classList.remove('dark');
-            document.documentElement.classList.add('light');
-            localStorage.setItem('orca_theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            document.documentElement.classList.remove('light');
-            localStorage.setItem('orca_theme', 'dark');
-        }
-        if(map) {
-            // Need to reload map tiles for dark mode, easiest is to recreate or reset url
-            const newUrl = !isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-            map.eachLayer(layer => { if(layer instanceof L.TileLayer) layer.setUrl(newUrl); });
-        }
-    };
-    const toggleBtnNav = document.getElementById('theme-toggle-btn-nav');
-    if (toggleBtnNav) toggleBtnNav.addEventListener('click', handleThemeToggle);
-
     // 2. Initialize Map
     initMap();
 
