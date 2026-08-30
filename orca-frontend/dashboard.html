@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW registered!', reg)).catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 <script>
     (function() {
       const savedTheme = localStorage.getItem('orca_theme');
@@ -32,6 +40,7 @@
 <!-- Leaflet.js for Interactive Map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/globe.gl"></script>
 
 <!-- Chart.js for Historical Trends -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -256,10 +265,16 @@ html.dark .border-slate-800 {
                 <span id="global-freshness" class="text-xs">Updating...</span>
             </p>
         </div>
-        <button onclick="fetchLatestData()" class="bg-surface-container-low dark:bg-slate-900 text-ink dark:text-white border border-hairline dark:border-slate-800 font-button-app px-4 py-2 rounded-lg hover:border-cyan-500/50 transition-colors flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-[18px]" id="refresh-icon">refresh</span>
-            <span>Refresh Data</span>
-        </button>
+        <div class="flex gap-2">
+            <button onclick="document.getElementById('incident-modal').classList.remove('hidden')" class="bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/30 font-button-app px-4 py-2 rounded-lg hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">report</span>
+                <span>Report Incident</span>
+            </button>
+            <button onclick="fetchLatestData()" class="bg-surface-container-low dark:bg-slate-900 text-ink dark:text-white border border-hairline dark:border-slate-800 font-button-app px-4 py-2 rounded-lg hover:border-cyan-500/50 transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[18px]" id="refresh-icon">refresh</span>
+                <span>Refresh Data</span>
+            </button>
+        </div>
     </div>
 
     <!-- 1. MARINE SITUATION OVERVIEW (Top Section) -->
@@ -305,8 +320,14 @@ html.dark .border-slate-800 {
         </div>
 
         <!-- 3. INTERACTIVE MARINE MAP -->
-        <div class="xl:col-span-5 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm overflow-hidden flex flex-col relative h-[300px] xl:h-auto">
-            <div id="dash-map"></div>
+        <div class="xl:col-span-5 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm overflow-hidden flex flex-col relative h-[300px] xl:h-auto group">
+            <div id="dash-map" class="w-full h-full"></div>
+            <div id="dash-globe" class="w-full h-full hidden cursor-pointer"></div>
+            
+            <button onclick="toggleGlobeMode()" class="absolute top-2 right-2 z-[400] bg-surface/90 dark:bg-black/90 backdrop-blur-md rounded-lg p-2 flex justify-center items-center border border-hairline dark:border-slate-700 shadow-sm hover:bg-surface-container-low transition-colors text-ink dark:text-white" title="Toggle 3D Globe">
+                <span class="material-symbols-outlined text-[20px]" id="globe-icon">public</span>
+            </button>
+
             <div class="absolute bottom-2 left-2 right-2 z-[400] bg-black/80 backdrop-blur-md rounded-lg p-2 flex justify-between items-center border border-slate-700">
                 <span class="text-xs text-white font-mono" id="map-coords-label">Lat: --, Lon: --</span>
                 <span class="text-[10px] text-slate-400 hidden sm:block">Click map to change location</span>
@@ -408,6 +429,100 @@ html.dark .border-slate-800 {
         </div>
     </div>
 
+    <!-- Coastal Authority Section (Role-based) -->
+    <div id="coastal-authority-section" class="hidden mt-8 pt-8 border-t border-hairline dark:border-slate-800">
+        <h3 class="font-headline-md text-xl font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2 mb-4">
+            <span class="material-symbols-outlined">directions_boat</span>
+            Coastal Authority Dashboard
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="p-6 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm">
+                <h4 class="font-bold text-ink dark:text-white mb-2">Regional Fleet Status</h4>
+                <p class="text-sm text-body dark:text-slate-400 mb-4">Monitor active fishing vessels in your jurisdiction.</p>
+                <div class="text-2xl font-bold text-blue-500">142 Active Vessels</div>
+            </div>
+            <div class="p-6 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm">
+                <h4 class="font-bold text-ink dark:text-white mb-2">Port Operations</h4>
+                <p class="text-sm text-body dark:text-slate-400 mb-4">Current status of major ports in the region.</p>
+                <div class="text-sm font-medium text-emerald-500 flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">check_circle</span> All Ports Operational</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disaster Management Section (Role-based) -->
+    <div id="disaster-management-section" class="hidden mt-8 pt-8 border-t border-hairline dark:border-slate-800">
+        <h3 class="font-headline-md text-xl font-bold text-red-600 dark:text-red-400 flex items-center gap-2 mb-4">
+            <span class="material-symbols-outlined">emergency</span>
+            Disaster Management Console
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="p-6 rounded-xl border border-red-500/30 bg-red-500/5 shadow-sm flex flex-col justify-between">
+                <div>
+                    <h4 class="font-bold text-red-500 mb-2">Emergency Broadcast</h4>
+                    <p class="text-sm text-body dark:text-slate-400 mb-4">Issue immediate alerts to all registered vessels in affected zones.</p>
+                </div>
+                <button class="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors mt-2">Broadcast Alert</button>
+            </div>
+            <div class="p-6 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm flex flex-col justify-between">
+                <div>
+                    <h4 class="font-bold text-ink dark:text-white mb-2">Evacuation Status</h4>
+                    <p class="text-sm text-body dark:text-slate-400 mb-4">Real-time tracking of coastal evacuation procedures.</p>
+                </div>
+                <div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mb-2">
+                        <div class="bg-red-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <div class="text-xs text-mute text-right">0% Active</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incident Reporting Modal -->
+    <div id="incident-modal" class="hidden fixed inset-0 z-[2000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="bg-surface-bright dark:bg-slate-900 rounded-xl border border-hairline dark:border-slate-800 shadow-xl max-w-lg w-full overflow-hidden">
+            <div class="p-4 border-b border-hairline dark:border-slate-800 flex justify-between items-center bg-surface-container-low dark:bg-slate-800">
+                <h3 class="font-headline-md text-lg font-bold text-ink dark:text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-red-500">report</span> Report Marine Incident
+                </h3>
+                <button onclick="document.getElementById('incident-modal').classList.add('hidden')" class="text-mute hover:text-ink dark:hover:text-white transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-ink dark:text-white mb-1">Incident Type</label>
+                    <select class="w-full rounded-lg border border-hairline dark:border-slate-700 bg-surface dark:bg-black text-ink dark:text-white p-2 focus:ring-2 focus:ring-cyan-500 outline-none">
+                        <option>Illegal Fishing Activity</option>
+                        <option>Oil Spill / Pollution</option>
+                        <option>Vessel in Distress</option>
+                        <option>Extreme Weather Event</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink dark:text-white mb-1">Description</label>
+                    <textarea rows="3" class="w-full rounded-lg border border-hairline dark:border-slate-700 bg-surface dark:bg-black text-ink dark:text-white p-2 focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="Provide details about the incident..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink dark:text-white mb-1">Location (Geotag)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="incident-location" readonly class="flex-1 rounded-lg border border-hairline dark:border-slate-700 bg-surface-container-low dark:bg-slate-800 text-mute p-2 text-sm" value="Lat: --, Lon: --">
+                        <button onclick="document.getElementById('incident-location').value = 'Lat: ' + selectedLat.toFixed(4) + ', Lon: ' + selectedLon.toFixed(4)" class="px-3 py-2 bg-surface-container-low dark:bg-slate-800 hover:bg-surface border border-hairline dark:border-slate-700 rounded-lg text-sm text-ink dark:text-white font-medium transition-colors">Use Current</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-ink dark:text-white mb-1">Evidence (Photo)</label>
+                    <input type="file" accept="image/*" class="w-full text-sm text-mute file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/10 file:text-cyan-600 dark:file:text-cyan-400 hover:file:bg-cyan-500/20">
+                </div>
+            </div>
+            <div class="p-4 border-t border-hairline dark:border-slate-800 flex justify-end gap-3 bg-surface-container-low dark:bg-slate-800/50">
+                <button onclick="document.getElementById('incident-modal').classList.add('hidden')" class="px-4 py-2 rounded-lg font-medium text-body dark:text-slate-400 hover:text-ink dark:hover:text-white transition-colors">Cancel</button>
+                <button onclick="alert('Incident report submitted successfully.'); document.getElementById('incident-modal').classList.add('hidden');" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium shadow-sm transition-colors">Submit Report</button>
+            </div>
+        </div>
+    </div>
+
 </main>
 </div>
 
@@ -415,8 +530,66 @@ html.dark .border-slate-800 {
 let map = null;
 let currentMarker = null;
 let historicalChart = null;
-let selectedLat = 12.87;
-let selectedLon = 74.84;
+let selectedLat = 15.0;
+let selectedLon = 73.0;
+
+let isGlobeMode = false;
+let globeViz = null;
+
+window.toggleGlobeMode = function() {
+    isGlobeMode = !isGlobeMode;
+    const mapEl = document.getElementById('dash-map');
+    const globeEl = document.getElementById('dash-globe');
+    const icon = document.getElementById('globe-icon');
+    
+    if (isGlobeMode) {
+        mapEl.classList.add('hidden');
+        globeEl.classList.remove('hidden');
+        icon.textContent = 'map';
+        
+        if (!globeViz) {
+            globeViz = Globe()(globeEl)
+                .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+                .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+                .pointOfView({ lat: selectedLat, lng: selectedLon, altitude: 1.5 })
+                .labelsData([{ lat: selectedLat, lng: selectedLon, text: 'Current Location', color: 'red' }])
+                .labelLat('lat')
+                .labelLng('lng')
+                .labelText('text')
+                .labelColor('color')
+                .labelSize(1.5)
+                .labelDotRadius(0.5);
+                
+            // Handle clicks on globe to update location
+            globeViz.onGlobeClick((coords) => {
+                selectedLat = coords.lat;
+                selectedLon = coords.lng;
+                globeViz.labelsData([{ lat: selectedLat, lng: selectedLon, text: 'Current Location', color: 'red' }]);
+                
+                document.getElementById('map-coords-label').textContent = `Lat: ${selectedLat.toFixed(2)}, Lon: ${selectedLon.toFixed(2)}`;
+                document.getElementById('current-location-label').textContent = `Lat ${selectedLat.toFixed(2)}, Lon ${selectedLon.toFixed(2)}`;
+                if(currentMarker) { currentMarker.setLatLng([selectedLat, selectedLon]); }
+                if(map) { map.setView([selectedLat, selectedLon]); }
+                fetchLatestData();
+            });
+            
+            // Resize handler
+            const updateGlobeSize = () => {
+                globeViz.width(globeEl.clientWidth).height(globeEl.clientHeight);
+            };
+            window.addEventListener('resize', updateGlobeSize);
+            setTimeout(updateGlobeSize, 100);
+        } else {
+            globeViz.pointOfView({ lat: selectedLat, lng: selectedLon, altitude: 1.5 });
+            globeViz.labelsData([{ lat: selectedLat, lng: selectedLon, text: 'Current Location', color: 'red' }]);
+        }
+    } else {
+        globeEl.classList.add('hidden');
+        mapEl.classList.remove('hidden');
+        icon.textContent = 'public';
+        if(map) { map.invalidateSize(); }
+    }
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Initialize Nav & Mobile Menu
@@ -450,10 +623,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     initMap();
 
     // 3. Load Role-based Features
-    const role = localStorage.getItem('userRole');
+    function getRoleFromToken() {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload).role || null;
+        } catch (e) {
+            console.error("Failed to decode token", e);
+            return null;
+        }
+    }
+    const role = getRoleFromToken();
     if (role === 'researcher' || role === 'admin') {
         document.getElementById('researcher-section').classList.remove('hidden');
         initChart();
+    }
+    if (role === 'coastal_authority' || role === 'admin') {
+        const caSection = document.getElementById('coastal-authority-section');
+        if (caSection) caSection.classList.remove('hidden');
+    }
+    if (role === 'disaster_management' || role === 'admin') {
+        const dmSection = document.getElementById('disaster-management-section');
+        if (dmSection) dmSection.classList.remove('hidden');
     }
 
     // 4. Fetch Initial Data
@@ -474,6 +670,10 @@ function initMap() {
         map.setView(e.latlng);
         document.getElementById('map-coords-label').textContent = `Lat: ${selectedLat.toFixed(2)}, Lon: ${selectedLon.toFixed(2)}`;
         document.getElementById('current-location-label').textContent = `Lat ${selectedLat.toFixed(2)}, Lon ${selectedLon.toFixed(2)}`;
+        if (globeViz) {
+            globeViz.labelsData([{ lat: selectedLat, lng: selectedLon, text: 'Current Location', color: 'red' }]);
+            globeViz.pointOfView({ lat: selectedLat, lng: selectedLon });
+        }
         await fetchLatestData();
     });
 }
@@ -676,4 +876,5 @@ function updateChart(days) {
 }
 </script>
 
-</body></html>
+<script src="theme-extensions.js"></script>
+</html>

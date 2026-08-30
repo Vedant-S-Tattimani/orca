@@ -47,8 +47,11 @@ class RiskEngine:
     Loads thresholds from YAML configuration file
     """
 
-    def __init__(self, thresholds_file: str = "app/rules/thresholds.yaml"):
-        self.thresholds_file = Path(thresholds_file)
+    def __init__(self, thresholds_file: str = None):
+        if thresholds_file is None:
+            self.thresholds_file = Path(__file__).parent / "thresholds.yaml"
+        else:
+            self.thresholds_file = Path(thresholds_file)
         self.thresholds = self._load_thresholds()
         logger.info(f"Loaded risk thresholds from {self.thresholds_file}")
 

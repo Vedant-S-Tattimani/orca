@@ -46,6 +46,7 @@ class BaseAPIClient:
         self.max_retries = max_retries
         self.retry_delay = retry_delay
         self.backoff_factor = backoff_factor
+        self.last_successful_fetch = None
         self.logger = logging.getLogger(self.__class__.__module__ + '.' + self.__class__.__name__)
 
     def _get_headers(self) -> Dict[str, str]:
@@ -133,10 +134,14 @@ class BaseAPIClient:
                         try:
                             result = await response.json()
                             self.logger.debug(f"Successfully retrieved data from {url}")
+                            from datetime import datetime
+                            self.last_successful_fetch = datetime.utcnow()
                             return result
                         except aiohttp.ContentTypeError:
                             # If response is not JSON, return text
                             text_result = await response.text()
+                            from datetime import datetime
+                            self.last_successful_fetch = datetime.utcnow()
                             return {"text": text_result, "status": response.status}
 
             except AsyncioTimeoutError:

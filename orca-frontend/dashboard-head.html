@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW registered!', reg)).catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
+<script>
+    (function() {
+      const savedTheme = localStorage.getItem('orca_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      }
+    })();
+</script>
+<!-- Google Fonts & Material Symbols -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORCA - Marine Dashboard</title>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="api.js"></script>
+<script>OrcaAPI.requireAuth();</script>
+<script src="i18n.js"></script>
+<script src="tts.js"></script>
+<script src="stt.js"></script>
+
+<!-- Leaflet.js for Interactive Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<!-- Chart.js for Historical Trends -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "error": "#ee0000",
+        "secondary": "#0057c0",
+        "body": "#4d4d4d",
+        "surface-bright": "#f9f9f9",
+        "surface-container": "#eeeeee",
+        "surface": "#f9f9f9",
+        "mute": "#8f8f8f",
+        "ink": "#171717",
+        "hairline": "#ebebeb",
+        "surface-container-low": "#f3f3f3",
+        "warning": "#f5a623",
+      },
+      "fontFamily": {
+        "sans": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        "mono": ["Geist Mono", "monospace"],
+        "label-mono": ["Geist Mono", "monospace"],
+        "display-xl": ["Inter", "sans-serif"],
+        "button-app": ["Inter", "sans-serif"],
+        "body-md": ["Inter", "sans-serif"],
+        "headline-md": ["Inter", "sans-serif"],
+        "headline-lg": ["Inter", "sans-serif"],
+      }
+    },
+  },
+}
+</script>
+
+<style>
+:root {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+}
+body, button, input, select, textarea {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+code, kbd, samp, pre, .font-mono, .font-label-mono {
+    font-family: 'Geist Mono', monospace !important;
+}
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 20px;
+    line-height: 1;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Pure Dark Mode Styles */
+html.dark {
+    color-scheme: dark;
+    background-color: #000000 !important;
+}
+html.dark body {
+    background-color: #000000 !important;
+    color: #d4d4d4 !important;
+}
+html.dark nav, 
+html.dark header, 
+html.dark aside {
+    background-color: #0a0a0a !important;
+    border-color: #262626 !important;
+}
+html.dark .bg-surface,
+html.dark .bg-canvas,
+html.dark .bg-surface-container-low,
+html.dark .bg-surface-container-high,
+html.dark .bg-surface-container-highest,
+html.dark .bg-surface-container {
+    background-color: #050505 !important;
+}
+html.dark .bg-surface-bright {
+    background-color: #121212 !important;
+}
+html.dark .text-ink,
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+    color: #ffffff !important;
+}
+html.dark .text-body,
+html.dark p {
+    color: #a3a3a3 !important;
+}
+html.dark .text-mute {
+    color: #737373 !important;
+}
+html.dark .border-hairline,
+html.dark .border-outline-variant,
+html.dark .border-slate-200,
+html.dark .border-slate-800 {
+    border-color: #262626 !important;
+}
+
+#dash-map { height: 100%; min-height: 350px; width: 100%; border-radius: 0.5rem; z-index: 10; }
+.leaflet-container { background: #0a0a0a; }
+</style>
+<link rel="icon" type="image/png" href="favicon.png"/>
+</head>
+<body class="text-ink antialiased flex flex-col h-screen overflow-hidden">
+
+<!-- Top Header / Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 h-16 z-[1000] bg-surface/80 dark:bg-black/80 backdrop-blur-md border-b border-hairline dark:border-slate-800 transition-colors duration-200">
+  <div class="max-w-7xl mx-auto h-full px-4 md:px-6 flex items-center justify-between">
+    <!-- Logo section -->
+    <div class="flex items-center gap-3 cursor-pointer group" onclick="window.location.href='index.html'">
+      <div class="w-10 h-10 md:w-11 md:h-11 flex items-center justify-center transition-transform group-hover:scale-105 shrink-0">
+        <img src="logo.png" alt="ORCA Marine Logo" class="w-full h-full object-contain dark:hidden">
+        <img src="logo-white.png" alt="ORCA Marine Logo" class="w-full h-full object-contain hidden dark:block">
+      </div>
+      <div>
+        <h1 class="font-headline-md text-sm md:text-base font-bold text-ink dark:text-white leading-tight">ORCA Marine</h1>
+        <p class="font-label-mono text-[9px] text-mute uppercase tracking-widest leading-none">Intelligence</p>
+      </div>
+    </div>
+
+    <!-- Navigation links -->
+    <nav class="hidden lg:flex items-center gap-1">
+      <a href="index.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">info</span>
+        <span data-i18n="nav_about">About</span>
+      </a>
+      <a href="dashboard.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 bg-ink text-white dark:bg-white dark:text-black shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">dashboard</span>
+        <span data-i18n="nav_dashboard">Dashboard</span>
+      </a>
+      <a href="assistant.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">smart_toy</span>
+        <span data-i18n="nav_assistant">Assistant</span>
+      </a>
+      <a href="map.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">map</span>
+        <span data-i18n="nav_map">Map</span>
+      </a>
+      <a href="fishing.html" class="px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-body dark:text-slate-400 hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50">
+        <span class="material-symbols-outlined text-[18px]">sailing</span>
+        <span data-i18n="nav_fishing">Fishing</span>
+      </a>
+      <!-- Researcher Dashboard (Hidden by default) -->
+      <a href="researcher.html" id="nav-researcher-link" class="hidden px-3 py-2 text-xs md:text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5 text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/30 border border-transparent hover:border-purple-200 dark:hover:border-purple-800/50">
+        <span class="material-symbols-outlined text-[18px]">science</span>
+        <span data-i18n="nav_researcher">Research</span>
+      </a>
+    </nav>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <a href="settings.html" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center" title="Settings">
+        <span class="material-symbols-outlined">settings</span>
+      </a>
+      <a href="login.html" class="px-3 py-1.5 text-xs md:text-sm font-semibold rounded-lg bg-surface-container-low dark:bg-slate-900 border border-hairline dark:border-slate-800 text-ink dark:text-white hover:border-cyan-500/50 dark:hover:border-cyan-500/50 transition-all flex items-center gap-1.5 shadow-sm" title="Login">
+        <span class="material-symbols-outlined text-[18px]">login</span>
+        <span data-i18n="nav_login">Login</span>
+      </a>
+      <button id="theme-toggle-btn-nav" aria-label="Toggle Dark Mode" class="p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors flex items-center justify-center">
+        <span class="material-symbols-outlined text-lg text-amber-500 dark:hidden">light_mode</span>
+        <span class="material-symbols-outlined text-lg text-cyan-400 hidden dark:inline">dark_mode</span>
+      </button>
+      <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-mute hover:text-ink dark:hover:text-white hover:bg-surface-container-low/50 dark:hover:bg-slate-900/50 transition-colors">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Menu dropdown -->
+  <div id="mobile-nav-menu" class="hidden lg:hidden border-b border-hairline dark:border-slate-800 bg-surface dark:bg-black w-full px-4 py-3 flex flex-col gap-2 transition-all duration-200">
+    <!-- Links omitted for brevity, matching previous implementation -->
+    <a href="index.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400">
+      <span class="material-symbols-outlined">info</span> About
+    </a>
+    <a href="dashboard.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 bg-ink text-white dark:bg-white dark:text-black">
+      <span class="material-symbols-outlined">dashboard</span> Dashboard
+    </a>
+    <a href="assistant.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400">
+      <span class="material-symbols-outlined">smart_toy</span> Assistant
+    </a>
+    <a href="map.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400">
+      <span class="material-symbols-outlined">map</span> Map
+    </a>
+    <a href="fishing.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400">
+      <span class="material-symbols-outlined">sailing</span> Fishing
+    </a>
+    <a href="login.html" class="px-3 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 text-body dark:text-slate-400">
+      <span class="material-symbols-outlined">login</span> Login
+    </a>
+  </div>
+</header>
+
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-full pt-16 overflow-hidden">
+<main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 bg-surface dark:bg-black">
+    
+    <!-- Onboarding / Disclaimer -->
+    <div id="onboarding-disclaimer" class="bg-cyan-500/10 border border-cyan-500/30 rounded-xl p-4 flex items-start gap-4 text-ink dark:text-white mb-4">
+        <span class="material-symbols-outlined text-cyan-500">info</span>
+        <div>
+            <h4 class="font-bold text-sm">Welcome to the ORCA Intelligence Dashboard</h4>
+            <p class="text-sm text-body dark:text-slate-400 mt-1">This dashboard provides real-time marine intelligence and advisory information. Please note that ORCA does not guarantee safety. Always exercise maritime caution.</p>
+            <button onclick="document.getElementById('onboarding-disclaimer').style.display='none'" class="mt-2 text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline">Dismiss</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-6">
+        <div>
+            <h2 class="font-headline-lg text-2xl md:text-3xl font-bold text-ink dark:text-white">Marine Situation Overview</h2>
+            <p class="font-body-md text-sm text-body dark:text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+                <span class="material-symbols-outlined text-[16px]">location_on</span>
+        <div class="flex gap-2">
+            <button onclick="document.getElementById('incident-modal').classList.remove('hidden')" class="bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/30 font-button-app px-4 py-2 rounded-lg hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">report</span>
+                <span>Report Incident</span>
+            </button>
+            <button onclick="fetchLatestData()" class="bg-surface-container-low dark:bg-slate-900 text-ink dark:text-white border border-hairline dark:border-slate-800 font-button-app px-4 py-2 rounded-lg hover:border-cyan-500/50 transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[18px]" id="refresh-icon">refresh</span>
+                <span>Refresh Data</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 1. MARINE SITUATION OVERVIEW (Top Section) -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+        
+        <!-- Safety Status & Active Advisories -->
+        <div class="xl:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Fisherman Experience: Safety Card -->
+            <div id="safety-card" class="p-6 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm flex flex-col justify-between">
+                <div>
+                    <h3 class="font-label-mono text-xs text-mute uppercase tracking-wider mb-2">Safety Status</h3>
+                    <div id="safety-status-title" class="font-display-xl text-3xl font-bold text-ink dark:text-white">Analyzing...</div>
+                    <p id="safety-status-desc" class="text-sm text-body dark:text-slate-400 mt-2">Checking conditions to determine if it is safe to go out today.</p>
+                </div>
+                <div class="mt-4 pt-4 border-t border-hairline dark:border-slate-800 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-warning" id="safety-icon">hourglass_empty</span>
+                    <span id="safety-action-text" class="text-sm font-semibold text-warning">Please wait for data.</span>
+                </div>
+            </div>
+
+            <!-- Active Advisories & AI Summary -->
+            <div class="p-6 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-label-mono text-xs text-mute uppercase tracking-wider">Active Advisories</h3>
+                    <span id="advisory-count" class="bg-surface-container-low dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold px-2 py-0.5 rounded text-ink dark:text-white">0</span>
+                </div>
+                <div id="advisory-list" class="flex-1 space-y-3 overflow-y-auto max-h-[150px] mb-4">
+                    <div class="text-sm text-mute flex items-center gap-2">

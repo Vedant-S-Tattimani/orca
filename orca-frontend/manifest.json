@@ -1,0 +1,21 @@
+{
+  "name": "ORCA Marine Intelligence",
+  "short_name": "ORCA",
+  "description": "Real-time marine intelligence and advisory platform.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#00dfd8",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -375,7 +375,7 @@
 <main class="flex-1 flex flex-col h-full pt-16 relative overflow-hidden">
 <div class="flex-1 flex overflow-hidden">
 <!-- Chat Interface -->
-<section class="flex-1 flex flex-col min-w-0 border-r border-hairline bg-canvas">
+<section class="flex-1 lg:flex-none lg:w-[45%] flex flex-col min-w-0 border-r border-hairline bg-canvas relative z-10 shadow-xl">
 <!-- Chat History -->
 <div id="chat-history" class="flex-1 overflow-y-auto p-lg lg:p-xl space-y-xl">
 <!-- Agent Response -->
@@ -421,6 +421,16 @@
 </div>
 </div>
 </section>
+
+<!-- Desktop Map View -->
+<section class="hidden lg:flex flex-1 relative bg-slate-100 dark:bg-slate-900 z-0">
+    <div id="desktop-map" class="w-full h-full"></div>
+    <div class="absolute top-4 right-4 bg-surface/90 dark:bg-black/90 backdrop-blur border border-hairline p-3 rounded-xl shadow-lg z-[1000] max-w-xs">
+        <h4 class="font-bold text-ink dark:text-white mb-1 flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">public</span> Global Marine Context</h4>
+        <p class="text-xs text-mute">Map automatically centers and plots entities mentioned in your conversation with ORCA.</p>
+    </div>
+</section>
+
 <!-- Agent Activity Feed (Right Sidebar) -->
 <aside class="hidden xl:flex w-80 flex-col bg-surface-bright border-l border-hairline shrink-0">
 <div class="p-md border-b border-hairline flex items-center gap-sm bg-canvas">
@@ -530,7 +540,30 @@
     }
 </script>
 <script>
+let globalDesktopMap = null;
+let globalDesktopMarker = null;
+let globalPfzCircle = null;
+
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Initialize Desktop Map
+    const desktopMapEl = document.getElementById('desktop-map');
+    if (desktopMapEl) {
+        globalDesktopMap = L.map('desktop-map', { zoomControl: true, attributionControl: false }).setView([15.0, 75.0], 5);
+        const isDark = document.documentElement.classList.contains('dark');
+        const tileUrl = isDark 
+            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+            : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+        
+        const baseMap = L.tileLayer(tileUrl, { maxZoom: 19 });
+        const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+        
+        baseMap.addTo(globalDesktopMap);
+        L.control.layers({
+            "Base Map": baseMap,
+            "Satellite": satelliteMap
+        }).addTo(globalDesktopMap);
+    }
 
     // Mobile menu toggle
     const menuBtn = document.getElementById('mobile-menu-btn');
@@ -659,7 +692,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         
         let alertHTML = '';
-        if (riskCard.risk_level === 'high' || riskCard.risk_level === 'extreme') {
+        if (riskCard.risk_level === 'offline') {
+            alertHTML = `
+                <div class="bg-error-container/20 border border-error/50 rounded-lg p-sm flex gap-sm mb-md mt-sm">
+                    <span class="material-symbols-outlined text-error shrink-0">signal_disconnected</span>
+                    <div>
+                        <h4 class="font-button-app text-button-app text-error mb-xxs">Connectivity Lost</h4>
+                        <p class="font-body-md text-body-md text-ink text-sm">Cannot verify live safety or marine conditions.</p>
+                    </div>
+                </div>
+            `;
+        } else if (riskCard.risk_level === 'high' || riskCard.risk_level === 'extreme') {
             alertHTML = `
                 <div class="bg-error-container/20 border border-error/30 rounded-lg p-sm flex gap-sm mb-md mt-sm">
                     <span class="material-symbols-outlined text-error shrink-0">warning</span>
@@ -875,6 +918,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 } catch (err) { console.error("Map render err:", err); }
             }, 100);
+        }
+
+        // Update Desktop Map if available
+        if (globalDesktopMap && hasMap) {
+            let mapLat = 15.0;
+            let mapLon = 75.0;
+            if (riskCard.location_info && riskCard.location_info.lat) {
+                mapLat = riskCard.location_info.lat;
+                mapLon = riskCard.location_info.lon;
+            }
+            const locName = riskCard.location_info?.name || "Target Location";
+            globalDesktopMap.setView([mapLat, mapLon], 7);
+            
+            if (globalDesktopMarker) globalDesktopMap.removeLayer(globalDesktopMarker);
+            if (globalPfzCircle) globalDesktopMap.removeLayer(globalPfzCircle);
+            
+            globalDesktopMarker = L.marker([mapLat, mapLon]).addTo(globalDesktopMap).bindTooltip(locName, {permanent: true, direction: 'top'});
+            
+            const pfzEvidence = riskCard.evidence.find(e => (e.source || '').toLowerCase().includes('pfz'));
+            if (pfzEvidence) {
+                globalPfzCircle = L.circle([mapLat - 0.2, mapLon - 0.2], { radius: 80000, color: '#00dfd8', fillOpacity: 0.3 }).addTo(globalDesktopMap).bindTooltip("Fishing Zone Match");
+            }
         }
 
         if (hasChart) {

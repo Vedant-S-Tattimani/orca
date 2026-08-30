@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="light" lang="en">
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW registered!', reg)).catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 <script>
     (function() {
       const savedTheme = localStorage.getItem('orca_theme');
@@ -666,4 +674,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-</body></html>
+<script src="theme-extensions.js"></script>
+</html>

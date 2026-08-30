@@ -24,6 +24,8 @@ from app.interface.nlu import NLU
 from app.orchestrator.planner import Planner
 from app.orchestrator.merger import Merger
 from app.orchestrator.location_resolver import LocationResolver
+from app.api.deps import get_current_user_optional
+from fastapi import Depends
 from app.synthesis.synthesis_agent import SynthesisAgent
 from app.response.card_builder import CardBuilder
 from app.config import settings
@@ -54,7 +56,12 @@ class QueryPostInput(BaseModel):
 
 
 @api_router.post("/query")
-async def submit_api_query(request: Request, input_data: QueryPostInput, background_tasks: BackgroundTasks):
+async def submit_api_query(
+    request: Request, 
+    input_data: QueryPostInput, 
+    background_tasks: BackgroundTasks,
+    current_user: Optional[Dict] = Depends(get_current_user_optional)
+):
     """
     POST /api/query
     Input: raw user text (+ optional lat/lon if browser geolocation is available)
@@ -101,6 +108,8 @@ async def submit_api_query(request: Request, input_data: QueryPostInput, backgro
             dev_logs=["NLU: Starting natural language query parsing..."]
         )
 
+        user_id = str(current_user["_id"]) if current_user and "_id" in current_user else None
+
         # 3. Process query in background
         background_tasks.add_task(
             process_query_background,
@@ -108,7 +117,8 @@ async def submit_api_query(request: Request, input_data: QueryPostInput, backgro
             structured_query,
             session_id,
             t_nlu,
-            demo_failure
+            demo_failure,
+            user_id
         )
 
         return {
@@ -806,7 +816,8 @@ async def get_location_environmental_data(lat: float, lon: float):
 
 
 
-async def process_query_background(query_id: str, structured_query: StructuredQuery, session_id: str = "default", t_nlu: float = None, demo_failure: bool = False):
+async def process_query_background(query_id: str, structured_query: StructuredQuery, session_id: str = "default", 
+t_nlu: float = None, demo_failure: bool = False, user_id: Optional[str] = None):
     
     # Try to inherit location from history if missing
     if structured_query and (structured_query.location.lat is None or structured_query.location.lon is None):
@@ -1155,6 +1166,27 @@ Respond naturally:"""
                     data_status=d_status
                 )
             )
+            
+            # Log to historical_readings if value is a number
+            if isinstance(ref.get("value"), (int, float)):
+                try:
+                    from app.db import db_manager
+                    if db_manager.db is not None:
+                        reading_doc = {
+                            "location": structured_query.location.name or f"{structured_query.location.lat},{structured_query.location.lon}",
+                            "type": ref.get("field", "reading"),
+                            "value": float(ref.get("value")),
+                            "timestamp": ts,
+                            "metadata": {
+                                "source": source_name,
+                                "data_status": d_status,
+                                "confidence": ref.get("confidence", 0.9)
+                            },
+                            "created_at": datetime.utcnow()
+                        }
+                        asyncio.create_task(db_manager.db["historical_readings"].insert_one(reading_doc))
+                except Exception as reading_err:
+                    logger.warning(f"Failed to save historical reading: {reading_err}")
 
         # Step 10: Build AgentStatus list
         agent_statuses = []
@@ -1246,6 +1278,24 @@ Respond naturally:"""
                 "role": "assistant",
                 "content": orca_response["summary"] + "\n" + orca_response["recommendation"]
             })
+            
+        # Log to MongoDB user_queries
+        from app.db import db_manager
+        if db_manager.db is not None:
+            try:
+                # Log query to user_queries for analytics
+                query_doc = {
+                    "query_id": query_id,
+                    "user_id": user_id,
+                    "query_text": structured_query.original_query,
+                    "parsed_intent": structured_query.task.value if hasattr(structured_query.task, "value") else str(structured_query.task),
+                    "execution_time_ms": (time.time() - t_nlu) * 1000 if t_nlu else 0,
+                    "timestamp": datetime.utcnow(),
+                    "created_at": datetime.utcnow()
+                }
+                await db_manager.db["user_queries"].insert_one(query_doc)
+            except Exception as mongo_err:
+                logger.error(f"Failed to log user query to MongoDB: {mongo_err}")
 
         logger.info(f"Query {query_id} background processing finished successfully")
 

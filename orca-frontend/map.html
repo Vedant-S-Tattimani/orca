@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 
-<html class="h-full" lang="en"><head>
+<html class="h-full" lang="en">
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW registered!', reg)).catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 <script>
     (function() {
       const savedTheme = localStorage.getItem('orca_theme');
@@ -760,9 +768,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Geographic Map Tile Layer (OpenStreetMap)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const baseMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19
+    });
+    
+    const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 19
+    });
+
+    baseMap.addTo(map);
+
+    L.control.layers({
+        "Base Map": baseMap,
+        "Satellite": satelliteMap
     }).addTo(map);
 
     // Dynamic Layer Groups
@@ -1327,4 +1347,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-</body></html>
+<script src="theme-extensions.js"></script>
+</html>

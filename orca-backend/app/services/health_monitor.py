@@ -45,7 +45,7 @@ class HealthMonitorService:
                 
                 if is_healthy and last_fetch:
                     age_hours = (datetime.utcnow() - last_fetch).total_seconds() / 3600
-                    if age_hours > 24:
+                    if age_hours > 2:
                         status = "DEGRADED"
                         staleness_warning = f"Data is stale by {round(age_hours, 1)} hours"
                         overall_status = "DEGRADED"

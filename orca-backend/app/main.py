@@ -3,6 +3,7 @@ ORCA Backend - Main Application Entry Point
 Marine EcoSystem Reasoning with Collaborative Agents
 """
 
+import os
 import time
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,17 +34,36 @@ async def log_requests(request: Request, call_next):
     )
     return response
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    # Basic CSP for API and Swagger docs
+    response.headers["Content-Security-Policy"] = "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self'"
+    return response
+
+# Setup CORS origins
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS")
+if allowed_origins_env:
+    origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+else:
+    logger.warning("No ALLOWED_ORIGINS set — using localhost defaults, do not use this config in production.")
+    origins = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
-        "*"
-    ],
+        "http://127.0.0.1:3000"
+    ]
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -87,6 +107,10 @@ async def startup_event():
     except Exception as e:
         logger.warning(f"Maritime graph initialization failed: {e}. "
                       "Routing will use COASTAL_FALLBACK mode.")
+                      
+    from app.tasks.historical_logger import historical_logging_task
+    import asyncio
+    asyncio.create_task(historical_logging_task())
 
 @app.on_event("shutdown")
 async def shutdown_event():

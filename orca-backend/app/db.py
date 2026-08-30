@@ -37,6 +37,8 @@ async def connect_to_mongo():
             await db_manager.db["hazard_advisories"].create_index("location")
             await db_manager.db["historical_readings"].create_index("location")
             await db_manager.db["alert_subscriptions"].create_index("location")
+            await db_manager.db["user_queries"].create_index("created_at")
+            await db_manager.db["user_queries"].create_index("query_id")
             logger.info("MongoDB indexes verified/created successfully.")
         except Exception as idx_err:
             logger.warning(f"Failed to create some MongoDB indexes: {idx_err}")

@@ -43,3 +43,70 @@ async def subscribe_alerts(request: SubscribeRequest, db = Depends(get_db)):
     logger.info(f"Subscribed {request.phone_number} to alerts for {request.location}")
     
     return {"status": "ok", "message": f"Successfully subscribed to alerts for {request.location}"}
+
+from app.api.deps import RoleChecker
+from typing import List
+
+allow_coastal_auth = RoleChecker(["coastal_authority", "admin"])
+
+class ManualAdvisoryRequest(BaseModel):
+    title: str = Field(..., description="Title of the advisory")
+    severity: str = Field(..., description="Severity (HIGH, EXTREME, etc.)")
+    location: str = Field(..., description="Affected location/region")
+    hazard: str = Field(..., description="Description of the hazard")
+    recommended_action: str = Field(..., description="Action to take")
+
+@router.post("/advisory", summary="Manual advisory override for coastal authorities", dependencies=[Depends(allow_coastal_auth)])
+async def create_manual_advisory(request: ManualAdvisoryRequest, db = Depends(get_db)):
+    """
+    Create a manual hazard advisory, overriding or supplementing the automated Risk Engine.
+    Requires coastal_authority role.
+    """
+    from app.services.alert_service import AlertService
+    alert_svc = AlertService()
+    
+    alert_data = request.dict()
+    alert_data["provenance"] = "Coastal Authority (Manual Override)"
+    
+    try:
+        alert_id = await alert_svc.push_alert(alert_data)
+        return {"status": "ok", "message": "Manual advisory dispatched", "alert_id": alert_id}
+    except Exception as e:
+        logger.error(f"Failed to dispatch manual advisory: {e}")
+        raise HTTPException(status_code=500, detail="Failed to dispatch advisory")
+
+@router.get("/audit", summary="Alert dispatch audit log", dependencies=[Depends(allow_coastal_auth)])
+async def get_alert_audit_log(limit: int = 50, db = Depends(get_db)):
+    """
+    View a record of all dispatched alerts.
+    Requires coastal_authority role.
+    """
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not connected")
+        
+    cursor = db["hazard_advisories"].find({}).sort("created_at", -1).limit(limit)
+    advisories = await cursor.to_list(length=limit)
+    
+    # Convert ObjectIds to strings
+    for adv in advisories:
+        adv["_id"] = str(adv["_id"])
+        
+    return {"status": "ok", "count": len(advisories), "audit_log": advisories}
+
+@router.get("/region", summary="Region-wide advisory view", dependencies=[Depends(allow_coastal_auth)])
+async def get_region_wide_advisories(db = Depends(get_db)):
+    """
+    View all active advisories across all zones at once.
+    Requires coastal_authority role.
+    """
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database not connected")
+        
+    # Active advisories are those that haven't expired (TTL index handles deletion, so all in collection are active)
+    cursor = db["hazard_advisories"].find({}).sort("created_at", -1)
+    advisories = await cursor.to_list(length=100)
+    
+    for adv in advisories:
+        adv["_id"] = str(adv["_id"])
+        
+    return {"status": "ok", "active_advisories": advisories}

@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 
-<html class="light" lang="en"><head>
+<html class="light" lang="en">
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(reg => console.log('SW registered!', reg)).catch(err => console.log('SW failed', err));
+    });
+  }
+</script>
 <script>
     (function() {
       const savedTheme = localStorage.getItem('orca_theme');
@@ -24,6 +32,7 @@
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="api.js"></script>
 <script>OrcaAPI.requireAuth();</script>
@@ -688,13 +697,26 @@ document.addEventListener('DOMContentLoaded', () => {
         ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
         : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
         
-    L.tileLayer(tileUrl, {
+    const baseMap = L.tileLayer(tileUrl, {
         attribution: '&copy; CartoDB',
         maxZoom: 19
+    });
+    
+    const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 19
+    });
+
+    baseMap.addTo(map);
+
+    L.control.layers({
+        "Base Map": baseMap,
+        "Satellite": satelliteMap
     }).addTo(map);
 
     let pfzZones = [];
     let markersLayer = L.layerGroup().addTo(map);
+    let heatLayer = null;
     let customPointMarker = null;
     window.weatherChartInstance = null;
 
@@ -775,20 +797,27 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function renderMapMarkers() {
         markersLayer.clearLayers();
+        if (heatLayer) {
+            map.removeLayer(heatLayer);
+            heatLayer = null;
+        }
+
+        const heatPoints = pfzZones.map(zone => {
+            const intensity = zone.suitability ? (zone.suitability / 100) : 0.5;
+            return [zone.coords[0], zone.coords[1], intensity];
+        });
+        
+        if (heatPoints.length > 0) {
+            heatLayer = L.heatLayer(heatPoints, {
+                radius: 40,
+                blur: 30,
+                maxZoom: 10,
+                gradient: {0.4: 'blue', 0.6: 'cyan', 0.8: 'lime', 1.0: 'red'}
+            }).addTo(map);
+        }
+
         pfzZones.forEach((zone, index) => {
             const latlng = [zone.coords[0], zone.coords[1]];
-            
-            L.circle(latlng, {
-                color: zone.color,
-                fillColor: zone.color,
-                fillOpacity: 0.2,
-                radius: 30000 
-            }).addTo(markersLayer)
-            .bindTooltip(`<b>${zone.name}</b><br>Suitability: ${zone.suitability}%<br>SST: ${zone.sst}°C`)
-            .on('click', (e) => {
-                L.DomEvent.stopPropagation(e);
-                updateSidePanel(zone);
-            });
             
             const windDir = zone.wind.direction_deg || 0;
             const windSpeed = zone.wind.speed_kmh || 0;
@@ -1336,4 +1365,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-</body></html>
+<script src="theme-extensions.js"></script>
+</html>
