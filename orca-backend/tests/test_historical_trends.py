@@ -53,12 +53,44 @@ def test_historical_trends_fisherman_forbidden():
 def test_historical_trends_researcher_success():
     # Create researcher token
     token = create_access_token(data={"sub": "researcher@orca.com", "role": "researcher"})
-    response = client.get(
-        "/api/v1/historical/trends?location=Mangalore-Coast&days=7",
-        headers={"Authorization": f"Bearer {token}"}
-    )
+    
+    # Patch the db_manager used inside the historical endpoint with event-per-metric mock docs
+    from datetime import datetime
+    mock_docs = [
+        {"_id": "id1", "location": "Mangalore-Coast", "type": "sst", "value": 28.5,
+         "timestamp": datetime(2024, 1, 1), "created_at": datetime(2024, 1, 1)},
+        {"_id": "id2", "location": "Mangalore-Coast", "type": "chlorophyll", "value": 1.2,
+         "timestamp": datetime(2024, 1, 1), "created_at": datetime(2024, 1, 1)},
+    ]
+    
+    mock_cursor = AsyncMock()
+    mock_cursor.__aiter__.return_value = mock_docs
+    
+    mock_find = MagicMock()
+    mock_sort = MagicMock()
+    mock_sort.limit.return_value = mock_cursor
+    mock_find.sort.return_value = mock_sort
+    
+    with patch("app.api.v1.historical.db_manager") as mock_db_mgr, \
+         patch("app.api.deps.UserService.get_user_by_email") as mock_get_user:
+        async def mock_user(email):
+            return {"email": email, "role": "researcher"}
+        mock_get_user.side_effect = mock_user
+        
+        mock_collection = MagicMock()
+        mock_collection.find.return_value = mock_find
+        mock_db_mgr.db = {"historical_readings": mock_collection}
+        
+        response = client.get(
+            "/api/v1/historical/trends?location=Mangalore-Coast&days=7",
+            headers={"Authorization": f"Bearer {token}"}
+        )
+    
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
     assert len(data["data"]) == 1
+    # The pivot logic groups by date and maps type -> field name
     assert data["data"][0]["sst"] == 28.5
+    assert data["data"][0]["chlorophyll"] == 1.2
+

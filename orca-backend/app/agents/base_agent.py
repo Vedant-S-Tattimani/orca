@@ -27,7 +27,8 @@ class BaseAgent(ABC):
         longitude: float,
         start_time: datetime,
         end_time: datetime,
-        radius_km: Optional[float] = None
+        radius_km: Optional[float] = None,
+        user_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Fetch raw data from the agent's data source
@@ -65,7 +66,9 @@ class BaseAgent(ABC):
         longitude: float,
         start_time: datetime,
         end_time: datetime,
-        radius_km: Optional[float] = None
+        radius_km: Optional[float] = None,
+        user_id: Optional[str] = None,
+        **kwargs
     ) -> Dict[str, Any]:
         """
         Main processing method that combines fetch and to_structured
@@ -82,7 +85,19 @@ class BaseAgent(ABC):
         """
         try:
             self.logger.info(f"Fetching data for {self.agent_name} at ({latitude}, {longitude})")
-            raw_data = await self.fetch(latitude, longitude, start_time, end_time, radius_km)
+            
+            # Pass user_id and kwargs if the agent's fetch signature accepts it
+            import inspect
+            sig = inspect.signature(self.fetch)
+            fetch_kwargs = {}
+            if 'user_id' in sig.parameters:
+                fetch_kwargs['user_id'] = user_id
+            for k, v in kwargs.items():
+                if k in sig.parameters:
+                    fetch_kwargs[k] = v
+                    
+            raw_data = await self.fetch(latitude, longitude, start_time, end_time, radius_km, **fetch_kwargs)
+                
             structured_data = self.to_structured(raw_data)
             self.logger.info(f"Processed data for {self.agent_name}")
             return structured_data

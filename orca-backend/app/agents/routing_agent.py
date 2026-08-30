@@ -7,7 +7,7 @@ from datetime import datetime
 import logging
 
 from .base_agent import BaseAgent
-from ..services.routing_service import RoutingService
+from ..services.routing_service import RoutingService, COASTAL_WAYPOINTS, haversine_distance_km
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,9 @@ class RoutingAgent(BaseAgent):
         longitude: float,
         start_time: datetime,
         end_time: datetime,
-        radius_km: Optional[float] = None
+        radius_km: Optional[float] = None,
+        user_id: Optional[str] = None,
+        emergency: bool = False
     ) -> Dict[str, Any]:
         """
         Fetch optimized routing parameters.
@@ -40,6 +42,20 @@ class RoutingAgent(BaseAgent):
         # But we can override dest_lat/dest_lon in radius_km parameter or standard context if needed.
         dest_lat = 13.0906
         dest_lon = 80.2989
+
+        if emergency:
+            self.logger.info("EMERGENCY mode active: routing to nearest safe harbour.")
+            best_dist = float('inf')
+            best_wp = None
+            for wp in COASTAL_WAYPOINTS:
+                dist = haversine_distance_km(latitude, longitude, wp["lat"], wp["lon"])
+                if dist < best_dist:
+                    best_dist = dist
+                    best_wp = wp
+            if best_wp:
+                dest_lat = best_wp["lat"]
+                dest_lon = best_wp["lon"]
+                self.logger.info(f"Nearest safe harbour identified as {best_wp['name']} at {best_dist}km.")
         
         self.logger.info(f"Routing Agent calculating route from ({latitude}, {longitude}) to ({dest_lat}, {dest_lon})")
         

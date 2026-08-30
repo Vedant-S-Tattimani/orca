@@ -1,11 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
 from app.services.auth_service import verify_password, get_password_hash, create_access_token
 from app.services.user_service import UserService
 from app.api.deps import get_current_active_user
+from app.utils.rate_limiter import RateLimiter
 
 router = APIRouter()
+
+# Rate limiters
+login_limiter = RateLimiter(max_requests=5, window_seconds=900)      # 5 per 15 min
+register_limiter = RateLimiter(max_requests=3, window_seconds=3600)  # 3 per hour
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -24,7 +29,14 @@ class UserResponse(BaseModel):
     role: str
 
 @router.post("/register", response_model=UserResponse)
-async def register(user_in: UserCreate):
+async def register(request: Request, user_in: UserCreate):
+    client_ip = request.client.host if request.client else "unknown"
+    if not register_limiter.allow(client_ip):
+        raise HTTPException(
+            status_code=429,
+            detail="Too many registration attempts. Try again later."
+        )
+
     user_svc = UserService()
     existing_user = await user_svc.get_user_by_email(user_in.email)
     if existing_user:
@@ -46,7 +58,14 @@ async def register(user_in: UserCreate):
     )
 
 @router.post("/login", response_model=Token)
-async def login_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
+    client_ip = request.client.host if request.client else "unknown"
+    if not login_limiter.allow(client_ip):
+        raise HTTPException(
+            status_code=429,
+            detail="Too many login attempts. Try again in 15 minutes."
+        )
+
     user_svc = UserService()
     user = await user_svc.get_user_by_email(form_data.username)
     if not user or not verify_password(form_data.password, user["hashed_password"]):
@@ -71,3 +90,4 @@ async def read_users_me(current_user = Depends(get_current_active_user)):
         full_name=current_user["full_name"],
         role=current_user["role"]
     )
+

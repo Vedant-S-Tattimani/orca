@@ -24,6 +24,7 @@ class AgentType(str, Enum):
     AIS = "ais_agent"
     RISK = "risk_agent"
     ROUTING = "routing_agent"
+    BOUNDARY = "boundary_agent"
 
 class OrchestrationPlan:
     """
@@ -61,6 +62,7 @@ class Planner:
         # We include both official agents (IMD/INCOIS) and Open-Meteo agents as alternatives/fallbacks
         self.task_to_agents = {
             TaskType.SAFETY_CHECK: [
+                AgentType.BOUNDARY,
                 AgentType.WEATHER,
                 AgentType.SEA_STATE,
                 AgentType.HAZARD,
@@ -68,6 +70,7 @@ class Planner:
                 AgentType.RISK
             ],
             TaskType.FISHING_ZONES: [
+                AgentType.BOUNDARY,
                 AgentType.PFZ_SATELLITE,
                 AgentType.WEATHER,
                 AgentType.SEA_STATE,
@@ -75,6 +78,7 @@ class Planner:
                 AgentType.RISK
             ],
             TaskType.ROUTE_PLANNING: [
+                AgentType.BOUNDARY,
                 AgentType.WEATHER,
                 AgentType.SEA_STATE,
                 AgentType.HAZARD,
@@ -83,6 +87,7 @@ class Planner:
                 AgentType.ROUTING
             ],
             TaskType.HAZARD_ALERT: [
+                AgentType.BOUNDARY,
                 AgentType.HAZARD,
                 AgentType.WEATHER,
                 AgentType.SEA_STATE,
@@ -90,9 +95,11 @@ class Planner:
                 AgentType.RISK
             ],
             TaskType.WEATHER_INFO: [
+                AgentType.BOUNDARY,
                 AgentType.WEATHER
             ],
             TaskType.GENERAL_INQUIRY: [
+                AgentType.BOUNDARY,
                 AgentType.WEATHER,
                 AgentType.SEA_STATE,
                 AgentType.HAZARD,
@@ -184,7 +191,7 @@ class Planner:
         }
 
     async def invoke_agents(self, agent_types: List[str], latitude: float, longitude: float,
-                          start_time: datetime, end_time: datetime, radius_km: Optional[float] = None) -> Dict[str, Any]:
+                          start_time: datetime, end_time: datetime, radius_km: Optional[float] = None, user_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Invoke specialist agents in parallel to fetch data
 
@@ -209,6 +216,7 @@ class Planner:
         from app.agents.ais_agent import AISAgent
         from app.agents.risk_agent import RiskAgent
         from app.agents.routing_agent import RoutingAgent
+        from app.agents.boundary_agent import BoundaryAgent
 
         # Map agent type strings to agent classes
         agent_classes = {
@@ -221,7 +229,8 @@ class Planner:
             "gis_agent": GISAgent,
             "ais_agent": AISAgent,
             "risk_agent": RiskAgent,
-            "routing_agent": RoutingAgent
+            "routing_agent": RoutingAgent,
+            "boundary_agent": BoundaryAgent
         }
 
         # Create agent instances
@@ -240,7 +249,8 @@ class Planner:
                 longitude=longitude,
                 start_time=start_time,
                 end_time=end_time,
-                radius_km=radius_km
+                radius_km=radius_km,
+                user_id=user_id
             )
             # Wrap with a 10 second timeout
             task = asyncio.create_task(asyncio.wait_for(process_coro, timeout=10.0))

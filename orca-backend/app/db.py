@@ -33,12 +33,30 @@ async def connect_to_mongo():
             await db_manager.db["hazard_advisories"].create_index(
                 "created_at", expireAfterSeconds=2592000
             )
-            # 2. Location index for faster querying
+            # 2. TTL index for historical_readings (expires after 90 days = 7776000 seconds)
+            await db_manager.db["historical_readings"].create_index(
+                "created_at", expireAfterSeconds=7776000
+            )
+            # 3. Compound index for historical_readings /trends queries (location + timestamp)
+            await db_manager.db["historical_readings"].create_index(
+                [("location", 1), ("timestamp", 1)]
+            )
+            # 4. Location index for faster querying
             await db_manager.db["hazard_advisories"].create_index("location")
             await db_manager.db["historical_readings"].create_index("location")
             await db_manager.db["alert_subscriptions"].create_index("location")
             await db_manager.db["user_queries"].create_index("created_at")
             await db_manager.db["user_queries"].create_index("query_id")
+            
+            # 5. Boundary logs and SOS
+            await db_manager.db["boundary_logs"].create_index("created_at")
+            await db_manager.db["boundary_logs"].create_index("user_id")
+            await db_manager.db["sos_alerts"].create_index("created_at")
+            await db_manager.db["sos_alerts"].create_index("resolved")
+            
+            # 6. Trips
+            await db_manager.db["trips"].create_index([("user_id", 1), ("status", 1)])
+            
             logger.info("MongoDB indexes verified/created successfully.")
         except Exception as idx_err:
             logger.warning(f"Failed to create some MongoDB indexes: {idx_err}")

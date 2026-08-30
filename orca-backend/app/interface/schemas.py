@@ -109,3 +109,4 @@ class RiskCard(BaseModel):
     dev_logs: List[str] = Field(default_factory=list, description="Internal agent execution and developer logs")
     suggested_queries: List[str] = Field(default_factory=list, description="Follow-up quick reply suggestions")
     location_info: dict = Field(default_factory=dict, description="Location coordinates and metadata")
+    stale: bool = Field(False, description="Indicates if the data is from an older cached advisory")

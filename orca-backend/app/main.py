@@ -75,6 +75,8 @@ from app.api.v1.health import router as health_router
 from app.api.v1.historical import router as historical_router
 from app.api.v1.reports import router as reports_router
 from app.api.v1.alerts import router as alerts_router
+from app.api.v1.sos import router as sos_router
+from app.api.v1.trips import router as trips_router
 
 from app.db import connect_to_mongo, close_mongo_connection
 from app.services.geospatial_service import GeofenceCache
@@ -86,6 +88,8 @@ app.include_router(health_router, prefix="/api/v1/health", tags=["health"])
 app.include_router(historical_router, prefix="/api/v1/historical", tags=["historical"])
 app.include_router(reports_router, prefix="/api/v1/reports", tags=["reports"])
 app.include_router(alerts_router, prefix="/api/v1/alerts", tags=["alerts"])
+app.include_router(sos_router, prefix="/api/v1/sos", tags=["sos"])
+app.include_router(trips_router, prefix="/api/v1/trips", tags=["trips"])
 
 @app.on_event("startup")
 async def startup_event():

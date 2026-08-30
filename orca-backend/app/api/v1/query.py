@@ -24,11 +24,12 @@ from app.interface.nlu import NLU
 from app.orchestrator.planner import Planner
 from app.orchestrator.merger import Merger
 from app.orchestrator.location_resolver import LocationResolver
-from app.api.deps import get_current_user_optional
-from fastapi import Depends
+from app.api.deps import get_current_user_optional, get_current_user
+from fastapi import Depends, HTTPException, Request
 from app.synthesis.synthesis_agent import SynthesisAgent
 from app.response.card_builder import CardBuilder
 from app.config import settings
+from app.utils.query_sanitizer import sanitize_query
 
 logger = logging.getLogger(__name__)
 
@@ -79,12 +80,15 @@ async def submit_api_query(
         
         history = conversation_history[session_id]
 
-        # 1. Parse raw query text into StructuredQuery using NLU
+        # 1. Sanitize user input against prompt injection
+        safe_text = sanitize_query(input_data.text)
+
+        # 2. Parse raw query text into StructuredQuery using NLU
         t0 = time.time()
         logger.info("Processing query via NLU...")
         nlu_processor = NLU()
         structured_query = await nlu_processor.parse_query(
-            text=input_data.text,
+            text=safe_text,
             lat=input_data.lat,
             lon=input_data.lon,
             history=history
@@ -190,6 +194,54 @@ async def get_vessels():
     """GET /api/vessels - Returns simulated AIS vessel tracking feed"""
     from app.services.ais_service import AISService
     return await AISService().get_all_vessels()
+
+
+@api_router.get("/v1/advisory/last-known")
+async def get_last_known_advisory(current_user: Dict = Depends(get_current_user)):
+    """
+    GET /api/v1/advisory/last-known
+    Offline/degraded connectivity handling. Returns the most recent RiskCard for the user.
+    """
+    from app.db import db_manager
+    if db_manager.db is None:
+        raise HTTPException(status_code=500, detail="Database not connected")
+        
+    user_id = str(current_user["_id"])
+    cursor = db_manager.db["user_queries"].find({"user_id": user_id, "status": "done"}).sort("created_at", -1).limit(1)
+    
+    docs = await cursor.to_list(length=1)
+    if not docs:
+        raise HTTPException(status_code=404, detail="No previous advisories found")
+        
+    doc = docs[0]
+    
+    from datetime import datetime, timezone
+    
+    # Check staleness based on age (e.g. older than 3 hours is considered stale)
+    created_at = doc.get("created_at")
+    is_stale = False
+    age_hours = 0
+    if created_at:
+        age_delta = datetime.now(timezone.utc) - created_at.replace(tzinfo=timezone.utc)
+        age_hours = age_delta.total_seconds() / 3600
+        if age_hours > 3:
+            is_stale = True
+            
+    # Format the result similar to a RiskCard
+    result = {
+        "query_id": doc.get("query_id"),
+        "risk_level": doc.get("risk_level", "unknown"),
+        "reasoning": doc.get("reasoning", ""),
+        "recommendation": doc.get("recommendation", ""),
+        "evidence": doc.get("evidence", []),
+        "agent_status": doc.get("agent_status", []),
+        "status": doc.get("status"),
+        "created_at": created_at.isoformat() if created_at else None,
+        "stale": is_stale,
+        "age_hours": round(age_hours, 1)
+    }
+    
+    return {"status": "success", "data": result}
 
 
 class AlertPushRequest(BaseModel):
@@ -403,6 +455,7 @@ class RouteRequest(BaseModel):
     dest_lon: float
     vessel_speed_knots: float = 12.0
     vessel_draft_m: float = 4.0
+    emergency: bool = False
 
 @api_router.post("/route")
 async def calculate_route(request: RouteRequest):
@@ -422,11 +475,27 @@ async def calculate_route(request: RouteRequest):
         "data_status": "UNAVAILABLE"
     }
     
+    dest_lat = request.dest_lat
+    dest_lon = request.dest_lon
+    
+    if request.emergency:
+        from app.services.routing_service import COASTAL_WAYPOINTS, haversine_distance_km
+        best_dist = float('inf')
+        best_wp = None
+        for wp in COASTAL_WAYPOINTS:
+            dist = haversine_distance_km(request.origin_lat, request.origin_lon, wp["lat"], wp["lon"])
+            if dist < best_dist:
+                best_dist = dist
+                best_wp = wp
+        if best_wp:
+            dest_lat = best_wp["lat"]
+            dest_lon = best_wp["lon"]
+    
     route_data = rs.calculate_route(
         origin_lat=request.origin_lat,
         origin_lon=request.origin_lon,
-        dest_lat=request.dest_lat,
-        dest_lon=request.dest_lon,
+        dest_lat=dest_lat,
+        dest_lon=dest_lon,
         vessel_speed_knots=request.vessel_speed_knots,
         vessel_draft_m=request.vessel_draft_m,
         env_data=env_data,
@@ -971,7 +1040,8 @@ Respond naturally:"""
             location_info["longitude"],
             structured_query.time_window.start,
             structured_query.time_window.end,
-            location_info.get("radius_km")
+            location_info.get("radius_km"),
+            user_id
         )
         
         if demo_failure:
@@ -1301,15 +1371,47 @@ Respond naturally:"""
 
     except Exception as e:
         logger.error(f"Error processing background query {query_id}: {str(e)}")
-        query_results[query_id] = RiskCard(
-            risk_level="medium",
-            reasoning=f"Agent reasoning synthesis failed: {str(e)}",
-            recommendation="Please try submitting your safety check query again.",
-            evidence=[],
-            agent_status=[AgentStatus(agent_name="synthesis", status="failed", note=str(e))],
-            status="failed",
-            dev_logs=["SYSTEM_ORCHESTRATOR ERROR: " + str(e)]
-        )
+        
+        # Fallback to last-known advisory if user is authenticated and DB is available
+        stale_fallback = False
+        from app.db import db_manager
+        if user_id and db_manager.db is not None:
+            try:
+                cursor = db_manager.db["user_queries"].find({"user_id": user_id, "status": "done"}).sort("created_at", -1).limit(1)
+                docs = await cursor.to_list(length=1)
+                if docs:
+                    doc = docs[0]
+                    from datetime import datetime, timezone
+                    created_at = doc.get("created_at")
+                    age_hours = 0
+                    if created_at:
+                        age_delta = datetime.now(timezone.utc) - created_at.replace(tzinfo=timezone.utc)
+                        age_hours = age_delta.total_seconds() / 3600
+                    
+                    query_results[query_id] = RiskCard(
+                        risk_level=doc.get("risk_level", "medium"),
+                        reasoning=f"⚠️ Live retrieval failed. Showing last known advisory from {round(age_hours, 1)} hours ago.\n\n" + doc.get("reasoning", ""),
+                        recommendation=doc.get("recommendation", ""),
+                        evidence=[],
+                        agent_status=[],
+                        status="done",
+                        dev_logs=["SYSTEM_ORCHESTRATOR ERROR: " + str(e), "Fallback to last known advisory invoked."],
+                        stale=True
+                    )
+                    stale_fallback = True
+            except Exception as fallback_err:
+                logger.error(f"Fallback to last known advisory failed: {fallback_err}")
+                
+        if not stale_fallback:
+            query_results[query_id] = RiskCard(
+                risk_level="medium",
+                reasoning=f"Agent reasoning synthesis failed: {str(e)}",
+                recommendation="Please try submitting your safety check query again.",
+                evidence=[],
+                agent_status=[AgentStatus(agent_name="synthesis", status="failed", note=str(e))],
+                status="failed",
+                dev_logs=["SYSTEM_ORCHESTRATOR ERROR: " + str(e)]
+            )
 
 
 # --- Legacy endpoints preserved for backward compatibility ---

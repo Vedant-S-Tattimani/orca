@@ -10,6 +10,9 @@ import asyncio
 from .base_agent import BaseAgent
 from ..services.imd_client import IMDClient
 from ..config import settings
+from astral import LocationInfo
+from astral.sun import sun
+from astral.moon import phase as moon_phase
 
 logger = logging.getLogger(__name__)
 
@@ -84,8 +87,29 @@ class WeatherAgent(BaseAgent):
         if "forecast_hours" not in base_data:
             base_data["forecast_hours"] = int((end_time - start_time).total_seconds() / 3600)
 
+        # Add astronomical data (sun/moon)
+        astro_data = self._get_astronomical_data(latitude, longitude, start_time)
+        base_data.update(astro_data)
+
         self.logger.debug(f"Fetched weather data: {base_data}")
         return base_data
+
+    def _get_astronomical_data(self, latitude: float, longitude: float, target_date: datetime) -> Dict[str, Any]:
+        try:
+            loc = LocationInfo("Custom", "Region", "Timezone", latitude, longitude)
+            # Make target_date naive or timezone-aware based on astral needs?
+            # sun() expects a date. We can just use the date part.
+            s = sun(loc.observer, date=target_date.date())
+            # moon_phase returns a float from 0 to 27.99 (days since new moon)
+            m_phase = moon_phase(target_date.date())
+            return {
+                "sunrise": s["sunrise"].isoformat(),
+                "sunset": s["sunset"].isoformat(),
+                "moon_phase_days": round(m_phase, 2)
+            }
+        except Exception as e:
+            self.logger.error(f"Error calculating astronomical data: {e}")
+            return {}
 
     def to_structured(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -109,7 +133,7 @@ class WeatherAgent(BaseAgent):
         weather_fields = [
             "wind_speed_kmh", "wind_direction_deg", "rainfall_mm",
             "visibility_km", "temperature_c", "humidity_percent",
-            "pressure_hpa", "forecast_hours"
+            "pressure_hpa", "forecast_hours", "sunrise", "sunset", "moon_phase_days"
         ]
 
         for field in weather_fields:
