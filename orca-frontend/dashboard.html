@@ -435,16 +435,63 @@ html.dark .border-slate-800 {
             <span class="material-symbols-outlined">directions_boat</span>
             Coastal Authority Dashboard
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Alerts and SOS Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div class="p-6 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm">
-                <h4 class="font-bold text-ink dark:text-white mb-2">Regional Fleet Status</h4>
-                <p class="text-sm text-body dark:text-slate-400 mb-4">Monitor active fishing vessels in your jurisdiction.</p>
-                <div class="text-2xl font-bold text-blue-500">142 Active Vessels</div>
+                <h4 class="font-bold text-ink dark:text-white mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-red-500">campaign</span> Create Manual Advisory</h4>
+                <form id="ca-advisory-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-ink dark:text-white">Title</label>
+                        <input type="text" id="ca-adv-title" required class="w-full rounded bg-surface dark:bg-slate-800 border border-hairline dark:border-slate-700 p-2 text-ink dark:text-white" />
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-ink dark:text-white">Severity</label>
+                            <select id="ca-adv-severity" class="w-full rounded bg-surface dark:bg-slate-800 border border-hairline dark:border-slate-700 p-2 text-ink dark:text-white">
+                                <option value="LOW">LOW</option>
+                                <option value="MEDIUM">MEDIUM</option>
+                                <option value="HIGH">HIGH</option>
+                                <option value="EXTREME">EXTREME</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1 text-ink dark:text-white">Location</label>
+                            <input type="text" id="ca-adv-location" required class="w-full rounded bg-surface dark:bg-slate-800 border border-hairline dark:border-slate-700 p-2 text-ink dark:text-white" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-ink dark:text-white">Hazard Description</label>
+                        <textarea id="ca-adv-hazard" required rows="2" class="w-full rounded bg-surface dark:bg-slate-800 border border-hairline dark:border-slate-700 p-2 text-ink dark:text-white"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-ink dark:text-white">Recommended Action</label>
+                        <input type="text" id="ca-adv-action" required class="w-full rounded bg-surface dark:bg-slate-800 border border-hairline dark:border-slate-700 p-2 text-ink dark:text-white" />
+                    </div>
+                    <button type="submit" id="ca-adv-submit" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold transition-colors">Dispatch Advisory</button>
+                </form>
             </div>
-            <div class="p-6 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm">
-                <h4 class="font-bold text-ink dark:text-white mb-2">Port Operations</h4>
-                <p class="text-sm text-body dark:text-slate-400 mb-4">Current status of major ports in the region.</p>
-                <div class="text-sm font-medium text-emerald-500 flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">check_circle</span> All Ports Operational</div>
+            
+            <div class="flex flex-col gap-6">
+                <div class="p-6 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm flex-1">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-ink dark:text-white flex items-center gap-2"><span class="material-symbols-outlined text-red-500">sos</span> Active SOS Incidents</h4>
+                        <button id="ca-sos-refresh" class="text-xs text-blue-500 hover:underline">Refresh</button>
+                    </div>
+                    <div id="ca-sos-list" class="space-y-3 overflow-y-auto max-h-[150px]">
+                        <div class="text-sm text-mute text-center py-4">Loading SOS incidents...</div>
+                    </div>
+                </div>
+                
+                <div class="p-6 rounded-xl border border-hairline dark:border-slate-800 bg-surface-bright dark:bg-slate-900 shadow-sm flex-1">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-ink dark:text-white flex items-center gap-2"><span class="material-symbols-outlined text-gray-500">history_edu</span> Advisory Audit Log</h4>
+                        <button id="ca-audit-refresh" class="text-xs text-blue-500 hover:underline">Refresh</button>
+                    </div>
+                    <div id="ca-audit-list" class="space-y-3 overflow-y-auto max-h-[150px]">
+                        <div class="text-sm text-mute text-center py-4">Loading audit log...</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -619,6 +666,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (role === 'coastal_authority' || role === 'admin') {
         const caSection = document.getElementById('coastal-authority-section');
         if (caSection) caSection.classList.remove('hidden');
+        initCoastalAuthority();
     }
     if (role === 'disaster_management' || role === 'admin') {
         const dmSection = document.getElementById('disaster-management-section');
@@ -846,6 +894,108 @@ function updateChart(days) {
     historicalChart.data.labels = labels;
     historicalChart.data.datasets[0].data = data;
     historicalChart.update();
+}
+
+function initCoastalAuthority() {
+    const advForm = document.getElementById('ca-advisory-form');
+    if (advForm) {
+        advForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('ca-adv-submit');
+            const ogText = btn.innerHTML;
+            btn.innerHTML = 'Dispatching...';
+            btn.disabled = true;
+            try {
+                const req = {
+                    title: document.getElementById('ca-adv-title').value,
+                    severity: document.getElementById('ca-adv-severity').value,
+                    location: document.getElementById('ca-adv-location').value,
+                    hazard_description: document.getElementById('ca-adv-hazard').value,
+                    recommended_action: document.getElementById('ca-adv-action').value
+                };
+                await window.OrcaAPI.createManualAdvisory(req);
+                alert('Advisory Dispatched Successfully');
+                advForm.reset();
+                loadCAAuditLogs();
+            } catch (err) {
+                console.error(err);
+                alert('Failed to dispatch advisory');
+            } finally {
+                btn.innerHTML = ogText;
+                btn.disabled = false;
+            }
+        });
+    }
+
+    const sosRefresh = document.getElementById('ca-sos-refresh');
+    if (sosRefresh) {
+        sosRefresh.addEventListener('click', loadCASOSIncidents);
+    }
+
+    const auditRefresh = document.getElementById('ca-audit-refresh');
+    if (auditRefresh) {
+        auditRefresh.addEventListener('click', loadCAAuditLogs);
+    }
+
+    // Initial load
+    loadCASOSIncidents();
+    loadCAAuditLogs();
+}
+
+async function loadCASOSIncidents() {
+    const list = document.getElementById('ca-sos-list');
+    if (!list) return;
+    list.innerHTML = '<div class="text-sm text-mute text-center py-4">Loading SOS incidents...</div>';
+    try {
+        const sosData = await window.OrcaAPI.getSOSAlerts();
+        if (sosData && sosData.length > 0) {
+            list.innerHTML = sosData.map(sos => `
+                <div class="border border-red-500/30 bg-red-500/10 rounded p-3">
+                    <div class="flex justify-between items-start mb-1">
+                        <div class="font-bold text-red-500">MMSI: ${sos.vessel_mmsi}</div>
+                        <div class="text-[10px] text-mute">${sos.timestamp}</div>
+                    </div>
+                    <div class="text-xs text-ink dark:text-slate-200">
+                        Lat: ${sos.latitude}, Lon: ${sos.longitude}
+                    </div>
+                    <div class="text-xs mt-1 text-red-600 dark:text-red-400 font-semibold uppercase">
+                        ${sos.status || 'UNRESOLVED'}
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = '<div class="text-sm text-mute text-center py-4">No active SOS incidents.</div>';
+        }
+    } catch (e) {
+        console.error(e);
+        list.innerHTML = '<div class="text-sm text-red-500 text-center py-4">Failed to load SOS data.</div>';
+    }
+}
+
+async function loadCAAuditLogs() {
+    const list = document.getElementById('ca-audit-list');
+    if (!list) return;
+    list.innerHTML = '<div class="text-sm text-mute text-center py-4">Loading audit log...</div>';
+    try {
+        const logs = await window.OrcaAPI.getAlertAuditLog();
+        if (logs && logs.length > 0) {
+            list.innerHTML = logs.map(log => `
+                <div class="border-b border-hairline dark:border-slate-800 pb-2 last:border-0 last:pb-0">
+                    <div class="text-xs font-semibold text-ink dark:text-white">${log.action}</div>
+                    <div class="text-[10px] text-mute flex justify-between mt-1">
+                        <span>By: ${log.user_id}</span>
+                        <span>${log.timestamp}</span>
+                    </div>
+                    ${log.details ? `<div class="text-[10px] text-body dark:text-slate-400 mt-1 bg-surface-container-low dark:bg-slate-950 p-1 rounded">${JSON.stringify(log.details)}</div>` : ''}
+                </div>
+            `).join('');
+        } else {
+            list.innerHTML = '<div class="text-sm text-mute text-center py-4">No audit logs available.</div>';
+        }
+    } catch (e) {
+        console.error(e);
+        list.innerHTML = '<div class="text-sm text-red-500 text-center py-4">Failed to load audit logs.</div>';
+    }
 }
 </script>
 

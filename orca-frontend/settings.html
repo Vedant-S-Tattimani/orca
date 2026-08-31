@@ -493,7 +493,7 @@
 <p class="font-label-mono text-label-mono text-mute" data-i18n="set_severe_weather_desc">Immediate push notifications for storms.</p>
 </div>
 <div class="relative inline-block w-10 h-6">
-<input checked="" class="peer sr-only" type="checkbox"/>
+<input id="alert-weather-toggle" checked="" class="peer sr-only" type="checkbox"/>
 <div class="block w-10 h-6 bg-surface-variant rounded-full peer-checked:bg-secondary transition-colors"></div>
 <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-4"></div>
 </div>
@@ -630,11 +630,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
+            saveBtn.addEventListener('click', async () => {
                 if (ttsToggle) window.OrcaTTS.setPreference('orca_tts_enabled', ttsToggle.checked ? 'true' : 'false');
                 if (ttsVoiceSelect) window.OrcaTTS.setPreference('orca_tts_voice', ttsVoiceSelect.value);
                 if (ttsRateSelect) window.OrcaTTS.setPreference('orca_tts_rate', ttsRateSelect.value);
                 
+                const weatherToggle = document.getElementById('alert-weather-toggle');
+                if (weatherToggle && window.OrcaAPI && window.OrcaAPI.subscribeAlert) {
+                    try {
+                        const alertTypes = [];
+                        if (weatherToggle.checked) alertTypes.push('weather');
+                        await window.OrcaAPI.subscribeAlert({
+                            email: 'user@orca.local',
+                            region: 'ALL',
+                            alert_types: alertTypes
+                        });
+                    } catch (e) {
+                        console.error('Failed to update alert subscription', e);
+                    }
+                }
+
                 alert(window.Orcai18n ? window.Orcai18n.getTranslation('settings_saved', 'Preferences saved successfully!') : 'Preferences saved successfully!');
             });
         }

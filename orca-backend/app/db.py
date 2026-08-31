@@ -13,16 +13,15 @@ db_manager = MongoDB()
 
 async def connect_to_mongo():
     """Create database connection."""
-    mongodb_url = settings.MONGODB_URL or "mongodb://localhost:27017"
+    mongodb_url = settings.MONGODB_URL or "mongodb://localhost:27017/orca"
     try:
         logger.info(f"Connecting to MongoDB...")
         db_manager.client = AsyncIOMotorClient(mongodb_url)
         
         # Determine database name
-        if settings.MONGODB_URL and "/" in settings.MONGODB_URL.split("?")[-1]:
-            # Extracted from standard connection string format if provided
-            db_manager.db = db_manager.client.get_default_database()
-        else:
+        try:
+            db_manager.db = db_manager.client.get_default_database(default="orca")
+        except Exception:
             db_manager.db = db_manager.client["orca"]
             
         logger.info(f"Connected to MongoDB database: {db_manager.db.name}")
