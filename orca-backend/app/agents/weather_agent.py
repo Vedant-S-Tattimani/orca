@@ -10,9 +10,14 @@ import asyncio
 from .base_agent import BaseAgent
 from ..services.imd_client import IMDClient
 from ..config import settings
-from astral import LocationInfo
-from astral.sun import sun
-from astral.moon import phase as moon_phase
+
+try:
+    from astral import LocationInfo
+    from astral.sun import sun
+    from astral.moon import phase as moon_phase
+    HAS_ASTRAL = True
+except ImportError:
+    HAS_ASTRAL = False
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +100,8 @@ class WeatherAgent(BaseAgent):
         return base_data
 
     def _get_astronomical_data(self, latitude: float, longitude: float, target_date: datetime) -> Dict[str, Any]:
+        if not HAS_ASTRAL:
+            return {}
         try:
             loc = LocationInfo("Custom", "Region", "Timezone", latitude, longitude)
             # Make target_date naive or timezone-aware based on astral needs?
