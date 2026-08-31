@@ -498,6 +498,15 @@
             border-color: #262626 !important;
         }
 
+        /* Leaflet Marine Theme Overrides */
+        .leaflet-container {
+            width: 100% !important;
+            height: 100% !important;
+            background-color: transparent !important;
+            z-index: 1;
+            font-family: 'Inter', sans-serif !important;
+        }
+
         html.dark .bg-surface,
         html.dark .bg-canvas,
         html.dark .bg-surface-container-low,
@@ -552,10 +561,10 @@ document.addEventListener('DOMContentLoaded', () => {
         globalDesktopMap = L.map('desktop-map', { zoomControl: true, attributionControl: false }).setView([15.0, 75.0], 5);
         const isDark = document.documentElement.classList.contains('dark');
         const tileUrl = isDark 
-            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-            : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+            ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         
-        const baseMap = L.tileLayer(tileUrl, { maxZoom: 19 });
+        const baseMap = L.tileLayer(tileUrl, { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' });
         const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
         
         baseMap.addTo(globalDesktopMap);
@@ -669,13 +678,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
-        } else if (riskCard.risk_level === 'high' || riskCard.risk_level === 'extreme') {
+        } else if (riskCard.risk_level === 'extreme') {
             alertHTML = `
-                <div class="bg-error-container/20 border border-error/30 rounded-lg p-sm flex gap-sm mb-md mt-sm">
-                    <span class="material-symbols-outlined text-error shrink-0">warning</span>
+                <div class="bg-error/10 border-2 border-error rounded-lg p-sm flex gap-sm mb-md mt-sm shadow-[0_0_15px_rgba(238,0,0,0.5)]">
+                    <span class="material-symbols-outlined text-error shrink-0 animate-pulse text-3xl">warning</span>
                     <div>
-                        <h4 class="font-button-app text-button-app text-error mb-xxs">Elevated Risk Detected</h4>
-                        <p class="font-body-md text-body-md text-ink text-sm">Please exercise caution and review the recommendation.</p>
+                        <h4 class="font-button-app text-button-app text-error font-bold mb-xxs uppercase tracking-wider text-lg">EXTREME RISK DETECTED</h4>
+                        <p class="font-body-md text-body-md text-ink font-bold">DANGER: Immediate action required. Follow safety instructions.</p>
+                    </div>
+                </div>
+            `;
+        } else if (riskCard.risk_level === 'high') {
+            alertHTML = `
+                <div class="bg-error-container border border-error rounded-lg p-sm flex gap-sm mb-md mt-sm">
+                    <span class="material-symbols-outlined text-error shrink-0 animate-pulse">warning</span>
+                    <div>
+                        <h4 class="font-button-app text-button-app text-error font-bold mb-xxs uppercase tracking-wider">High Risk Detected</h4>
+                        <p class="font-body-md text-body-md text-on-error-container font-medium">Caution is strongly advised. Read recommendations below.</p>
                     </div>
                 </div>
             `;
@@ -757,11 +776,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Global TTS UI Controller ---
         window.submitFeedback = async function(qId, isHelpful) {
             try {
-                await fetch('/api/feedback', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query_id: qId, is_helpful: isHelpful })
-                });
+                if (window.OrcaAPI && window.OrcaAPI._fetchAuth) {
+                    await window.OrcaAPI._fetchAuth('/api/v1/feedback', {
+                        method: 'POST',
+                        body: JSON.stringify({ query_id: qId, is_helpful: isHelpful })
+                    });
+                } else {
+                    await fetch('/api/v1/feedback', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query_id: qId, is_helpful: isHelpful })
+                    });
+                }
                 const msgEl = document.getElementById('feedback-msg-' + qId);
                 if (msgEl) {
                     msgEl.classList.remove('hidden');
@@ -862,9 +888,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const cMap = L.map('map-' + queryId, { zoomControl: false, attributionControl: false }).setView([mapLat, mapLon], 6);
                     const isDark = document.documentElement.classList.contains('dark');
                     const tileUrl = isDark 
-                        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-                    L.tileLayer(tileUrl).addTo(cMap);
+                        ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                    L.tileLayer(tileUrl, { attribution: '&copy; OpenStreetMap contributors' }).addTo(cMap);
                     
                     if (riskCard.location_info && riskCard.location_info.lat) {
                          const locName = riskCard.location_info.name || "Target Location";

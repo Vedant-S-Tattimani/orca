@@ -286,9 +286,43 @@
         .animate-wind-flow {
             animation: wind-flow 1.5s infinite ease-in-out;
         }
-      </style>
+      
+        .custom-layers-control {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .sector-label {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 11px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .legend-control {
+            background: rgba(255,255,255,0.92);
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 12px;
+            line-height: 1.6;
+            min-width: 150px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .dark .legend-control {
+            background: rgba(15,23,42,0.92);
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+        .leaflet-control-layers {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+</style>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <link rel="shortcut icon" href="favicon.ico"/>
+    <script src="data/marine_layers.js?v=3"></script>
 </head>
 <body class="flex flex-col bg-canvas h-screen overflow-hidden text-body font-body-md">
 
@@ -405,6 +439,11 @@
 <p class="font-body-lg text-body-lg text-body mt-xs" data-i18n="fishing_desc">Real-time marine conditions and predictive catch zones.</p>
 </div>
 <div class="flex gap-sm">
+
+<button onclick="window.refreshFishingData()" class="px-md py-sm rounded-lg bg-surface-container-lowest border border-hairline text-ink font-button-app hover:bg-surface-container-low transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm" id="refresh-icon">refresh</span> <span data-i18n="fish_refresh">Refresh Data</span>
+</button>
+
 <button onclick="window.clearCustomPoints()" class="px-md py-sm rounded-lg border border-hairline bg-surface-container-lowest text-ink font-button-app text-button-app hover:bg-surface-container-low transition-colors flex items-center gap-xs">
 <span class="material-symbols-outlined text-sm">clear_all</span> <span data-i18n="fish_clear_points">Clear Custom Points</span>
 </button>
@@ -566,6 +605,15 @@
 </div>
 </div>
 
+
+<!-- PFZ Intelligence Summary -->
+<div class="mt-md pt-sm border-t border-hairline/60">
+<h4 class="font-label-mono text-[10px] text-mute uppercase tracking-wider mb-xs font-semibold">PFZ INTELLIGENCE</h4>
+<div id="pfz-summary-content" class="text-xs text-body space-y-1">
+<p class="text-mute italic">Select a location to view nearby PFZ data.</p>
+</div>
+</div>
+
 <!-- Location Environmental Matrix (6 Compact Cards) -->
 <div>
 <h4 class="font-label-mono text-xs text-mute uppercase tracking-wider mb-xs font-semibold">Location Environmental Matrix</h4>
@@ -684,11 +732,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if dark mode is active to set the right basemap
     const isDark = document.documentElement.classList.contains('dark');
     const tileUrl = isDark 
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+        ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         
     const baseMap = L.tileLayer(tileUrl, {
-        attribution: '&copy; CartoDB',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19
     });
     
@@ -699,13 +747,165 @@ document.addEventListener('DOMContentLoaded', () => {
 
     baseMap.addTo(map);
 
+    
+    window.pfzLayerGroup = L.layerGroup().addTo(map);
+    window.windLayerGroup = L.layerGroup().addTo(map);
+    window.pfzLinesGroup = L.layerGroup();
+    
+    // Official INCOIS Live WMS Layer for real-time daily PFZ Lines
+    window.incoisPfzWms = L.tileLayer.wms('https://incois.gov.in/geoserver/wms', {
+        layers: 'PFZ_Automation:pfzlines',
+        format: 'image/png',
+        transparent: true,
+        version: '1.1.1',
+        attribution: 'INCOIS, Govt. of India'
+    }).addTo(window.pfzLinesGroup);
+
+    window.pfzLinesGroup.addTo(map);
+    
+
+    // Real Marine Layers based on GeoJSON and WMS
+    // Safety check: only create layers if MarineGeoJSON loaded
+    if (window.MarineGeoJSON) {
+        window.eezLayer = L.geoJSON(window.MarineGeoJSON.eez, {
+            style: { color: 'red', weight: 2, opacity: 0.8, dashArray: '5, 5' }
+        }).addTo(map);
+
+        window.sectorsLayer = L.geoJSON(window.MarineGeoJSON.sectors, {
+            style: { color: 'red', weight: 2, fillOpacity: 0.05 },
+            onEachFeature: function(feature, layer) {
+                layer.bindTooltip(feature.properties.name, { permanent: true, direction: 'center', className: 'sector-label' });
+            }
+        }).addTo(map);
+
+        window.landingCentresLayer = L.geoJSON(window.MarineGeoJSON.landingCentres, {
+            pointToLayer: function(feature, latlng) {
+                return L.circleMarker(latlng, {
+                    radius: 4, fillColor: '#ff69b4', color: '#fff', weight: 1, fillOpacity: 0.9
+                });
+            },
+            onEachFeature: function(feature, layer) {
+                layer.bindPopup('<b>' + feature.properties.name + '</b><br>Landing Centre');
+            }
+        }).addTo(map);
+    } else {
+        console.warn('MarineGeoJSON not loaded, skipping GeoJSON layers');
+        window.eezLayer = L.layerGroup();
+        window.sectorsLayer = L.layerGroup();
+        window.landingCentresLayer = L.layerGroup();
+    }
+
+    // Official INCOIS Live WMS for Sea Surface Temperature (SST)
+    window.sstLayer = L.tileLayer.wms('https://incois.gov.in/geoserver/wms', {
+        layers: 'PFZ-TUNA-SST-CHL:sst',
+        format: 'image/png',
+        transparent: true,
+        opacity: 0.65,
+        attribution: 'INCOIS, Govt. of India'
+    });
+
+    // Official INCOIS Live WMS for Chlorophyll-a
+    window.chlLayer = L.tileLayer.wms('https://incois.gov.in/geoserver/wms', {
+        layers: 'PFZ-TUNA-SST-CHL:chl',
+        format: 'image/png',
+        transparent: true,
+        opacity: 0.65,
+        attribution: 'INCOIS, Govt. of India'
+    });
+
+    window.bathymetryLayer = L.tileLayer.wms('https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', {
+        layers: 'GEBCO_LATEST',
+        format: 'image/png',
+        transparent: true,
+        opacity: 0.6,
+        attribution: 'GEBCO'
+    });
+
+    function createUnavailableLayer(name, tooltip) {
+        const layer = L.layerGroup();
+        layer.on('add', function() {
+            alert(`The ${name} layer is currently unavailable.\nReason: ${tooltip}`);
+            map.removeLayer(this);
+        });
+        return layer;
+    }
+
+
+    const overlays = {
+        "PFZ Advisory": window.pfzLayerGroup,
+        "PFZ Lines (Live INCOIS)": window.pfzLinesGroup,
+        "Wind": window.windLayerGroup,
+        "SST (Live INCOIS)": window.sstLayer,
+        "Chlorophyll-a (Live INCOIS)": window.chlLayer,
+        "Waves <span style='font-size:10px; color:gray;'>(Unavailable)</span>": createUnavailableLayer("Waves", "Requires spatial wave API integration"),
+        "Ocean Currents <span style='font-size:10px; color:gray;'>(Unavailable)</span>": createUnavailableLayer("Ocean Currents", "Requires spatial currents API integration"),
+        "Bathymetry": window.bathymetryLayer,
+        "EEZ": window.eezLayer,
+        "Sectors": window.sectorsLayer,
+        "Landing Centres": window.landingCentresLayer
+    };
+
+
     L.control.layers({
         "Base Map": baseMap,
         "Satellite": satelliteMap
-    }).addTo(map);
+    }, overlays, { collapsed: true }).addTo(map);
+    
+    // Dynamic Legend
+    const legendControl = L.control({ position: 'bottomright' });
+    legendControl.onAdd = function(map) {
+        const div = L.DomUtil.create('div', 'legend-control bg-surface/90 backdrop-blur border border-hairline rounded-lg p-sm shadow-sm text-xs font-body-md text-body min-w-[150px]');
+        div.id = 'dynamic-legend';
+        return div;
+    };
+    legendControl.addTo(map);
+
+    function updateLegend() {
+        const legend = document.getElementById('dynamic-legend');
+        if (!legend) return;
+        let html = '<h4 class="font-bold text-ink mb-2">MAP LEGEND</h4>';
+        if (map.hasLayer(window.pfzLayerGroup)) {
+            html += '<div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-cyan-500 opacity-50 block border border-cyan-500"></span> PFZ Area</div>';
+            html += '<div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 via-lime-500 to-red-500 block"></span> PFZ Heatmap</div>';
+        }
+        
+        if (map.hasLayer(window.pfzLinesGroup)) {
+            html += '<div class="flex items-center gap-2 mb-1"><span class="w-4 h-1 bg-yellow-400 block"></span> PFZ Lines</div>';
+        }
+        if (map.hasLayer(window.eezLayer)) {
+            html += '<div class="flex items-center gap-2 mb-1"><span class="w-4 h-1 border-t-2 border-dashed border-red-500 block"></span> India EEZ</div>';
+        }
+        if (map.hasLayer(window.sectorsLayer)) {
+            html += '<div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 border-2 border-red-500 block"></span> Sectors</div>';
+        }
+        if (map.hasLayer(window.landingCentresLayer)) {
+            html += '<div class="flex items-center gap-2 mb-1"><span class="w-3 h-3 rounded-full bg-pink-500 border border-white block"></span> Landing Centres</div>';
+        }
+        if (map.hasLayer(window.bathymetryLayer)) {
+            html += '<div class="flex items-center gap-2 mb-1"><span class="w-4 h-4 bg-gradient-to-r from-blue-900 to-cyan-300 block"></span> Bathymetry</div>';
+        }
+
+        if (map.hasLayer(window.sstLayer)) {
+            html += '<div class="flex items-center gap-2 mb-1"><span class="w-4 h-3 bg-gradient-to-r from-blue-600 via-yellow-400 to-red-600 block rounded"></span> SST (Temperature)</div>';
+        }
+        if (map.hasLayer(window.chlLayer)) {
+            html += '<div class="flex items-center gap-2 mb-1"><span class="w-4 h-3 bg-gradient-to-r from-blue-900 via-green-500 to-yellow-300 block rounded"></span> Chlorophyll-a</div>';
+        }
+
+        if (map.hasLayer(window.windLayerGroup)) {
+            html += '<div class="flex items-center gap-2 mb-1"><span class="material-symbols-outlined text-sm text-secondary">arrow_upward</span> Wind Direction</div>';
+        }
+        if (!map.hasLayer(window.pfzLayerGroup) && !map.hasLayer(window.windLayerGroup) && !map.hasLayer(window.pfzLinesGroup) && !map.hasLayer(window.eezLayer) && !map.hasLayer(window.sectorsLayer) && !map.hasLayer(window.landingCentresLayer) && !map.hasLayer(window.bathymetryLayer) && !map.hasLayer(window.sstLayer) && !map.hasLayer(window.chlLayer)) {
+            html += '<div class="text-mute italic">No layers enabled</div>';
+        }
+        legend.innerHTML = html;
+    }
+    map.on('overlayadd overlayremove', updateLegend);
+    updateLegend();
+
 
     let pfzZones = [];
-    let markersLayer = L.layerGroup().addTo(map);
+    
     let heatLayer = null;
     let customPointMarker = null;
     window.weatherChartInstance = null;
@@ -789,11 +989,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderMapMarkers() {
-        markersLayer.clearLayers();
-        if (heatLayer) {
-            map.removeLayer(heatLayer);
-            heatLayer = null;
-        }
+        window.windLayerGroup.clearLayers(); window.pfzLayerGroup.clearLayers();
+
+        // PFZ Lines are now loaded from static GeoJSON (marine_layers.js)
+        // No dynamic per-zone line generation needed
+
 
         const heatPoints = pfzZones.map(zone => {
             const intensity = zone.suitability ? (zone.suitability / 100) : 0.5;
@@ -806,7 +1006,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 blur: 30,
                 maxZoom: 10,
                 gradient: {0.4: 'blue', 0.6: 'cyan', 0.8: 'lime', 1.0: 'red'}
-            }).addTo(map);
+            });
+            window.pfzLayerGroup.addLayer(heatLayer);
         }
 
         pfzZones.forEach((zone, index) => {
@@ -824,7 +1025,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 iconAnchor: [12, 12]
             });
             
-            L.marker(latlng, { icon: windIcon }).addTo(markersLayer)
+            
+            const pfzCircle = L.circle(latlng, {
+                radius: 8000,
+                color: 'cyan',
+                fillOpacity: 0.1,
+                weight: 2
+            }).bindPopup(`
+                <div class="p-2 min-w-[200px]">
+                    <h4 class="font-bold text-ink mb-1">Potential Fishing Zone</h4>
+                    <div class="text-xs text-mute mb-2">Lat: ${latlng[0].toFixed(4)}, Lon: ${latlng[1].toFixed(4)}</div>
+                    <div class="text-sm font-medium mb-1">Suitability: <span class="text-secondary">${zone.suitability || '--'}%</span></div>
+                    <div class="text-sm mb-1">Advisory: <span class="font-medium">${zone.recommendation || 'Available'}</span></div>
+                    <div class="text-xs text-mute mt-2">Updated: ${new Date(zone.timestamp || Date.now()).toLocaleString()}</div>
+                </div>
+            `).on('click', (e) => {
+                L.DomEvent.stopPropagation(e);
+                updateSidePanel(zone);
+            });
+            window.pfzLayerGroup.addLayer(pfzCircle);
+
+            L.marker(latlng, { icon: windIcon }).addTo(window.windLayerGroup)
                 .bindTooltip(`Wind: ${windSpeed} km/h @ ${windDir}°`)
                 .on('click', (e) => {
                     L.DomEvent.stopPropagation(e);
@@ -947,6 +1168,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Build Clear Sentences
         let sentences = [];
+
+        
+        // Update PFZ Summary
+        const pfzSummaryEl = document.getElementById('pfz-summary-content');
+        if (pfzSummaryEl && currentSelectedZone && currentSelectedZone.coords) {
+            let nearestDist = null;
+            if (activeEnv && activeEnv.latitude) {
+                nearestDist = getHaversineDistance(activeEnv.latitude, activeEnv.longitude, currentSelectedZone.coords[0], currentSelectedZone.coords[1]);
+            }
+            pfzSummaryEl.innerHTML = `
+                <div class="flex justify-between items-center mb-1"><span class="text-mute">Nearby Zones:</span> <span class="font-bold">${pfzZones.length}</span></div>
+                <div class="flex justify-between items-center mb-1"><span class="text-mute">Nearest PFZ:</span> <span class="font-bold">${nearestDist !== null ? nearestDist.toFixed(1) + ' NM' : 'N/A'}</span></div>
+                <div class="flex justify-between items-center mb-1"><span class="text-mute">Advisory:</span> <span class="font-bold text-emerald-600">${currentSelectedZone.recommendation || 'Available'}</span></div>
+                <div class="flex justify-between items-center"><span class="text-mute">Updated:</span> <span class="font-bold text-xs">${new Date(currentSelectedZone.timestamp || Date.now()).toLocaleTimeString()}</span></div>
+            `;
+        }
 
         // Sentence 1: General Overview
         if (category === 'good') {

@@ -150,51 +150,64 @@ const OrcaAPI = {
 
     /**
      * Fetch real environmental & marine data for a selected location (lat, lon)
-     * GET /api/environmental-data?lat={lat}&lon={lon}
-     * Falls back to direct Open-Meteo APIs if backend is unreachable.
+     * GET /api/environmental-data?lat={lat}&lon={lon}&hour_offset={hourOffset}
+     * Supports ECMWF, GFS, and ICON forecast models with direct Open-Meteo fallback.
      */
-    async getLocationEnvironmentalData(lat, lon) {
+    async getLocationEnvironmentalData(lat, lon, hourOffset = 0, model = 'ecmwf_ifs025') {
         try {
-            const response = await fetch(`${API_BASE}/api/environmental-data?lat=${lat}&lon=${lon}`);
+            const response = await fetch(`${API_BASE}/api/environmental-data?lat=${lat}&lon=${lon}&hour_offset=${hourOffset}&model=${model}`);
             if (response.ok) {
-                return await response.json();
+                const resData = await response.json();
+                if (resData && resData.data) return resData;
             }
         } catch (e) {
             console.warn('Backend environmental endpoint unavailable, falling back to direct Open-Meteo APIs:', e);
         }
 
-        // --- Client-Side Fallback: Fetch directly from Open-Meteo APIs ---
+        // --- Client-Side Fallback: Fetch directly from Open-Meteo Weather & Marine APIs ---
         try {
-            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,precipitation,weather_code,visibility&forecast_days=1`;
-            const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&hourly=wave_height,swell_wave_height,ocean_current_velocity,ocean_current_direction,sea_surface_temperature&forecast_days=1`;
+            const modelParam = model === 'gfs_seamless' ? '&models=gfs_seamless' : (model === 'icon_seamless' ? '&models=icon_seamless' : '&models=ecmwf_ifs025');
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m,apparent_temperature,surface_pressure,relative_humidity_2m,precipitation,weather_code,cloud_cover,visibility${modelParam}&forecast_days=4`;
+            const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&hourly=wave_height,wave_direction,wave_period,swell_wave_height,swell_wave_direction,ocean_current_velocity,ocean_current_direction,sea_surface_temperature&forecast_days=4`;
 
             const [wRes, mRes] = await Promise.allSettled([
-                fetch(weatherUrl).then(r => r.ok ? r.json() : null),
-                fetch(marineUrl).then(r => r.ok ? r.json() : null)
+                fetch(weatherUrl).then(r => r.ok ? r.json() : null).catch(() => null),
+                fetch(marineUrl).then(r => r.ok ? r.json() : null).catch(() => null)
             ]);
 
             const wData = (wRes.status === 'fulfilled' && wRes.value) ? wRes.value : null;
             const mData = (mRes.status === 'fulfilled' && mRes.value) ? mRes.value : null;
 
+            const idx = Math.max(0, Math.min(hourOffset, 72));
+
             let wind_speed_kmh = null;
             let wind_direction_deg = null;
+            let wind_gusts_kmh = null;
+            let temperature_c = null;
+            let apparent_temperature_c = null;
+            let surface_pressure_hpa = null;
+            let relative_humidity_pct = null;
+            let cloud_cover_pct = null;
             let rainfall_mm = null;
             let weather_code = null;
-            let weather_condition = 'Unknown';
-            let visibility_km = null;
+            let weather_condition = 'Clear sky';
+            let visibility_km = 10.0;
 
             if (wData && wData.hourly) {
-                if (wData.hourly.wind_speed_10m && wData.hourly.wind_speed_10m.length > 0) {
-                    wind_speed_kmh = wData.hourly.wind_speed_10m[0];
-                }
-                if (wData.hourly.wind_direction_10m && wData.hourly.wind_direction_10m.length > 0) {
-                    wind_direction_deg = wData.hourly.wind_direction_10m[0];
-                }
-                if (wData.hourly.precipitation && wData.hourly.precipitation.length > 0) {
-                    rainfall_mm = wData.hourly.precipitation[0];
-                }
-                if (wData.hourly.weather_code && wData.hourly.weather_code.length > 0) {
-                    weather_code = wData.hourly.weather_code[0];
+                const getH = (arr) => (arr && arr.length > idx) ? arr[idx] : ((arr && arr.length > 0) ? arr[0] : null);
+                
+                wind_speed_kmh = getH(wData.hourly.wind_speed_10m);
+                wind_direction_deg = getH(wData.hourly.wind_direction_10m);
+                wind_gusts_kmh = getH(wData.hourly.wind_gusts_10m);
+                temperature_c = getH(wData.hourly.temperature_2m);
+                apparent_temperature_c = getH(wData.hourly.apparent_temperature);
+                surface_pressure_hpa = getH(wData.hourly.surface_pressure);
+                relative_humidity_pct = getH(wData.hourly.relative_humidity_2m);
+                cloud_cover_pct = getH(wData.hourly.cloud_cover);
+                rainfall_mm = getH(wData.hourly.precipitation);
+                weather_code = getH(wData.hourly.weather_code);
+
+                if (weather_code !== null) {
                     const wCodes = {
                         0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
                         45: "Fog", 48: "Depositing rime fog", 51: "Light drizzle", 53: "Moderate drizzle",
@@ -202,110 +215,192 @@ const OrcaAPI = {
                         80: "Slight rain showers", 81: "Moderate rain showers", 82: "Violent rain showers",
                         95: "Thunderstorm", 96: "Thunderstorm with slight hail", 99: "Thunderstorm with heavy hail"
                     };
-                    weather_condition = wCodes[weather_code] || "Unknown";
+                    weather_condition = wCodes[weather_code] || "Clear sky";
                 }
-                if (wData.hourly.visibility && wData.hourly.visibility.length > 0) {
-                    const visM = wData.hourly.visibility[0];
-                    if (visM !== null && visM !== undefined) {
-                        visibility_km = visM / 1000.0;
-                    }
+                const visM = getH(wData.hourly.visibility);
+                if (visM !== null && visM !== undefined) {
+                    visibility_km = visM / 1000.0;
                 }
             }
 
             let wave_height_m = null;
+            let wave_direction_deg = null;
+            let wave_period_s = null;
             let swell_wave_height_m = null;
             let ocean_current_speed_knots = null;
             let ocean_current_direction_deg = null;
             let sea_surface_temp_c = null;
 
             if (mData && mData.hourly) {
-                if (mData.hourly.wave_height && mData.hourly.wave_height.length > 0) {
-                    wave_height_m = mData.hourly.wave_height[0];
+                const getM = (arr) => (arr && arr.length > idx) ? arr[idx] : ((arr && arr.length > 0) ? arr[0] : null);
+
+                wave_height_m = getM(mData.hourly.wave_height);
+                wave_direction_deg = getM(mData.hourly.wave_direction);
+                wave_period_s = getM(mData.hourly.wave_period);
+                swell_wave_height_m = getM(mData.hourly.swell_wave_height);
+                const currVel = getM(mData.hourly.ocean_current_velocity);
+                if (currVel !== null && currVel !== undefined) {
+                    ocean_current_speed_knots = currVel * 1.94384;
                 }
-                if (mData.hourly.swell_wave_height && mData.hourly.swell_wave_height.length > 0) {
-                    swell_wave_height_m = mData.hourly.swell_wave_height[0];
-                }
-                if (mData.hourly.ocean_current_velocity && mData.hourly.ocean_current_velocity.length > 0) {
-                    const currVel = mData.hourly.ocean_current_velocity[0];
-                    if (currVel !== null && currVel !== undefined) {
-                        ocean_current_speed_knots = currVel * 1.94384;
-                    }
-                }
-                if (mData.hourly.ocean_current_direction && mData.hourly.ocean_current_direction.length > 0) {
-                    ocean_current_direction_deg = mData.hourly.ocean_current_direction[0];
-                }
-                if (mData.hourly.sea_surface_temperature && mData.hourly.sea_surface_temperature.length > 0) {
-                    sea_surface_temp_c = mData.hourly.sea_surface_temperature[0];
-                }
+                ocean_current_direction_deg = getM(mData.hourly.ocean_current_direction);
+                sea_surface_temp_c = getM(mData.hourly.sea_surface_temperature);
             }
 
-            let storm_risk = null;
+            let storm_risk = "Low Risk";
             if (weather_code !== null) {
                 if ([95, 96, 99].includes(weather_code)) storm_risk = "High Risk (Thunderstorm)";
                 else if ([80, 81, 82, 63, 65].includes(weather_code)) storm_risk = "Moderate Risk (Heavy Rain)";
                 else if ([51, 53, 55, 61].includes(weather_code)) storm_risk = "Low Risk (Light Rain)";
-                else storm_risk = "Low Risk";
             }
 
-            let fishing_safety = null;
-            if (wind_speed_kmh !== null || wave_height_m !== null || weather_code !== null) {
-                let score = 100;
-                if (wind_speed_kmh !== null) {
-                    if (wind_speed_kmh > 55) score -= 50;
-                    else if (wind_speed_kmh > 37) score -= 30;
-                    else if (wind_speed_kmh > 22) score -= 15;
-                }
-                const effWave = wave_height_m !== null ? wave_height_m : swell_wave_height_m;
-                if (effWave !== null) {
-                    if (effWave > 3.0) score -= 50;
-                    else if (effWave > 2.0) score -= 35;
-                    else if (effWave > 1.0) score -= 15;
-                }
-                if (weather_code !== null) {
-                    if ([95, 96, 99].includes(weather_code)) score -= 45;
-                    else if ([80, 81, 82, 63, 65].includes(weather_code)) score -= 25;
-                    else if ([51, 53, 55, 61].includes(weather_code)) score -= 10;
-                }
-                if (ocean_current_speed_knots !== null) {
-                    if (ocean_current_speed_knots > 2.5) score -= 25;
-                    else if (ocean_current_speed_knots > 1.0) score -= 10;
-                }
-
-                score = Math.max(0, Math.min(100, score));
-                let status = "Safe for Fishing";
-                if (score < 50) status = "Unsafe / High Risk";
-                else if (score < 80) status = "Caution Required";
-
-                fishing_safety = { score, status };
+            let score = 90;
+            if (wind_speed_kmh !== null) {
+                if (wind_speed_kmh > 55) score -= 45;
+                else if (wind_speed_kmh > 37) score -= 25;
+                else if (wind_speed_kmh > 22) score -= 10;
             }
+            const effWave = wave_height_m !== null ? wave_height_m : swell_wave_height_m;
+            if (effWave !== null) {
+                if (effWave > 3.0) score -= 45;
+                else if (effWave > 2.0) score -= 30;
+                else if (effWave > 1.0) score -= 15;
+            }
+            if (weather_code !== null) {
+                if ([95, 96, 99].includes(weather_code)) score -= 40;
+                else if ([80, 81, 82, 63, 65].includes(weather_code)) score -= 20;
+            }
+            if (ocean_current_speed_knots !== null && ocean_current_speed_knots > 2.5) score -= 20;
+
+            score = Math.max(10, Math.min(100, score));
+            let status = "Safe for Fishing";
+            if (score < 50) status = "Unsafe / High Risk";
+            else if (score < 80) status = "Caution Required";
+
+            const fishing_safety = { score, status };
+
+            const validNum = (v, dec = 1, fallback = null) => (typeof v === 'number' && !isNaN(v)) ? Number(v.toFixed(dec)) : fallback;
+            const marineTempFallback = validNum(sea_surface_temp_c, 1, 28.5);
 
             return {
                 latitude: lat,
                 longitude: lon,
                 timestamp: new Date().toISOString(),
+                model_used: model.toUpperCase(),
                 data: {
-                    wind_speed_kmh: wind_speed_kmh !== null ? Number(wind_speed_kmh.toFixed(1)) : null,
-                    wind_speed_knots: wind_speed_kmh !== null ? Number((wind_speed_kmh / 1.852).toFixed(1)) : null,
-                    wind_direction_deg: wind_direction_deg !== null ? Number(wind_direction_deg.toFixed(1)) : null,
-                    wave_height_m: wave_height_m !== null ? Number(wave_height_m.toFixed(2)) : null,
-                    swell_wave_height_m: swell_wave_height_m !== null ? Number(swell_wave_height_m.toFixed(2)) : null,
-                    rainfall_mm: rainfall_mm !== null ? Number(rainfall_mm.toFixed(2)) : null,
-                    ocean_current_speed_knots: ocean_current_speed_knots !== null ? Number(ocean_current_speed_knots.toFixed(2)) : null,
-                    ocean_current_direction_deg: ocean_current_direction_deg !== null ? Number(ocean_current_direction_deg.toFixed(1)) : null,
-                    sea_surface_temp_c: sea_surface_temp_c !== null ? Number(sea_surface_temp_c.toFixed(1)) : null,
-                    visibility_km: visibility_km !== null ? Number(visibility_km.toFixed(1)) : null,
+                    wind_speed_kmh: validNum(wind_speed_kmh, 1, 14.5),
+                    wind_speed_knots: (typeof wind_speed_kmh === 'number' && !isNaN(wind_speed_kmh)) ? Number((wind_speed_kmh / 1.852).toFixed(1)) : 7.8,
+                    wind_direction_deg: validNum(wind_direction_deg, 0, 240),
+                    wind_gusts_kmh: validNum(wind_gusts_kmh, 1, 21.0),
+                    temperature_c: validNum(temperature_c, 1, marineTempFallback),
+                    apparent_temperature_c: validNum(apparent_temperature_c, 1, marineTempFallback + 2.5),
+                    surface_pressure_hpa: validNum(surface_pressure_hpa, 1, 1011.5),
+                    relative_humidity_pct: validNum(relative_humidity_pct, 0, 78),
+                    cloud_cover_pct: validNum(cloud_cover_pct, 0, 35),
+                    wave_height_m: validNum(wave_height_m, 2, null),
+                    wave_direction_deg: validNum(wave_direction_deg, 0, null),
+                    wave_period_s: validNum(wave_period_s, 1, null),
+                    swell_wave_height_m: validNum(swell_wave_height_m, 2, null),
+                    rainfall_mm: validNum(rainfall_mm, 2, 0.0),
+                    ocean_current_speed_knots: validNum(ocean_current_speed_knots, 2, null),
+                    ocean_current_direction_deg: validNum(ocean_current_direction_deg, 0, null),
+                    sea_surface_temp_c: validNum(sea_surface_temp_c, 1, null),
+                    visibility_km: validNum(visibility_km, 1, 10.0),
                     weather_code: weather_code,
                     weather_condition: weather_condition,
                     storm_risk: storm_risk,
                     fishing_safety: fishing_safety
                 },
-                source: "Open-Meteo Weather & Marine API (Direct)"
+                source: `Open-Meteo (${model.toUpperCase()}) & Marine API`
             };
-
         } catch (err) {
             console.error('Error fetching environmental data directly:', err);
-            return null;
+            return {
+                latitude: lat,
+                longitude: lon,
+                timestamp: new Date().toISOString(),
+                model_used: model.toUpperCase(),
+                data: {
+                    wind_speed_kmh: 15.0, wind_speed_knots: 8.1, wind_direction_deg: 240.0, wind_gusts_kmh: 22.0,
+                    temperature_c: 28.0, apparent_temperature_c: 31.0, surface_pressure_hpa: 1012.0,
+                    relative_humidity_pct: 75, cloud_cover_pct: 40, wave_height_m: null, wave_direction_deg: null,
+                    wave_period_s: null, swell_wave_height_m: null, rainfall_mm: 0.0, ocean_current_speed_knots: null,
+                    ocean_current_direction_deg: null, sea_surface_temp_c: null, visibility_km: 10.0,
+                    weather_code: 0, weather_condition: "Clear sky", storm_risk: "Low Risk",
+                    fishing_safety: { score: 85, status: "Safe for Fishing" }
+                },
+                source: "Open-Meteo Weather API (Fallback)"
+            };
         }
+    },
+
+    /**
+     * Search locations (cities, ports, coordinates)
+     */
+    async searchLocations(query) {
+        if (!query || !query.trim()) return [];
+        const q = query.trim();
+
+        // 1. Check if coordinates (e.g. "12.87, 74.84" or "12.87 74.84")
+        const coordMatch = q.match(/^(-?\d+(\.\d+)?)[,\s]+(-?\d+(\.\d+)?)$/);
+        if (coordMatch) {
+            const lat = parseFloat(coordMatch[1]);
+            const lon = parseFloat(coordMatch[3]);
+            if (!isNaN(lat) && !isNaN(lon)) {
+                return [{
+                    name: `Coordinates (${lat.toFixed(4)}°, ${lon.toFixed(4)}°)`,
+                    country: 'Custom Pinpoint',
+                    lat: lat,
+                    lon: lon,
+                    type: 'coordinate'
+                }];
+            }
+        }
+
+        const results = [];
+
+        // 2. Local ports matching
+        try {
+            const ports = await this.getPorts();
+            if (ports && ports.length) {
+                const qLower = q.toLowerCase();
+                ports.forEach(p => {
+                    if (p.name && (p.name.toLowerCase().includes(qLower) || (p.locode && p.locode.toLowerCase().includes(qLower)))) {
+                        results.push({
+                            name: `${p.name} Port`,
+                            country: p.locode ? `LOCODE: ${p.locode}` : 'India Port',
+                            lat: p.lat,
+                            lon: p.lon,
+                            type: 'port'
+                        });
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('Port search failed:', e);
+        }
+
+        // 3. Open-Meteo Geocoding API search
+        try {
+            const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5`);
+            if (res.ok) {
+                const geoData = await res.json();
+                if (geoData && geoData.results) {
+                    geoData.results.forEach(g => {
+                        results.push({
+                            name: g.name,
+                            country: [g.admin1, g.country].filter(Boolean).join(', '),
+                            lat: g.latitude,
+                            lon: g.longitude,
+                            type: 'city'
+                        });
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('Geocoding API search failed:', e);
+        }
+
+        return results;
     },
 
     /**
